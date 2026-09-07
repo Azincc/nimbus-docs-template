@@ -7,6 +7,7 @@
 ## 从这里开始
 
 - [快速入门](./getting-started.md)：运行示例，了解构建和部署所需的配置。
+- [修改部署配置](./deployment/configuration.md)：通过 GitHub 或 Cloudflare 修改文档源和站点地址，处理构建变量区域为空的情况。
 - [编写文档](./writing-docs.md)：添加页面、组织目录、引用图片和链接。
 - [站点配置](./site-config.md)：修改站点名称、导航、主题和品牌资源。
 - [私有仓库部署](./deployment/private-repository.md)：创建只读 Token，通过 Cloudflare Build Secret 读取私有文档。

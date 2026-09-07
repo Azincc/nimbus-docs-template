@@ -35,6 +35,8 @@
 
 这些公开默认值位于 `wrangler.jsonc` 的 `vars`，无需逐项重复填写。构建时同名 **Build variables** 优先；直接修改你自己的模板仓库里的默认值也会用于后续构建。`DOCS_CONFIG_PATH` 和 `SITE_URL` 可显式设为空字符串，分别使用通用站点配置和不指定正式站点地址。
 
+部署后需要修改参数，或控制台显示“未配置构建变量或密钥”时，参照[修改部署配置](docs/deployment/configuration.md)，通过 GitHub 编辑配置文件或添加 Cloudflare 构建变量，再重新构建。
+
 克隆模板后，默认仍读取上述公开仓库。要发布自己副本里的文档，将 `DOCS_REPO` 改为自己的仓库地址，保留 `DOCS_PATH=docs` 和 `DOCS_CONFIG_PATH=docs/site.json`。如果换用其他结构的文档仓库，请同时调整目录和配置文件路径；没有站点 JSON 时将 `DOCS_CONFIG_PATH` 置空。
 
 示例包含首页、[快速开始](docs/getting-started.md)、[编写文档](docs/writing-docs.md)、[站点配置](docs/site-config.md)、[私有仓库部署](docs/deployment/private-repository.md)、[原文档仓库构建挂钩](docs/deployment/deploy-hook.md)，以及被文档和站点配置共同引用的品牌图片。`maintenance/` 保存平台研究和验证记录，不进入示例站点。

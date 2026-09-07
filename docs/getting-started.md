@@ -39,6 +39,8 @@ pnpm dev
 
 如果文档位于私有仓库，请按[私有仓库部署](./deployment/private-repository.md)完成 Token 授权、构建变量和 Secret 设置，再执行首次构建。
 
+部署后需要更换参数，或看到“未配置构建变量或密钥”时，按[修改部署配置](./deployment/configuration.md)在 GitHub 编辑 `wrangler.jsonc`，也可通过 Cloudflare 构建变量覆盖默认值。
+
 ## 构建与预览
 
 ```sh
