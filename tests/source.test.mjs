@@ -10,6 +10,8 @@ const defaults = {
   DOCS_BRANCH: 'main',
   DOCS_PATH: 'docs',
   DOCS_CONFIG_PATH: 'docs/site.json',
+  SITE_LOGO: '',
+  SITE_FAVICON: '',
 };
 
 test('build variables override public defaults and the token comes only from the environment', () => {
@@ -17,10 +19,36 @@ test('build variables override public defaults and the token comes only from the
   assert.deepEqual(settings, {
     repo: 'https://github.com/Azincc/nimbus-docs-template.git',
     branch: 'docs/update', docsPath: 'docs', configPath: undefined,
-    siteUrl: 'https://docs.example.com', token: 'test-build-secret',
+    siteUrl: 'https://docs.example.com', siteLogo: undefined, siteFavicon: undefined, token: 'test-build-secret',
   });
   assert.equal(readSourceSettings({}, defaults).token, undefined);
   assert.throws(() => readSourceSettings({}, { ...defaults, DOCS_TOKEN: 'must-not-be-public' }), /Workers Builds secret/);
+});
+
+test('branding build variables override public defaults and blank values defer to site JSON', () => {
+  const brandingDefaults = { ...defaults, SITE_LOGO: 'https://cdn.example.com/logo.svg', SITE_FAVICON: 'brand/favicon.svg' };
+  const inherited = readSourceSettings({}, brandingDefaults);
+  assert.equal(inherited.siteLogo, 'https://cdn.example.com/logo.svg');
+  assert.equal(inherited.siteFavicon, 'brand/favicon.svg');
+  const overridden = readSourceSettings({ SITE_LOGO: 'brand/logo.svg', SITE_FAVICON: 'http://cdn.example.com/favicon.svg' }, brandingDefaults);
+  assert.equal(overridden.siteLogo, 'brand/logo.svg');
+  assert.equal(overridden.siteFavicon, 'http://cdn.example.com/favicon.svg');
+  const cleared = readSourceSettings({ SITE_LOGO: ' \t ', SITE_FAVICON: '' }, brandingDefaults);
+  assert.equal(cleared.siteLogo, undefined);
+  assert.equal(cleared.siteFavicon, undefined);
+});
+
+test('branding settings reject credential URLs, other protocols and paths outside the repository', () => {
+  for (const key of ['SITE_LOGO', 'SITE_FAVICON']) {
+    for (const value of [
+      'https://secret-value@cdn.example.com/logo.svg',
+      'ftp://cdn.example.com/logo.svg',
+      'data:image/svg+xml,svg',
+      '../outside.svg', '/brand/logo.svg', 'C:\\brand\\logo.svg', '//cdn.example.com/logo.svg',
+    ]) {
+      assert.throws(() => readSourceSettings({ [key]: value }, defaults), (error) => error.message.includes(key) && !error.message.includes('secret-value'));
+    }
+  }
 });
 
 test('source settings reject credentials and unsafe locations without echoing secrets', () => {

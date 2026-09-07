@@ -63,12 +63,18 @@ export async function prepareSiteConfig({ root, settings, content }) {
     validateSiteConfig(config);
   }
   const brand = { ...config.brand };
+  const overrides = { logo: settings.siteLogo, favicon: settings.siteFavicon };
+  for (const [key, value] of Object.entries(overrides)) {
+    if (value) brand[key] = value;
+  }
   for (const key of ['logo', 'favicon', 'socialImage']) {
     if (!brand[key]) continue;
-    if (/^https?:\/\//i.test(brand[key])) brand[key] = httpUrl(brand[key], `brand.${key}`);
+    const name = overrides[key] ? `SITE_${key.toUpperCase()}` : `brand.${key}`;
+    if (/^https?:\/\//i.test(brand[key])) brand[key] = httpUrl(brand[key], name);
     else {
-      if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(brand[key])) throw new Error(`brand.${key} must be an HTTP(S) URL or a local repository asset.`);
-      brand[key] = await content.copyAsset(brand[key], settings.configPath);
+      if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(brand[key])) throw new Error(`${name} must be an HTTP(S) URL or a local repository asset.`);
+      // Build variables use repository-relative paths; JSON paths stay relative to that file.
+      brand[key] = await content.copyAsset(brand[key], overrides[key] ? undefined : settings.configPath);
     }
   }
   const routes = new Set(content.pages.filter(p => !p.data.draft).map(p => p.route.replace(/\/$/, '') || '/'));

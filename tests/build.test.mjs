@@ -71,15 +71,18 @@ test('artifact digests detect edits, path changes, and deleted files', async (t)
 test('Wrangler public defaults can be overridden by Workers Builds variables and its build secret', async () => {
   assert.deepEqual(await loadSettings({}), {
     repo: 'https://github.com/Azincc/nimbus-docs-template.git', branch: 'main',
-    docsPath: 'docs', configPath: 'docs/site.json', siteUrl: 'https://nimbus.az1n.com', token: undefined,
+    docsPath: 'docs', configPath: 'docs/site.json', siteUrl: 'https://nimbus.az1n.com',
+    siteLogo: undefined, siteFavicon: undefined, token: undefined,
   });
   assert.deepEqual(await loadSettings({
     DOCS_REPO: 'https://github.com/Azincc/nimbus-docs-template.git', DOCS_BRANCH: 'docs/current',
     DOCS_PATH: 'knowledge', DOCS_CONFIG_PATH: 'website.json', SITE_URL: 'https://docs.example.com/',
+    SITE_LOGO: 'https://cdn.example.com/logo.svg', SITE_FAVICON: 'brand/favicon.svg',
     DOCS_TOKEN: 'private-repository-build-secret',
   }), {
     repo: 'https://github.com/Azincc/nimbus-docs-template.git', branch: 'docs/current',
     docsPath: 'knowledge', configPath: 'website.json', siteUrl: 'https://docs.example.com',
+    siteLogo: 'https://cdn.example.com/logo.svg', siteFavicon: 'brand/favicon.svg',
     token: 'private-repository-build-secret',
   });
 });

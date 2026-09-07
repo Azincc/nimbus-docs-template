@@ -21,6 +21,9 @@ docs/
 ├── deployment/
 │   ├── private-repository.md
 │   └── deploy-hook.md
+├── markdown测试.md
+├── markdown测试/
+│   └── markdown显示测试.md
 ├── site.json
 └── assets/
     └── nimbus-mark.svg
@@ -34,8 +37,12 @@ docs/
 | `docs/site-config.md` | `/site-config` |
 | `docs/deployment/private-repository.md` | `/deployment/private-repository` |
 | `docs/deployment/deploy-hook.md` | `/deployment/deploy-hook` |
+| `docs/markdown测试.md` | `/markdown测试` |
+| `docs/markdown测试/markdown显示测试.md` | `/markdown测试/markdown显示测试` |
 
 子目录也可以添加 `README.md` 或 `index.md` 作为目录首页。同一目录只保留其中一个，避免两个文件竞争同一路由。普通文件按照路径生成小写 slug。
+
+常见语法的实际渲染效果见 [markdown显示测试](./markdown测试/markdown显示测试.md)。
 
 ## 标题和侧栏
 
@@ -87,7 +94,7 @@ sidebar:
 
 模板会复制被引用的本地资源并重写地址。图片可以放在原仓库的其他普通目录中，但路径不能越出仓库；隐藏文件、隐藏目录和符号链接不会被发布。
 
-品牌 Logo 和 favicon 的路径以站点 JSON 文件为基准，具体见[品牌资源](./site-config.md#品牌资源)。
+品牌 Logo 和 favicon 也可以通过可选的普通构建变量 `SITE_LOGO`、`SITE_FAVICON` 设置：接受 HTTP(S) 图片 URL，或相对 `DOCS_REPO` 文档源仓库根目录的路径，例如 `docs/assets/nimbus-mark.svg`，不依赖站点 JSON 的位置。JSON 中的 `brand.logo`、`brand.favicon` 本地路径仍以 JSON 文件为基准。构建变量的最终非空值覆盖对应 JSON 字段，最终为空则继承 JSON；在 Cloudflare Builds 区域保存变量后重新构建生效。具体见[品牌资源](./site-config.md#品牌资源)。
 
 ## 发布更新
 

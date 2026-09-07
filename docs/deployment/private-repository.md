@@ -57,7 +57,7 @@ Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于�
 
 ## 4. 配置构建变量和 Secret
 
-打开目标 Worker 的 **Settings → Builds → Build variables and secrets**，按下表配置。前五项是非秘密变量，`DOCS_TOKEN` 单独选择 **Secret** 类型。
+打开目标 Worker 的 **Settings → Builds → Build variables and secrets**，按下表配置。文档源与站点参数使用普通变量，`DOCS_TOKEN` 单独选择 **Secret** 类型；Logo 和 favicon 是可选项。
 
 | 名称 | 类型 | 填写内容 |
 | --- | --- | --- |
@@ -66,13 +66,17 @@ Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于�
 | `DOCS_PATH` | Variable | 相对私有仓库根目录的文档目录；上述结构为 `docs`，也是默认值 |
 | `DOCS_CONFIG_PATH` | Variable | 有配置文件时填 `docs/site.json` 或实际路径；没有 JSON 文件时显式置空 |
 | `SITE_URL` | Variable | 默认 `https://nimbus.az1n.com`；可覆盖为自己站点包含 `https://` 的实际地址，也可显式置空 |
+| `SITE_LOGO` | Variable，可选 | Logo 的 HTTP(S) 图片 URL 或相对私有文档源仓库根目录的路径，例如 `docs/assets/nimbus-mark.svg`；默认空 |
+| `SITE_FAVICON` | Variable，可选 | favicon 的 HTTP(S) 图片 URL 或相对私有文档源仓库根目录的路径，例如 `docs/assets/nimbus-mark.svg`；默认空 |
 | `DOCS_TOKEN` | Secret | 上一步生成且已获得所需组织批准的只读 GitHub Token |
 
 未提供同名构建变量时，模板会读取 `wrangler.jsonc` 中的公开默认值，因此无需重复填写仍适用的值。`DOCS_REPO` 必须覆盖为你的私有仓库地址，否则仍会读取公开示例。
 
+`SITE_LOGO` 和 `SITE_FAVICON` 的最终非空值分别覆盖 JSON 的 `brand.logo` 和 `brand.favicon`，最终为空则继承 JSON。变量路径以 `DOCS_REPO` 仓库根目录为基准，不依赖站点 JSON 是否存在或放在哪里；JSON 内原有本地资源仍相对 JSON 文件。只读 Token 同时允许构建读取这些仓库图片，无需为图片添加另一份凭据。
+
 `SITE_URL` 不会自动绑定域名。使用自己的正式地址前，先完成对应的域名配置；暂时置空仍可浏览站点，但不生成依赖正式站点地址的 canonical、SEO 输出和 sitemap。
 
-这里的 **Build variables and secrets** 提供给构建进程。普通 **Settings → Variables & Secrets** 中的 Worker 运行时 Secret 不会自动变成构建 Secret，把 `DOCS_TOKEN` 只填在运行时区域无法满足文档拉取所需的认证。
+这里的 **Build variables and secrets** 提供给构建进程。普通 **Settings → Variables & Secrets** 中的 Worker 运行时变量和 Secret 不会自动提供给静态构建，把 `DOCS_TOKEN` 只填在运行时区域无法满足文档拉取所需的认证。Logo 和 favicon 的普通构建变量也需要保存后重新构建才能生效。
 
 保存后在构建记录中选择 **Retry build**。如果初始部署没有 Build Secret 入口，这就是在 Worker 创建后补齐配置并完成私有文档首次构建的步骤。后续更换文档源或 Token 仍修改这些变量和 Secret，构建命令、部署命令及根目录保持不变。
 

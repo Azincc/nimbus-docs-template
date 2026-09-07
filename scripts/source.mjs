@@ -48,6 +48,20 @@ function publicSiteUrl(value) {
   return url.origin;
 }
 
+function publicBrandAsset(value, key) {
+  if (!value) return undefined;
+  if (/^https?:\/\//i.test(value)) {
+    let url;
+    try { url = new URL(value); } catch { throw new Error(`${key} must be an HTTP(S) image URL or a relative repository asset path.`); }
+    if (url.username || url.password) throw new Error(`${key} must be an HTTP(S) URL without credentials.`);
+    return url.href;
+  }
+  if (/^(?:[a-z][a-z\d+.-]*:|\/\/|[?#])/i.test(value)) {
+    throw new Error(`${key} must be an HTTP(S) image URL or a relative repository asset path.`);
+  }
+  return repositoryPath(value, key);
+}
+
 function sourceToken(value) {
   if (value == null || value === '') return undefined;
   if (typeof value !== 'string' || /[\x00-\x1f\x7f]/.test(value)) {
@@ -71,6 +85,8 @@ export function readSourceSettings(env = process.env, defaults = {}) {
     docsPath: repositoryPath(setting(env, defaults, 'DOCS_PATH', 'docs') || 'docs', 'DOCS_PATH'),
     configPath: configPath ? repositoryPath(configPath, 'DOCS_CONFIG_PATH') : undefined,
     siteUrl: publicSiteUrl(setting(env, defaults, 'SITE_URL')),
+    siteLogo: publicBrandAsset(setting(env, defaults, 'SITE_LOGO'), 'SITE_LOGO'),
+    siteFavicon: publicBrandAsset(setting(env, defaults, 'SITE_FAVICON'), 'SITE_FAVICON'),
     token: sourceToken(env.DOCS_TOKEN),
   };
 }

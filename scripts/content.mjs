@@ -206,14 +206,14 @@ export async function prepareContent({ root, docsPath = ".", outputDir, assetsDi
   };
   const localTarget = (pathname, source) => pathname.startsWith("/")
     ? path.resolve(root, `.${pathname}`)
-    : path.resolve(path.dirname(absoluteSource(source)), pathname);
+    : path.resolve(source === undefined ? root : path.dirname(absoluteSource(source)), pathname);
   const copied = new Set();
   async function copyAsset(url, source) {
     if (!url || external(url) || url.startsWith("#") || url.startsWith("?")) return url;
     const { pathname, suffix } = splitReference(url);
     const filename = localTarget(pathname, source);
     const stat = await safeStat(root, filename);
-    if (!stat?.isFile()) throw new Error(`Missing local asset "${url}" referenced from ${source}`);
+    if (!stat?.isFile()) throw new Error(`Missing local asset "${url}" referenced from ${source ?? "repository root"}`);
     const relative = slash(path.relative(root, filename));
     if (!copied.has(relative)) {
       const destination = path.join(assetsDir, relative);

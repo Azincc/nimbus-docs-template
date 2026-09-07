@@ -6,7 +6,7 @@ sidebar:
   order: 3
 ---
 
-模板在构建时读取文档源仓库中的 JSON 配置，校验后应用到站点。它不加载文档源仓库的 `astro.config.*`，也不执行其中的 JavaScript 或 MDX。
+模板在构建时读取文档源仓库中的 JSON 配置，校验后应用到站点。Logo 和 favicon 也可以通过可选构建变量单独设置。模板不加载文档源仓库的 `astro.config.*`，也不执行其中的 JavaScript 或 MDX。
 
 ## 本站示例
 
@@ -77,6 +77,25 @@ sidebar:
 
 ## 品牌资源
 
+### 通过构建变量设置 Logo 和 favicon
+
+在 Cloudflare 的 **Worker → Settings → Builds → Build variables and secrets** 中添加普通变量，保存后重新构建：
+
+| 构建变量 | 默认值 | 覆盖的 JSON 字段 | 可填写的值 |
+| --- | --- | --- | --- |
+| `SITE_LOGO` | 空字符串 | `brand.logo` | HTTP(S) 图片 URL，或相对文档源仓库根目录的文件路径 |
+| `SITE_FAVICON` | 空字符串 | `brand.favicon` | HTTP(S) 图片 URL，或相对文档源仓库根目录的文件路径 |
+
+这两项均可省略。构建时先读取同名环境变量，未提供时读取 `wrangler.jsonc` 的默认值；最终非空值覆盖 JSON 对应品牌字段，最终为空则继承 JSON。设置 Logo 不会改变 favicon，反之亦然。
+
+显式空字符串也是有效的构建变量：即使 Wrangler 中配置了非空默认值，也会被这个空值覆盖，最终恢复 JSON 对应设置。删除构建变量则重新读取 Wrangler 默认值，与显式置空不同。
+
+例如，两项都填 `docs/assets/nimbus-mark.svg`，就使用 `DOCS_REPO` 仓库根目录下的该文件；也可以填 `https://example.com/brand/logo.svg` 或 `http://example.com/brand/favicon.png` 等图片 URL。变量的本地路径始终以**文档源仓库根目录**为基准，不依赖 `DOCS_PATH` 或 `DOCS_CONFIG_PATH`，没有站点 JSON 时也可以使用。
+
+这些是构建变量。普通 **Settings → Variables & Secrets** 中的运行时变量不会自动提供给静态构建，修改后也需要重新构建才会反映在页面上。
+
+### 在 JSON 中维护品牌配置
+
 | 字段 | 用途 |
 | --- | --- |
 | `brand.logo` | 站点品牌标识 |
@@ -84,7 +103,7 @@ sidebar:
 | `brand.favicon` | 浏览器图标 |
 | `brand.socialImage` | 默认分享图片 |
 
-图片可以使用完整 HTTPS URL，或相对站点 JSON 文件的本地路径。本示例中的 `./assets/nimbus-mark.svg` 以 `docs/site.json` 为基准，指向 `docs/assets/nimbus-mark.svg`，同一图片也用在[首页](./README.md)。
+JSON 中的图片可以使用完整 HTTPS URL，或相对站点 JSON 文件的本地路径。本示例中的 `./assets/nimbus-mark.svg` 以 `docs/site.json` 为基准，指向 `docs/assets/nimbus-mark.svg`，同一图片也用在[首页](./README.md)。这个路径基准与 `SITE_LOGO`、`SITE_FAVICON` 的仓库根目录基准不同。
 
 本地资源必须存在，解析后的路径必须处于源仓库内。模板只将被引用的资源复制到公开产物中。Markdown 图片路径则以引用它的 Markdown 文件为基准，见[图片和资源](./writing-docs.md#图片和资源)。
 
@@ -96,7 +115,7 @@ sidebar:
 
 ## 更新与凭据
 
-修改 `docs/site.json` 或品牌资源后，提交并推送到配置的文档源分支，然后重新触发构建。页脚和 `/_build.json` 记录实际读取的文档提交 SHA。
+修改 `docs/site.json` 或品牌资源后，提交并推送到配置的文档源分支，然后重新触发构建。仅修改 Cloudflare 中的 `SITE_LOGO`、`SITE_FAVICON` 时，保存变量后重新构建即可。页脚和 `/_build.json` 记录实际读取的文档提交 SHA；仅改变构建变量时该 SHA 可能保持不变。
 
 公开的 [nimbus-docs-template 示例仓库](https://github.com/Azincc/nimbus-docs-template.git) 不需要 Token。私有仓库的 `DOCS_TOKEN` 仅作为 Cloudflare Build Secret 提供给 Git fetch，不能放入站点 JSON、图片 URL 或其他公开字段。
 

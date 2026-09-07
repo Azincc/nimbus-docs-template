@@ -1,6 +1,6 @@
 ---
 title: 修改部署配置
-description: 部署后通过 GitHub 或 Cloudflare 修改文档仓库、分支、目录和站点地址，并重新构建使配置生效。
+description: 部署后通过 GitHub 或 Cloudflare 修改文档源、站点地址、Logo 和 favicon，并重新构建使配置生效。
 sidebar:
   label: 修改部署配置
   order: 3
@@ -30,7 +30,9 @@ sidebar:
   "DOCS_BRANCH": "main",
   "DOCS_PATH": "docs",
   "DOCS_CONFIG_PATH": "docs/site.json",
-  "SITE_URL": "https://docs.example.com"
+  "SITE_URL": "https://docs.example.com",
+  "SITE_LOGO": "",
+  "SITE_FAVICON": ""
 }
 ```
 
@@ -43,10 +45,14 @@ sidebar:
 | `DOCS_PATH` | 填相对文档源仓库根目录的文档目录，例如 `docs`、`manual`；文档位于根目录时填 `.` |
 | `DOCS_CONFIG_PATH` | 填相对文档源仓库根目录的站点 JSON 路径，例如 `docs/site.json`；没有此文件时填 `""` |
 | `SITE_URL` | 填包含 `https://` 的实际站点地址，例如 `https://你的Worker.你的子域.workers.dev`；不附带页面路径、查询参数或锚点，也可填 `""` |
+| `SITE_LOGO` | 可选；默认 `""`。填 Logo 的 HTTP(S) 图片 URL 或相对文档源仓库根目录的文件路径，例如 `docs/assets/nimbus-mark.svg` |
+| `SITE_FAVICON` | 可选；默认 `""`。填 favicon 的 HTTP(S) 图片 URL 或相对文档源仓库根目录的文件路径，例如 `docs/assets/nimbus-mark.svg` |
 
 复制模板不会自动把 `DOCS_REPO` 改成你的仓库。默认值仍为 `https://github.com/Azincc/nimbus-docs-template.git`；要发布自己副本里的 `docs/`，必须把它改成自己的仓库地址。
 
 `DOCS_CONFIG_PATH` 与 `DOCS_PATH` 都从文档源仓库根目录计算。例如文档放在 `manual/`、配置放在 `config/site.json`，分别填写 `manual` 和 `config/site.json`。
+
+`SITE_LOGO` 和 `SITE_FAVICON` 的本地路径也从 `DOCS_REPO` 文档源仓库根目录计算，不依赖 `DOCS_CONFIG_PATH`；没有站点 JSON 也能使用。JSON 中已有的 `brand.logo`、`brand.favicon` 本地路径继续相对 JSON 文件解析。
 
 没有站点 JSON 时保留 `"DOCS_CONFIG_PATH": ""`，模板会使用通用站点配置。`SITE_URL` 置空后仍可浏览站点，但不会生成 canonical、依赖正式站点地址的 SEO 输出和 sitemap。填写 `SITE_URL` 不会自动绑定自定义域名，需要先在 Cloudflare 完成域名配置。
 
@@ -73,7 +79,9 @@ sidebar:
 
 `DOCS_CONFIG_PATH` 和 `SITE_URL` 的空字符串也是有效覆盖。删除构建变量会恢复文件默认值，与显式设为空字符串不同。
 
-如果界面没有添加或编辑入口，公开参数可按方式一修改。私有文档仓库所需的 `DOCS_TOKEN` 仍必须保存为这里的 **Secret（机密）**，不能写入 `wrangler.jsonc`、站点 JSON 或仓库 URL。普通 **Settings → Variables & Secrets** 中的运行时 Secret 不会自动提供给构建。具体操作见[私有仓库部署](./private-repository.md)。
+`SITE_LOGO` 和 `SITE_FAVICON` 也按上述顺序读取。最终非空值分别覆盖 JSON 的 `brand.logo`、`brand.favicon`；最终为空时继承 JSON 对应设置。显式空构建变量会覆盖 Wrangler 中的非空默认值并恢复 JSON 设置；删除变量才恢复读取 Wrangler 默认值。因此默认留空即可沿用已有品牌资源，只在需要覆盖时填写。两项都使用普通变量类型，不需要 Secret。
+
+如果界面没有添加或编辑入口，公开参数可按方式一修改。私有文档仓库所需的 `DOCS_TOKEN` 仍必须保存为这里的 **Secret（机密）**，不能写入 `wrangler.jsonc`、站点 JSON 或仓库 URL。普通 **Settings → Variables & Secrets** 中的运行时变量和 Secret 不会自动提供给静态构建。具体操作见[私有仓库部署](./private-repository.md)。
 
 ## 确认修改生效
 
@@ -87,7 +95,8 @@ Cloudflare 构建记录显示的模板提交与页面显示的文档提交可以
 | 提示站点配置文件不存在 | 核对 `DOCS_CONFIG_PATH` 相对文档源仓库根目录的路径；没有配置文件时显式设为 `""` |
 | 修改文件后站点没有更新 | 确认提交到了 Builds 关联的模板仓库与分支，并且该提交的构建和部署均成功 |
 | 修改了独立文档源但没有触发构建 | 按[原文档仓库构建挂钩](./deploy-hook.md)连接文档推送与模板构建 |
+| Logo 或 favicon 没有变化 | 确认变量设在 Builds 区域并已重新构建；检查非空值是否覆盖了 JSON、本地路径是否相对文档源仓库根目录 |
 
-如果要修改站点名称、导航、主题或 Logo，请编辑文档源仓库中 `DOCS_CONFIG_PATH` 指定的 JSON，具体字段见[站点配置](../site-config.md)。
+Logo 和 favicon 可以直接用上面的构建变量调整。站点名称、导航、主题、Logo 替代文字及完整品牌配置仍可在文档源仓库中 `DOCS_CONFIG_PATH` 指定的 JSON 维护，具体字段与优先级见[站点配置](../site-config.md)。
 
 Cloudflare 官方说明：[构建配置](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)与[构建变量设置入口](https://developers.cloudflare.com/workers/ci-cd/builds/build-image/#advanced-settings)。

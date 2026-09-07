@@ -8,8 +8,10 @@ try {
     docsPath: settings.docsPath,
     configPath: settings.configPath || null,
     siteUrl: settings.siteUrl || null,
+    siteLogo: settings.siteLogo || null,
+    siteFavicon: settings.siteFavicon || null,
     tokenPresent: Boolean(settings.token),
-    origins: Object.fromEntries(['DOCS_REPO', 'DOCS_BRANCH', 'DOCS_PATH', 'DOCS_CONFIG_PATH', 'SITE_URL'].map(key => [key, process.env[key] === undefined ? 'wrangler.jsonc.vars' : 'build environment'])),
+    origins: Object.fromEntries(['DOCS_REPO', 'DOCS_BRANCH', 'DOCS_PATH', 'DOCS_CONFIG_PATH', 'SITE_URL', 'SITE_LOGO', 'SITE_FAVICON'].map(key => [key, process.env[key] === undefined ? 'wrangler.jsonc.vars' : 'build environment'])),
     source: 'Build environment overrides wrangler.jsonc vars; token only comes from build environment.',
   }, null, 2));
 } catch (error) {

@@ -32,14 +32,18 @@
 | `DOCS_PATH` | `docs` | 仓库内文档目录 |
 | `DOCS_CONFIG_PATH` | `docs/site.json` | 示例站点配置，相对仓库根目录；可置空使用通用配置 |
 | `SITE_URL` | `https://nimbus.az1n.com` | 可选站点正式公开地址；可覆盖或显式置空 |
+| `SITE_LOGO` | 空字符串 | 可选 Logo；HTTP(S) 图片 URL 或相对文档源仓库根目录的文件路径 |
+| `SITE_FAVICON` | 空字符串 | 可选浏览器图标；HTTP(S) 图片 URL 或相对文档源仓库根目录的文件路径 |
 
 这些公开默认值位于 `wrangler.jsonc` 的 `vars`，无需逐项重复填写。构建时同名 **Build variables** 优先；直接修改你自己的模板仓库里的默认值也会用于后续构建。`DOCS_CONFIG_PATH` 和 `SITE_URL` 可显式设为空字符串，分别使用通用站点配置和不指定正式站点地址。
+
+`SITE_LOGO` 和 `SITE_FAVICON` 的最终非空值分别覆盖站点 JSON 的 `brand.logo` 和 `brand.favicon`，最终为空时继承 JSON 中的对应设置。显式空构建变量会覆盖 Wrangler 默认值并恢复 JSON 设置；删除构建变量则恢复读取 Wrangler 默认值。它们的本地路径以 `DOCS_REPO` 仓库根目录为基准，例如 `docs/assets/nimbus-mark.svg`，不依赖 `DOCS_CONFIG_PATH`；JSON 内原有品牌资源仍相对 JSON 文件解析。
 
 部署后需要修改参数，或控制台显示“未配置构建变量或密钥”时，参照[修改部署配置](docs/deployment/configuration.md)，通过 GitHub 编辑配置文件或添加 Cloudflare 构建变量，再重新构建。
 
 克隆模板后，默认仍读取上述公开仓库。要发布自己副本里的文档，将 `DOCS_REPO` 改为自己的仓库地址，保留 `DOCS_PATH=docs` 和 `DOCS_CONFIG_PATH=docs/site.json`。如果换用其他结构的文档仓库，请同时调整目录和配置文件路径；没有站点 JSON 时将 `DOCS_CONFIG_PATH` 置空。
 
-示例包含首页、[快速开始](docs/getting-started.md)、[编写文档](docs/writing-docs.md)、[站点配置](docs/site-config.md)、[私有仓库部署](docs/deployment/private-repository.md)、[原文档仓库构建挂钩](docs/deployment/deploy-hook.md)，以及被文档和站点配置共同引用的品牌图片。`maintenance/` 保存平台研究和验证记录，不进入示例站点。
+示例包含首页、[快速开始](docs/getting-started.md)、[编写文档](docs/writing-docs.md)、[站点配置](docs/site-config.md)、[私有仓库部署](docs/deployment/private-repository.md)、[原文档仓库构建挂钩](docs/deployment/deploy-hook.md)，以及被文档和站点配置共同引用的品牌图片。另设“markdown测试”分类，提供 [markdown显示测试](docs/markdown测试/markdown显示测试.md) 页面。`maintenance/` 保存平台研究和验证记录，不进入示例站点。
 
 在部署配置阶段确定下列构建配置；该部署流程确认后不再修改这组设置：
 
@@ -47,13 +51,13 @@
 - Deploy command：`pnpm run deploy`
 - Root directory：仓库根目录
 
-这组构建配置与公开变量不同。后续更换文档仓库、分支、目录或站点地址时，调整 **Build variables** 或仓库中的公开默认值，再重新构建；变量仍可修改，也可不填写以继承默认值。
+这组构建配置与公开变量不同。后续更换文档仓库、分支、目录、站点地址、Logo 或 favicon 时，调整 **Build variables** 或仓库中的公开默认值，再重新构建；变量仍可修改，也可不填写以继承默认值。
 
 官方部署按钮会识别 `package.json` 中的 `build` 和 `deploy`。但官方尚未明确承诺表单中的 Worker `vars` 在首次构建开始前回写：**当前没有对这项时序完成云端实测**。如果首次构建读取不到填写的配置，或仍读到默认示例，进入 **Worker → Settings → Builds → Build variables and secrets**，填写上述文档源配置，保存并 **Retry build**。重试会使用保存后的构建变量和 Secret。
 
 私有文档源需要额外配置 `DOCS_TOKEN` **构建 Secret**。首次部署可直接按下方的[私有仓库部署](#私有仓库部署)操作；完整的 Token 创建步骤、配置对照表和排障见[私有仓库部署指南](docs/deployment/private-repository.md)。
 
-普通 **Settings → Variables & Secrets** 中的 Worker Secret 与构建 Secret 不同。公开仓库可以完全不填 Token；`DOCS_TOKEN` 不应写入 `vars`、仓库 URL、站点 JSON 或提交的环境文件。
+`SITE_LOGO` 和 `SITE_FAVICON` 在 **Settings → Builds → Build variables and secrets** 中使用普通变量，保存并重新构建后生效。普通 **Settings → Variables & Secrets** 中的 Worker 运行时变量和 Secret 不会自动提供给静态构建。公开仓库可以完全不填 Token；`DOCS_TOKEN` 不应写入 `vars`、仓库 URL、站点 JSON 或提交的环境文件。
 
 首次构建不需要 Webhook。成功后，使用 Cloudflare 提供的 `workers.dev` 地址访问站点。页面页脚及 `/_build.json` 记录实际使用的**文档提交 SHA**。
 
@@ -102,6 +106,8 @@ Cloudflare 仅对同一 Hook 前一次构建仍处于 `queued` 或 `initializing
    | `DOCS_PATH` | Variable | 文档目录；默认 `docs` |
    | `DOCS_CONFIG_PATH` | Variable | 站点 JSON 路径；默认 `docs/site.json`，没有该文件时显式置空 |
    | `SITE_URL` | Variable | 你的站点完整公开地址；默认 `https://nimbus.az1n.com`，可覆盖或显式置空 |
+   | `SITE_LOGO` | Variable，可选 | Logo 的 HTTP(S) URL 或相对私有文档源仓库根目录的路径；默认空，继承 JSON |
+   | `SITE_FAVICON` | Variable，可选 | favicon 的 HTTP(S) URL 或相对私有文档源仓库根目录的路径；默认空，继承 JSON |
    | `DOCS_TOKEN` | **Secret** | 上一步创建的只读 GitHub Token |
 
 4. 保存后重新构建；如果首次私有仓库拉取已经失败，选择 **Retry build**。成功后访问页面和图片，并核对页脚或 `/_build.json` 的 SHA 是否对应私有仓库提交。
@@ -125,7 +131,7 @@ Cloudflare 仅对同一 Hook 前一次构建仍处于 `queued` 或 `initializing
 
 无效的本地文档或资源引用会阻止构建，便于在发布前修复。文档目录之外的 `.md` 不会成为本站页面，链接到它们时使用完整 GitHub URL。
 
-需要修改站点名称、介绍、顶部导航、主题或品牌资源时，在原文档仓库提交站点 JSON，并设置 `DOCS_CONFIG_PATH`。字段、示例和 frontmatter 写法见 [站点配置](docs/site-config.md)。这是模板实现的受校验 JSON 格式，不是 Nimbus 原生任意配置接口。
+需要修改站点名称、介绍、顶部导航、主题或完整品牌配置时，在原文档仓库提交站点 JSON，并设置 `DOCS_CONFIG_PATH`。Logo 和 favicon 也可以直接通过可选构建变量 `SITE_LOGO`、`SITE_FAVICON` 配置，无需先创建 JSON。字段、优先级、示例和 frontmatter 写法见 [站点配置](docs/site-config.md)。这是模板实现的受校验 JSON 格式，不是 Nimbus 原生任意配置接口。
 
 `SITE_URL` 默认是 `https://nimbus.az1n.com`。部署自己的站点时，将它覆盖为包含 `https://` 的实际公开地址并重新构建；设置此变量不会自动绑定域名。显式留空时站点可以正常浏览，模板不生成 canonical、依赖绝对站点地址的 SEO 输出和 sitemap。
 

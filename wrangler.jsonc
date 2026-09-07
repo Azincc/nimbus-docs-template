@@ -9,7 +9,10 @@
     "DOCS_BRANCH": "main",
     "DOCS_PATH": "docs",
     "DOCS_CONFIG_PATH": "docs/site.json",
-    "SITE_URL": "https://nimbus.az1n.com"
+    "SITE_URL": "https://nimbus.az1n.com",
+    // Empty values inherit brand.logo / brand.favicon from the site JSON.
+    "SITE_LOGO": "",
+    "SITE_FAVICON": ""
   },
   "assets": {
     "directory": "./dist",
