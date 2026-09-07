@@ -3,7 +3,7 @@ title: 修改部署配置
 description: 部署后通过 GitHub 或 Cloudflare 修改文档源、站点地址、Logo 和 favicon，并重新构建使配置生效。
 sidebar:
   label: 修改部署配置
-  order: 3
+  order: 10
 ---
 
 部署后看到“构建 → 变量和机密：未配置构建变量或密钥”，表示 Cloudflare 尚未保存额外的构建变量。模板仍会读取根目录 `wrangler.jsonc` 中的 `vars` 默认值，这些文件配置不会自动列在构建变量区域。

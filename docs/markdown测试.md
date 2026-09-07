@@ -2,7 +2,7 @@
 title: markdown测试
 description: 查看常见 Markdown 语法在本站中的显示效果。
 sidebar:
-  order: 6
+  order: 50
   group:
     label: markdown测试
     hideIndex: true

@@ -3,7 +3,7 @@ title: 原文档仓库构建挂钩
 description: 将原文档仓库的 GitHub push 事件连接到 Cloudflare Deploy Hook，自动构建并发布最新文档。
 sidebar:
   label: 构建挂钩
-  order: 5
+  order: 30
 ---
 
 Deploy Hook 在 Cloudflare 创建，Webhook 在 `DOCS_REPO` 指定的原文档仓库创建。连接后，原文档仓库的 push 会触发模板重新构建并发布最新内容，公开和私有文档源都可以使用这一流程。

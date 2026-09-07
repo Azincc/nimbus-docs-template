@@ -3,7 +3,7 @@ title: markdown显示测试
 description: 常见 Markdown 排版的实际效果与简短源码示例。
 sidebar:
   label: markdown显示测试
-  order: 1
+  order: 10
 ---
 
 这是一页可以直接浏览的 Markdown 样式样本，用于查看标题、文字、列表、表格、代码和图片的显示效果。🔎

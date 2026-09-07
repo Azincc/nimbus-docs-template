@@ -3,7 +3,7 @@ title: 编写文档
 description: 使用普通 Markdown 编写页面、组织目录，并添加相对链接和本地图片。
 sidebar:
   label: 编写文档
-  order: 2
+  order: 20
 ---
 
 在文档源仓库的 `docs/` 中维护 `.md` 文件。模板会自动发现页面，保留原始文件不变，只向临时和生成目录写入构建内容。
@@ -17,8 +17,11 @@ docs/
 ├── README.md
 ├── getting-started.md
 ├── writing-docs.md
+├── sidebar-order.md
 ├── site-config.md
+├── deployment.md
 ├── deployment/
+│   ├── configuration.md
 │   ├── private-repository.md
 │   └── deploy-hook.md
 ├── markdown测试.md
@@ -34,7 +37,10 @@ docs/
 | `docs/README.md` | `/` |
 | `docs/getting-started.md` | `/getting-started` |
 | `docs/writing-docs.md` | `/writing-docs` |
+| `docs/sidebar-order.md` | `/sidebar-order` |
 | `docs/site-config.md` | `/site-config` |
+| `docs/deployment.md` | `/deployment` |
+| `docs/deployment/configuration.md` | `/deployment/configuration` |
 | `docs/deployment/private-repository.md` | `/deployment/private-repository` |
 | `docs/deployment/deploy-hook.md` | `/deployment/deploy-hook` |
 | `docs/markdown测试.md` | `/markdown测试` |
@@ -56,7 +62,7 @@ title: 编写文档
 description: 使用 Markdown 维护文档页面。
 sidebar:
   label: 编写文档
-  order: 2
+  order: 20
 ---
 
 从这里开始编写正文。
@@ -67,6 +73,10 @@ sidebar:
 ```
 
 页面会显示 `title` 作为主标题，无需在正文重复。侧栏自动收录页面；较小的 `sidebar.order` 排在前面。
+
+本示例使用 `10、20、30…` 为同级页面排序，方便在中间插入新页面。分类的顺序由同级同名 Markdown 文件控制，例如 [deployment.md](./deployment.md) 设置整个“部署指南”分类的位置，`deployment/` 内各页面的 `sidebar.order` 设置分类内的顺序。
+
+逐项操作、完整配置示例和当前文档的顺序对照见[配置侧栏顺序](./sidebar-order.md)。
 
 非首页页面可以设置 `slug` 自定义路由，例如 `slug: writing-docs`，不要添加开头或结尾的 `/`。目录首页保留自动映射，不另设 slug。
 

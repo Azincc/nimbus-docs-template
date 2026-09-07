@@ -3,7 +3,7 @@ title: 站点配置
 description: 配置 Nimbus 文档站点的名称、导航、主题和品牌资源。
 sidebar:
   label: 站点配置
-  order: 3
+  order: 30
 ---
 
 模板在构建时读取文档源仓库中的 JSON 配置，校验后应用到站点。Logo 和 favicon 也可以通过可选构建变量单独设置。模板不加载文档源仓库的 `astro.config.*`，也不执行其中的 JavaScript 或 MDX。
@@ -57,6 +57,8 @@ sidebar:
 `navigation` 配置顶部入口。内部链接使用已生成的站点路由，例如 `/` 或 `/getting-started`，不填写 `.md` 文件路径；外部链接使用完整 HTTPS URL。内部目标页面必须存在，否则构建会报告错误。
 
 侧栏根据文档自动生成，与顶部导航分别配置。页面标题、描述和顺序在 Markdown frontmatter 中维护，见[编写文档](./writing-docs.md#标题和侧栏)。
+
+调整页面和分类的位置，按[配置侧栏顺序](./sidebar-order.md)设置 `sidebar.order`，再重新构建。
 
 ## 主题
 

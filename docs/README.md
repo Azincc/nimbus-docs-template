@@ -7,9 +7,10 @@
 ## 从这里开始
 
 - [快速入门](./getting-started.md)：运行示例，了解构建和部署所需的配置。
-- [修改部署配置](./deployment/configuration.md)：通过 GitHub 或 Cloudflare 修改文档源、站点地址、Logo 和 favicon，处理构建变量区域为空的情况。
 - [编写文档](./writing-docs.md)：添加页面、组织目录、引用图片和链接。
+- [侧栏顺序](./sidebar-order.md)：设置页面、分类和分类内页面的排列顺序。
 - [站点配置](./site-config.md)：修改站点名称、导航、主题和品牌资源。
+- [修改部署配置](./deployment/configuration.md)：通过 GitHub 或 Cloudflare 修改文档源、站点地址、Logo 和 favicon，处理构建变量区域为空的情况。
 - [私有仓库部署](./deployment/private-repository.md)：创建只读 Token，通过 Cloudflare Build Secret 读取私有文档。
 - [原文档仓库构建挂钩](./deployment/deploy-hook.md)：连接 GitHub Webhook 与 Cloudflare Deploy Hook，让文档推送自动触发构建。
 - [markdown显示测试](./markdown测试/markdown显示测试.md)：查看“markdown测试”分类中的常见 Markdown 样式。

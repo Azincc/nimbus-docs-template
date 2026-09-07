@@ -3,7 +3,7 @@ title: 私有仓库部署
 description: 为私有 GitHub 文档源配置只读访问凭据，完成 Cloudflare 构建、发布与自动更新。
 sidebar:
   label: 私有仓库部署
-  order: 4
+  order: 20
 ---
 
 私有文档源不会自动让生成的站点变为私有；需要限制读者访问时，须另行配置 Cloudflare Access 等访问控制，本模板不会自动完成这项配置。

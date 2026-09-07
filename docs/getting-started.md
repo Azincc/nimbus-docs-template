@@ -3,7 +3,7 @@ title: 快速入门
 description: 运行 Nimbus Docs Template 自带的文档示例，并了解构建配置。
 sidebar:
   label: 快速入门
-  order: 1
+  order: 10
 ---
 
 示例文档和模板代码维护在同一个 [GitHub 仓库](https://github.com/Azincc/nimbus-docs-template.git)。默认配置读取 `main` 分支的 `docs/`，站点配置文件为 `docs/site.json`。
