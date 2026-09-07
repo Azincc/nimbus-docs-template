@@ -28,7 +28,7 @@ Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于�
 
 ## 2. 准备私有仓库中的文档
 
-在目标私有仓库的文档分支中创建 `docs/README.md`，写入标题和正文并提交。该文件将成为站点首页；更多页面与图片的写法见[编写文档](./writing-docs.md)。
+在目标私有仓库的文档分支中创建 `docs/README.md`，写入标题和正文并提交。该文件将成为站点首页；更多页面与图片的写法见[编写文档](../writing-docs.md)。
 
 需要自定义站点名称、导航或品牌资源时，可以再添加 `docs/site.json`。最小配置为：
 
@@ -38,7 +38,7 @@ Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于�
 }
 ```
 
-其他字段按需添加，见[站点配置](./site-config.md)。没有这个文件时，稍后将 `DOCS_CONFIG_PATH` 显式设为空字符串；仅省略变量会继承模板默认的 `docs/site.json` 路径。
+其他字段按需添加，见[站点配置](../site-config.md)。没有这个文件时，稍后将 `DOCS_CONFIG_PATH` 显式设为空字符串；仅省略变量会继承模板默认的 `docs/site.json` 路径。
 
 记下私有仓库的 HTTPS 克隆地址、文档所在分支，以及文档目录和配置文件相对仓库根目录的路径。仓库地址从该仓库的 **Code → HTTPS** 中复制，不在地址中添加 Token。
 
@@ -120,7 +120,7 @@ Token 到期、被撤销或需要轮换时，按第 3 步创建新的只读 Toke
 | --- | --- |
 | 私有仓库拉取失败、提示找不到仓库或无权限 | 核对 HTTPS 仓库地址、分支是否存在，以及 `DOCS_TOKEN` 是否位于当前 Worker 的构建 Secret；确认 Token 未过期、选中了目标仓库、具备 Contents 只读权限且组织已批准 |
 | 报告 `DOCS_CONFIG_PATH` 或 JSON 错误 | 路径以私有仓库根目录为基准；没有配置文件时显式置空，有文件时检查 JSON 格式和 `schemaVersion: 1` |
-| 页面或图片在构建时提示不存在 | 确认文件已提交到 `DOCS_BRANCH`，检查 `DOCS_PATH`、大小写和相对链接，参见[编写文档](./writing-docs.md) |
+| 页面或图片在构建时提示不存在 | 确认文件已提交到 `DOCS_BRANCH`，检查 `DOCS_PATH`、大小写和相对链接，参见[编写文档](../writing-docs.md) |
 | 修改了变量或 Secret，站点没有更新 | 保存后重新触发构建；检查新构建的文档 SHA，不仅查看旧的部署结果 |
 | GitHub push 后没有新构建 | 检查 Webhook 最近一次投递、Deploy Hook URL 和关联模板分支；确认修改已推送到构建读取的文档分支 |
 
@@ -129,4 +129,4 @@ Token 到期、被撤销或需要轮换时，按第 3 步创建新的只读 Toke
 - [Cloudflare Workers Builds 配置](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)
 - [GitHub Personal Access Token 管理说明](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
 
-返回[快速入门](./getting-started.md)或[首页](./README.md)。
+返回[快速入门](../getting-started.md)或[首页](../README.md)。

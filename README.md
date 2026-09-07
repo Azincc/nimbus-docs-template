@@ -37,7 +37,7 @@
 
 克隆模板后，默认仍读取上述公开仓库。要发布自己副本里的文档，将 `DOCS_REPO` 改为自己的仓库地址，保留 `DOCS_PATH=docs` 和 `DOCS_CONFIG_PATH=docs/site.json`。如果换用其他结构的文档仓库，请同时调整目录和配置文件路径；没有站点 JSON 时将 `DOCS_CONFIG_PATH` 置空。
 
-示例包含首页、[快速开始](docs/getting-started.md)、[编写文档](docs/writing-docs.md)、[站点配置](docs/site-config.md)、[私有仓库部署](docs/private-repository.md)、[原文档仓库构建挂钩](docs/deploy-hook.md)，以及被文档和站点配置共同引用的品牌图片。`maintenance/` 保存平台研究和验证记录，不进入示例站点。
+示例包含首页、[快速开始](docs/getting-started.md)、[编写文档](docs/writing-docs.md)、[站点配置](docs/site-config.md)、[私有仓库部署](docs/deployment/private-repository.md)、[原文档仓库构建挂钩](docs/deployment/deploy-hook.md)，以及被文档和站点配置共同引用的品牌图片。`maintenance/` 保存平台研究和验证记录，不进入示例站点。
 
 在部署配置阶段确定下列构建配置；该部署流程确认后不再修改这组设置：
 
@@ -49,7 +49,7 @@
 
 官方部署按钮会识别 `package.json` 中的 `build` 和 `deploy`。但官方尚未明确承诺表单中的 Worker `vars` 在首次构建开始前回写：**当前没有对这项时序完成云端实测**。如果首次构建读取不到填写的配置，或仍读到默认示例，进入 **Worker → Settings → Builds → Build variables and secrets**，填写上述文档源配置，保存并 **Retry build**。重试会使用保存后的构建变量和 Secret。
 
-私有文档源需要额外配置 `DOCS_TOKEN` **构建 Secret**。首次部署可直接按下方的[私有仓库部署](#私有仓库部署)操作；完整的 Token 创建步骤、配置对照表和排障见[私有仓库部署指南](docs/private-repository.md)。
+私有文档源需要额外配置 `DOCS_TOKEN` **构建 Secret**。首次部署可直接按下方的[私有仓库部署](#私有仓库部署)操作；完整的 Token 创建步骤、配置对照表和排障见[私有仓库部署指南](docs/deployment/private-repository.md)。
 
 普通 **Settings → Variables & Secrets** 中的 Worker Secret 与构建 Secret 不同。公开仓库可以完全不填 Token；`DOCS_TOKEN` 不应写入 `vars`、仓库 URL、站点 JSON 或提交的环境文件。
 
@@ -59,7 +59,7 @@
 
 将文档与模板放在同一个 Builds 关联仓库、同一个分支时，提交即可触发该仓库的自动构建，无需额外 Webhook。使用独立文档源时，再完成下面两步。
 
-完整的逐项操作、推送验证和排障见[原文档仓库构建挂钩指南](docs/deploy-hook.md)。Deploy Hook 创建在 Cloudflare，GitHub Webhook 添加在 `DOCS_REPO` 对应的原文档仓库。
+完整的逐项操作、推送验证和排障见[原文档仓库构建挂钩指南](docs/deployment/deploy-hook.md)。Deploy Hook 创建在 Cloudflare，GitHub Webhook 添加在 `DOCS_REPO` 对应的原文档仓库。
 
 进入 **Workers & Pages → 目标 Worker → Settings → Builds → Deploy Hooks**，创建一个挂钩，选择**模板仓库的构建分支**（通常为 `main`），复制生成的 URL。
 
@@ -108,7 +108,7 @@ Cloudflare 仅对同一 Hook 前一次构建仍处于 `queued` 或 `initializing
 
 私有源仓库不等于私有网站：本模板默认发布可公开访问的静态文档，包含文档正文、引用资源及搜索索引。需要限制读者时，应另行配置 Cloudflare Access 等站点访问控制；`DOCS_TOKEN` 仅负责构建时读取仓库。
 
-详细操作与常见错误处理见[私有仓库部署指南](docs/private-repository.md)。
+详细操作与常见错误处理见[私有仓库部署指南](docs/deployment/private-repository.md)。
 
 ## 文档与站点配置
 
