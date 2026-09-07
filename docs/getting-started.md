@@ -56,4 +56,6 @@ pnpm preview
 
 构建配置与公开变量分开。后续更换文档源或站点地址时，在 Worker 的 **Settings → Builds → Build variables and secrets** 中调整相应变量，或修改仓库内的公开默认值，然后重新触发构建。变量仍可修改，未填写时继承默认值。成功后使用 Cloudflare 提供的站点地址访问；设置 `SITE_URL` 不会自动绑定自定义域名。
 
+首次部署成功后，按[原文档仓库构建挂钩](./deploy-hook.md)为独立文档源配置自动更新。公开仓库和私有仓库使用同一挂钩流程。
+
 继续阅读[编写文档](./writing-docs.md)，或[返回首页](./README.md)。

@@ -88,6 +88,8 @@ Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于�
 
 ## 6. 让文档推送触发更新
 
+逐项表单说明、推送验证和故障排查见[原文档仓库构建挂钩](./deploy-hook.md)。公开与私有仓库使用相同的触发流程；私有文档仍通过构建 Secret 中的 `DOCS_TOKEN` 读取。
+
 私有文档源与 Builds 关联的模板仓库相互独立时，需要把原文档仓库的 push 连接到 Cloudflare Deploy Hook。首次构建不依赖 Webhook，可以在发布成功后配置：
 
 1. 在 Worker 的 **Settings → Builds → Deploy Hooks** 创建 Hook，选择模板仓库的构建分支，复制生成的 URL。

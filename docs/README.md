@@ -10,6 +10,7 @@
 - [编写文档](./writing-docs.md)：添加页面、组织目录、引用图片和链接。
 - [站点配置](./site-config.md)：修改站点名称、导航、主题和品牌资源。
 - [私有仓库部署](./private-repository.md)：创建只读 Token，通过 Cloudflare Build Secret 读取私有文档。
+- [原文档仓库构建挂钩](./deploy-hook.md)：连接 GitHub Webhook 与 Cloudflare Deploy Hook，让文档推送自动触发构建。
 
 ## 示例如何工作
 

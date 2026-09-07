@@ -19,6 +19,7 @@ docs/
 ├── writing-docs.md
 ├── site-config.md
 ├── private-repository.md
+├── deploy-hook.md
 ├── site.json
 └── assets/
     └── nimbus-mark.svg
@@ -31,6 +32,7 @@ docs/
 | `docs/writing-docs.md` | `/writing-docs` |
 | `docs/site-config.md` | `/site-config` |
 | `docs/private-repository.md` | `/private-repository` |
+| `docs/deploy-hook.md` | `/deploy-hook` |
 
 子目录也可以添加 `README.md` 或 `index.md` 作为目录首页。同一目录只保留其中一个，避免两个文件竞争同一路由。普通文件按照路径生成小写 slug。
 
@@ -89,6 +91,8 @@ sidebar:
 ## 发布更新
 
 提交并推送文档修改后，重新触发站点构建。构建会重新生成页面与自动侧栏；删除文件后，对应页面也会从下次产物中移除。若顶部导航手动引用了删除的页面，同时修改 `docs/site.json`。
+
+独立文档源可以通过[构建挂钩](./deploy-hook.md)在 push 后自动重建，省去每次手动触发的步骤。
 
 当前文档输入仅处理 `.md`，忽略 `.mdx`；文档源不执行 JavaScript 或 MDX 组件。需要调整模板代码时，直接修改模板项目，并参考[仓库维护说明](https://github.com/Azincc/nimbus-docs-template/blob/main/AGENT.md)。
 

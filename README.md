@@ -37,7 +37,7 @@
 
 克隆模板后，默认仍读取上述公开仓库。要发布自己副本里的文档，将 `DOCS_REPO` 改为自己的仓库地址，保留 `DOCS_PATH=docs` 和 `DOCS_CONFIG_PATH=docs/site.json`。如果换用其他结构的文档仓库，请同时调整目录和配置文件路径；没有站点 JSON 时将 `DOCS_CONFIG_PATH` 置空。
 
-示例包含首页、[快速开始](docs/getting-started.md)、[编写文档](docs/writing-docs.md)、[站点配置](docs/site-config.md)、[私有仓库部署](docs/private-repository.md)，以及被文档和站点配置共同引用的品牌图片。`maintenance/` 保存平台研究和验证记录，不进入示例站点。
+示例包含首页、[快速开始](docs/getting-started.md)、[编写文档](docs/writing-docs.md)、[站点配置](docs/site-config.md)、[私有仓库部署](docs/private-repository.md)、[原文档仓库构建挂钩](docs/deploy-hook.md)，以及被文档和站点配置共同引用的品牌图片。`maintenance/` 保存平台研究和验证记录，不进入示例站点。
 
 在部署配置阶段确定下列构建配置；该部署流程确认后不再修改这组设置：
 
@@ -59,6 +59,8 @@
 
 将文档与模板放在同一个 Builds 关联仓库、同一个分支时，提交即可触发该仓库的自动构建，无需额外 Webhook。使用独立文档源时，再完成下面两步。
 
+完整的逐项操作、推送验证和排障见[原文档仓库构建挂钩指南](docs/deploy-hook.md)。Deploy Hook 创建在 Cloudflare，GitHub Webhook 添加在 `DOCS_REPO` 对应的原文档仓库。
+
 进入 **Workers & Pages → 目标 Worker → Settings → Builds → Deploy Hooks**，创建一个挂钩，选择**模板仓库的构建分支**（通常为 `main`），复制生成的 URL。
 
 ### 3. 在原文档仓库添加 GitHub Webhook
@@ -71,8 +73,13 @@
 | Content type | `application/json` |
 | Secret | 留空；该流程使用 Deploy Hook URL 作为触发凭据 |
 | Events | `Just the push event` |
+| Active | 勾选启用 |
+
+保持 SSL 验证开启。添加 Webhook 需要原文档仓库的所有者或管理员权限，`DOCS_TOKEN` 不填写在这里。
 
 保存后，原文档仓库的 push 会通过 GitHub 直接调用 Cloudflare Deploy Hook 并触发重建。挂钩 URL 本身就是凭据，只保存在 Webhook 设置等需要它的位置，不放入公开仓库。
+
+向 `DOCS_BRANCH` 推送文档修改后，在 GitHub 的 **Recent Deliveries** 查看该次 `push` 投递，再在 Cloudflare Builds 确认构建和发布成功。投递返回 2xx 只代表触发请求已被接收，还需检查站点正文及 `/_build.json` 的文档 SHA；创建 Webhook 时的 `ping` 不能代替这一步。
 
 Hook 选择的模板分支与 `DOCS_BRANCH` 是独立配置。其他原文档分支的 push 也可能触发额外构建，但构建仍读取 `DOCS_BRANCH` 的最新内容。外部 Webhook 的提交 SHA 不会自动作为文档构建版本传入；本模板会自己记录实际拉取的 SHA。
 
