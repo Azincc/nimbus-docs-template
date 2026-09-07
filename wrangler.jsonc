@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nimbus-template",
+  "compatibility_date": "2026-09-01",
+  // Public inputs only. The build reads these defaults; Build variables override them.
+  // DOCS_TOKEN belongs exclusively in Settings > Builds > Variables and secrets.
+  "vars": {
+    "DOCS_REPO": "https://github.com/Azincc/echo",
+    "DOCS_BRANCH": "main",
+    "DOCS_PATH": "gitbook",
+    "DOCS_CONFIG_PATH": "",
+    "SITE_URL": ""
+  },
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}
