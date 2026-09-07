@@ -37,7 +37,7 @@
 
 克隆模板后，默认仍读取上述公开仓库。要发布自己副本里的文档，将 `DOCS_REPO` 改为自己的仓库地址，保留 `DOCS_PATH=docs` 和 `DOCS_CONFIG_PATH=docs/site.json`。如果换用其他结构的文档仓库，请同时调整目录和配置文件路径；没有站点 JSON 时将 `DOCS_CONFIG_PATH` 置空。
 
-示例包含首页、[快速开始](docs/getting-started.md)、[编写文档](docs/writing-docs.md)、[站点配置](docs/site-config.md)，以及被文档和站点配置共同引用的品牌图片。`maintenance/` 保存平台研究和验证记录，不进入示例站点。
+示例包含首页、[快速开始](docs/getting-started.md)、[编写文档](docs/writing-docs.md)、[站点配置](docs/site-config.md)、[私有仓库部署](docs/private-repository.md)，以及被文档和站点配置共同引用的品牌图片。`maintenance/` 保存平台研究和验证记录，不进入示例站点。
 
 在部署配置阶段确定下列构建配置；该部署流程确认后不再修改这组设置：
 
@@ -49,7 +49,7 @@
 
 官方部署按钮会识别 `package.json` 中的 `build` 和 `deploy`。但官方尚未明确承诺表单中的 Worker `vars` 在首次构建开始前回写：**当前没有对这项时序完成云端实测**。如果首次构建读取不到填写的配置，或仍读到默认示例，进入 **Worker → Settings → Builds → Build variables and secrets**，填写上述文档源配置，保存并 **Retry build**。重试会使用保存后的构建变量和 Secret。
 
-私有原文档仓库还需要一个步骤：在同一处添加名为 `DOCS_TOKEN` 的 **构建 Secret**，使用仅可读取目标仓库内容的 GitHub Token。优先使用限定目标仓库且 `Contents: Read-only` 的 fine-grained PAT。若初始界面提供 Build variables and secrets，可在首次构建前填写；若只能在创建 Worker 后进入，则补配后重试首次失败的构建。
+私有文档源需要额外配置 `DOCS_TOKEN` **构建 Secret**。首次部署可直接按下方的[私有仓库部署](#私有仓库部署)操作；完整的 Token 创建步骤、配置对照表和排障见[私有仓库部署指南](docs/private-repository.md)。
 
 普通 **Settings → Variables & Secrets** 中的 Worker Secret 与构建 Secret 不同。公开仓库可以完全不填 Token；`DOCS_TOKEN` 不应写入 `vars`、仓库 URL、站点 JSON 或提交的环境文件。
 
@@ -77,6 +77,31 @@
 Hook 选择的模板分支与 `DOCS_BRANCH` 是独立配置。其他原文档分支的 push 也可能触发额外构建，但构建仍读取 `DOCS_BRANCH` 的最新内容。外部 Webhook 的提交 SHA 不会自动作为文档构建版本传入；本模板会自己记录实际拉取的 SHA。
 
 Cloudflare 仅对同一 Hook 前一次构建仍处于 `queued` 或 `initializing` 的重复请求返回已有构建。构建已经运行后，后续请求仍可能创建新构建。
+
+## 私有仓库部署
+
+文档可以继续保存在私有 GitHub 仓库中。通过部署按钮创建的模板副本负责构建，`DOCS_TOKEN` 负责读取私有文档源；Cloudflare 的 GitHub 连接授权不会自动成为同步脚本的读取凭据。
+
+1. 点击本 README 的 **Deploy to Cloudflare** 创建模板副本与 Worker，保留上面的构建和部署命令。如果创建界面暂时没有 Build Secret 入口，可以先使用默认公开示例完成创建，再配置私有文档源。
+2. 在 GitHub 的 **Settings → Developer settings → Personal access tokens → Fine-grained tokens** 创建 Token。选择私有仓库所属的 Resource owner，仅授权目标仓库，将 **Contents** 设为 **Read-only**；组织要求审批时，先等待批准。
+3. 在 **Worker → Settings → Builds → Build variables and secrets** 设置以下值：
+
+   | 名称 | 类型 | 填写内容 |
+   | --- | --- | --- |
+   | `DOCS_REPO` | Variable | 你的私有仓库 HTTPS 地址，不包含 Token |
+   | `DOCS_BRANCH` | Variable | 文档分支；默认 `main` |
+   | `DOCS_PATH` | Variable | 文档目录；默认 `docs` |
+   | `DOCS_CONFIG_PATH` | Variable | 站点 JSON 路径；默认 `docs/site.json`，没有该文件时显式置空 |
+   | `SITE_URL` | Variable | 你的站点完整公开地址；默认 `https://nimbus.az1n.com`，可覆盖或显式置空 |
+   | `DOCS_TOKEN` | **Secret** | 上一步创建的只读 GitHub Token |
+
+4. 保存后重新构建；如果首次私有仓库拉取已经失败，选择 **Retry build**。成功后访问页面和图片，并核对页脚或 `/_build.json` 的 SHA 是否对应私有仓库提交。
+
+同一仓库、同一分支的提交可直接通过 Builds 触发更新。文档源与模板分开时，在私有文档仓库设置 [GitHub Webhook](#3-在原文档仓库添加-github-webhook)，调用模板 Worker 的 Deploy Hook。Token 过期后更新同一 Build Secret 并重新构建。
+
+私有源仓库不等于私有网站：本模板默认发布可公开访问的静态文档，包含文档正文、引用资源及搜索索引。需要限制读者时，应另行配置 Cloudflare Access 等站点访问控制；`DOCS_TOKEN` 仅负责构建时读取仓库。
+
+详细操作与常见错误处理见[私有仓库部署指南](docs/private-repository.md)。
 
 ## 文档与站点配置
 

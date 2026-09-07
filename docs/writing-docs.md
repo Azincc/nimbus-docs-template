@@ -18,6 +18,7 @@ docs/
 ├── getting-started.md
 ├── writing-docs.md
 ├── site-config.md
+├── private-repository.md
 ├── site.json
 └── assets/
     └── nimbus-mark.svg
@@ -29,6 +30,7 @@ docs/
 | `docs/getting-started.md` | `/getting-started` |
 | `docs/writing-docs.md` | `/writing-docs` |
 | `docs/site-config.md` | `/site-config` |
+| `docs/private-repository.md` | `/private-repository` |
 
 子目录也可以添加 `README.md` 或 `index.md` 作为目录首页。同一目录只保留其中一个，避免两个文件竞争同一路由。普通文件按照路径生成小写 slug。
 

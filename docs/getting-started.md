@@ -37,6 +37,8 @@ pnpm dev
 
 使用自己的文档时，将仓库、分支和路径改为实际内容的位置，并将 `SITE_URL` 改为包含 `https://` 的实际公开地址。`DOCS_CONFIG_PATH` 可显式置空以使用通用站点配置，`SITE_URL` 可显式置空以不指定正式站点地址。公开仓库不需要 `DOCS_TOKEN`；私有仓库将只读 Token 保存为 Cloudflare Build Secret，仅在 Git 拉取期间使用。
 
+如果文档位于私有仓库，请按[私有仓库部署](./private-repository.md)完成 Token 授权、构建变量和 Secret 设置，再执行首次构建。
+
 ## 构建与预览
 
 ```sh
