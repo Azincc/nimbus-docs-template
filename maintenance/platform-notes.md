@@ -74,8 +74,8 @@ Workers Builds 文档说明保存的构建配置用于下次构建；重试构�
 ```json
 {
   "scripts": {
-    "build": "node scripts/sync-docs.mjs && astro build",
-    "deploy": "wrangler deploy"
+    "build": "node scripts/build.mjs",
+    "deploy": "node scripts/deploy.mjs"
   }
 }
 ```

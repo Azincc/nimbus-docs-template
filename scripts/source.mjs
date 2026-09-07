@@ -14,7 +14,7 @@ function repositoryUrl(value) {
   // encoded separators, dot segments, ports, or a different transport.
   const match = /^https:\/\/github\.com\/([a-z\d](?:[a-z\d-]{0,37}[a-z\d])?)\/([a-z\d._-]+?)(?:\.git)?\/?$/i.exec(value);
   if (!match || match[2].length > 100 || /^\.+$/.test(match[2])) {
-    throw new Error('DOCS_REPO must be an HTTPS GitHub repository URL, for example https://github.com/owner/repo. Credentials, ports, query strings, and fragments are not allowed.');
+    throw new Error('DOCS_REPO must be an HTTPS GitHub repository URL, for example https://github.com/Azincc/nimbus-docs-template.git. Credentials, ports, query strings, and fragments are not allowed.');
   }
   return `https://github.com/${match[1]}/${match[2]}.git`;
 }

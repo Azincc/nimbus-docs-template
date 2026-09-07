@@ -6,17 +6,17 @@ import test from 'node:test';
 import { checkoutSource, readSourceSettings } from '../scripts/source.mjs';
 
 const defaults = {
-  DOCS_REPO: 'https://github.com/Azincc/echo',
+  DOCS_REPO: 'https://github.com/Azincc/nimbus-docs-template.git',
   DOCS_BRANCH: 'main',
-  DOCS_PATH: 'gitbook',
-  DOCS_CONFIG_PATH: 'nimbus-site.json',
+  DOCS_PATH: 'docs',
+  DOCS_CONFIG_PATH: 'docs/site.json',
 };
 
 test('build variables override public defaults and the token comes only from the environment', () => {
   const settings = readSourceSettings({ DOCS_BRANCH: 'docs/update', DOCS_CONFIG_PATH: '', SITE_URL: 'https://docs.example.com/', DOCS_TOKEN: 'test-build-secret' }, defaults);
   assert.deepEqual(settings, {
-    repo: 'https://github.com/Azincc/echo.git',
-    branch: 'docs/update', docsPath: 'gitbook', configPath: undefined,
+    repo: 'https://github.com/Azincc/nimbus-docs-template.git',
+    branch: 'docs/update', docsPath: 'docs', configPath: undefined,
     siteUrl: 'https://docs.example.com', token: 'test-build-secret',
   });
   assert.equal(readSourceSettings({}, defaults).token, undefined);
@@ -47,7 +47,7 @@ test('source settings reject credentials and unsafe locations without echoing se
 test('invalid source settings fail before creating a temporary checkout', async () => {
   const workDir = await mkdtemp(path.join(tmpdir(), 'nimbus-source-test-'));
   try {
-    await assert.rejects(checkoutSource({ repo: 'https://github.com/owner/repo', branch: '../bad', workDir }), /branch name/);
+    await assert.rejects(checkoutSource({ repo: 'https://github.com/Azincc/nimbus-docs-template.git', branch: '../bad', workDir }), /branch name/);
     assert.deepEqual(await readdir(workDir), []);
   } finally {
     await rm(workDir, { recursive: true, force: true });

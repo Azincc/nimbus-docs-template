@@ -12,6 +12,6 @@ try {
   await writeFile(file, readme.replace(pattern, `<!-- deploy-button:start -->\n${button}\n<!-- deploy-button:end -->`));
   console.log(`Deploy button configured for ${repoUrl}. Publish this repository before using the button.`);
 } catch (error) {
-  console.error(`[template] ${error.message}\nUsage: node scripts/configure-template.mjs https://github.com/OWNER/REPOSITORY`);
+  console.error(`[template] ${error.message}\nUsage: node scripts/configure-template.mjs https://github.com/Azincc/nimbus-docs-template.git`);
   process.exitCode = 1;
 }

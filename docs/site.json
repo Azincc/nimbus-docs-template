@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "title": "Nimbus Docs Template",
+  "description": "使用 GitHub Markdown 构建文档站点；本仓库 docs/ 即为完整示例。",
+  "locale": "zh-CN",
+  "homeLabel": "首页",
+  "github": "https://github.com/Azincc/nimbus-docs-template.git",
+  "navigation": [
+    { "label": "本站首页", "link": "/" },
+    { "label": "入门", "link": "/getting-started" },
+    { "label": "仓库", "link": "https://github.com/Azincc/nimbus-docs-template.git" }
+  ],
+  "theme": {
+    "defaultMode": "system"
+  },
+  "brand": {
+    "logo": "./assets/nimbus-mark.svg",
+    "logoAlt": "Nimbus Docs Template",
+    "favicon": "./assets/nimbus-mark.svg"
+  }
+}

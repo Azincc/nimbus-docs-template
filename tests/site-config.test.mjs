@@ -24,7 +24,7 @@ test('site configuration maps navigation, branding and SEO from a source reposit
     await writeFile(path.join(root, 'brand', 'logo.svg'), '<svg xmlns="http://www.w3.org/2000/svg"></svg>');
     const config = { schemaVersion: 1, title: 'My docs', brand: { logo: './brand/logo.svg' }, navigation: [{ label: 'Start', link: '/' }], theme: { defaultMode: 'dark', accent: '#abcdef' } };
     await writeFile(path.join(root, 'site.json'), JSON.stringify(config));
-    const settings = { repo: 'https://github.com/owner/repo.git', configPath: 'site.json', siteUrl: 'https://docs.example.org' };
+    const settings = { repo: 'https://github.com/Azincc/nimbus-docs-template.git', configPath: 'site.json', siteUrl: 'https://docs.example.org' };
     const content = await prepareContent({ root, docsPath: 'docs', outputDir: path.join(directory, 'docs'), assetsDir: path.join(directory, 'assets') });
     const site = await prepareSiteConfig({ root, settings, content });
     assert.equal(site.nimbus.title, 'My docs');

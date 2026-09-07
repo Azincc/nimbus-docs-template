@@ -16,24 +16,28 @@
 
 点击上方 **Deploy to Cloudflare**，完成 Cloudflare 与 GitHub 授权。Cloudflare 将公开模板复制到你自己的新仓库，并把 Worker 的 Builds 关联到这个新仓库。
 
-这里有两个独立仓库：
+模板支持将站点源码与文档来源分开维护：
 
 | 仓库 | 维护的内容 | 用途 |
 | --- | --- | --- |
 | 你的模板仓库 | 本模板源码、依赖、Wrangler 配置 | Cloudflare Builds 关联并构建它 |
 | 原文档仓库 | Markdown、图片和可选站点 JSON 配置 | 每次构建时读取它的最新内容 |
 
-公开文档源默认使用 Echoes 示例：
+默认示例直接使用 [本仓库的 docs 目录](docs/README.md)，无需准备另一个文档仓库：
 
 | 配置 | 默认值 | 说明 |
 | --- | --- | --- |
-| `DOCS_REPO` | `https://github.com/Azincc/echo` | GitHub 仓库 HTTPS 地址，不包含 Token |
+| `DOCS_REPO` | `https://github.com/Azincc/nimbus-docs-template.git` | GitHub 仓库 HTTPS 地址，不包含 Token |
 | `DOCS_BRANCH` | `main` | 原文档仓库分支名 |
-| `DOCS_PATH` | `gitbook` | 仓库内文档目录 |
-| `DOCS_CONFIG_PATH` | 空 | 可选站点 JSON 文件，相对仓库根目录 |
+| `DOCS_PATH` | `docs` | 仓库内文档目录 |
+| `DOCS_CONFIG_PATH` | `docs/site.json` | 示例站点配置，相对仓库根目录；可置空使用通用配置 |
 | `SITE_URL` | 空 | 可选站点正式公开地址，例如 `https://docs.example.com` |
 
 这些公开默认值位于 `wrangler.jsonc` 的 `vars`。构建时同名 **Build variables** 优先；直接修改你自己的模板仓库里的默认值也会用于后续构建。
+
+克隆模板后，默认仍读取上述公开仓库。要发布自己副本里的文档，将 `DOCS_REPO` 改为自己的仓库地址，保留 `DOCS_PATH=docs` 和 `DOCS_CONFIG_PATH=docs/site.json`。如果换用其他结构的文档仓库，请同时调整目录和配置文件路径；没有站点 JSON 时将 `DOCS_CONFIG_PATH` 置空。
+
+示例包含首页、[快速开始](docs/getting-started.md)、[编写文档](docs/writing-docs.md)、[站点配置](docs/site-config.md)，以及被文档和站点配置共同引用的品牌图片。`maintenance/` 保存平台研究和验证记录，不进入示例站点。
 
 在部署界面填写文档源，并确认预填命令：
 
@@ -50,6 +54,8 @@
 首次构建不需要 Webhook。成功后，使用 Cloudflare 提供的 `workers.dev` 地址访问站点。页面页脚及 `/_build.json` 记录实际使用的**文档提交 SHA**。
 
 ### 2. 创建 Cloudflare Deploy Hook
+
+将文档与模板放在同一个 Builds 关联仓库、同一个分支时，提交即可触发该仓库的自动构建，无需额外 Webhook。使用独立文档源时，再完成下面两步。
 
 进入 **Workers & Pages → 目标 Worker → Settings → Builds → Deploy Hooks**，创建一个挂钩，选择**模板仓库的构建分支**（通常为 `main`），复制生成的 URL。
 
@@ -77,7 +83,7 @@ Cloudflare 仅对同一 Hook 前一次构建仍处于 `queued` 或 `initializing
 - 文档根目录的 `README.md` 或 `index.md` 对应站点首页 `/`；子目录同名文件对应目录首页。同一目录不能同时有这两种首页文件。
 - 若文档根目录没有首页文件，模板生成目录首页，方便访问自动发现的文档。
 - `.md` 相对链接转换到生成后的页面路由；引用的锚点保留。
-- 相对图片与文件可以位于文档目录之外，但必须仍在原文档仓库内。例如 Echoes 的 `gitbook/README.md` 引用 `../docs/screenshots/` 中的图片。
+- 相对图片与文件可以位于文档目录之外，但必须仍在原文档仓库内。默认示例的 `docs/README.md` 引用 `./assets/nimbus-mark.svg`，构建会自动复制该图片。
 - 每次重新生成文档和引用资源，删除源文档后不会保留旧的生成页面。
 - 文档来源第一版支持 `.md`，不执行来源仓库中的 MDX 或任意 Astro/JavaScript 配置。
 
@@ -95,7 +101,7 @@ Cloudflare 仅对同一 Hook 前一次构建仍处于 `queued` 或 `initializing
 2. 将下面命令中的示例路径替换为真实模板仓库地址，生成 README 部署按钮：
 
    ```sh
-   node scripts/configure-template.mjs https://github.com/OWNER/REPO
+   node scripts/configure-template.mjs https://github.com/Azincc/nimbus-docs-template.git
    ```
 
 3. 提交更新后的 README 和依赖锁文件，使按钮指向包含完整模板的公开仓库。
@@ -112,7 +118,7 @@ pnpm build
 pnpm preview:cf
 ```
 
-默认构建读取上面的 Echoes 公开示例，需要网络访问 GitHub。修改 `wrangler.jsonc` 中的公开默认值，或通过 shell 环境变量指定其他来源。不要把 Token 写入公开配置；构建脚本从进程环境读取 `DOCS_TOKEN`。
+默认构建读取本仓库 `main` 分支上的 `docs/`，需要网络访问 GitHub。本地修改示例文档后先提交并推送，再运行构建；构建始终以配置分支的最新已提交内容为准。修改 `wrangler.jsonc` 中的公开默认值，或通过 shell 环境变量指定其他来源。不要把 Token 写入公开配置；构建脚本从进程环境读取 `DOCS_TOKEN`。
 
 | 命令 | 用途 |
 | --- | --- |
@@ -128,7 +134,7 @@ pnpm preview:cf
 
 ## 发布与验收边界
 
-已完成 Echoes 公开仓库完整本地构建、15 项核心测试、Astro 类型检查、浏览器搜索、Workers Static Assets HTTP 200/404 和 Wrangler 发布 dry-run。详细结果见 [本地核心验证记录](docs/validation.md)。
+默认示例和核心测试均使用本项目的文档结构，验证范围和记录见 [本地核心验证记录](maintenance/validation.md)。
 
 构建先拉取来源，再准备文档并运行 Nimbus；只有构建成功后才进入 Wrangler 发布。拉取、配置校验或构建失败应在构建日志中明确报错，本次不发布新站点。内容 SHA 记录属于原文档仓库，不应与 Cloudflare 显示的模板仓库 SHA 混淆。
 
@@ -141,7 +147,7 @@ pnpm preview:cf
 
 本地构建和测试不能替代以上云端验收。更完整的性能、无障碍、多平台及长期运行测试由使用者决定范围。
 
-平台原文、首次构建变量时序的证据边界和后续验收要点见 [平台核对记录](docs/platform-notes.md)。
+平台原文、首次构建变量时序的证据边界和后续验收要点见 [平台核对记录](maintenance/platform-notes.md)。
 
 ## 官方参考
 
