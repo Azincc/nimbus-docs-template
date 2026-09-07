@@ -31,21 +31,23 @@
 | `DOCS_BRANCH` | `main` | 原文档仓库分支名 |
 | `DOCS_PATH` | `docs` | 仓库内文档目录 |
 | `DOCS_CONFIG_PATH` | `docs/site.json` | 示例站点配置，相对仓库根目录；可置空使用通用配置 |
-| `SITE_URL` | 空 | 可选站点正式公开地址，例如 `https://docs.example.com` |
+| `SITE_URL` | `https://nimbus.az1n.com` | 可选站点正式公开地址；可覆盖或显式置空 |
 
-这些公开默认值位于 `wrangler.jsonc` 的 `vars`。构建时同名 **Build variables** 优先；直接修改你自己的模板仓库里的默认值也会用于后续构建。
+这些公开默认值位于 `wrangler.jsonc` 的 `vars`，无需逐项重复填写。构建时同名 **Build variables** 优先；直接修改你自己的模板仓库里的默认值也会用于后续构建。`DOCS_CONFIG_PATH` 和 `SITE_URL` 可显式设为空字符串，分别使用通用站点配置和不指定正式站点地址。
 
 克隆模板后，默认仍读取上述公开仓库。要发布自己副本里的文档，将 `DOCS_REPO` 改为自己的仓库地址，保留 `DOCS_PATH=docs` 和 `DOCS_CONFIG_PATH=docs/site.json`。如果换用其他结构的文档仓库，请同时调整目录和配置文件路径；没有站点 JSON 时将 `DOCS_CONFIG_PATH` 置空。
 
 示例包含首页、[快速开始](docs/getting-started.md)、[编写文档](docs/writing-docs.md)、[站点配置](docs/site-config.md)，以及被文档和站点配置共同引用的品牌图片。`maintenance/` 保存平台研究和验证记录，不进入示例站点。
 
-在部署界面填写文档源，并确认预填命令：
+在部署配置阶段确定下列构建配置；该部署流程确认后不再修改这组设置：
 
 - Build command：`pnpm run build`
 - Deploy command：`pnpm run deploy`
 - Root directory：仓库根目录
 
-官方部署按钮会识别 `package.json` 中的 `build` 和 `deploy`。但官方尚未明确承诺表单中的 Worker `vars` 在首次构建开始前回写：**当前没有对这项时序完成云端实测**。如果首次构建读取不到填写的配置，或仍读到默认示例，进入 **Worker → Settings → Builds → Build variables and secrets**，填写上述文档源配置，保存并 **Retry build**。重试会使用保存后的构建配置。
+这组构建配置与公开变量不同。后续更换文档仓库、分支、目录或站点地址时，调整 **Build variables** 或仓库中的公开默认值，再重新构建；变量仍可修改，也可不填写以继承默认值。
+
+官方部署按钮会识别 `package.json` 中的 `build` 和 `deploy`。但官方尚未明确承诺表单中的 Worker `vars` 在首次构建开始前回写：**当前没有对这项时序完成云端实测**。如果首次构建读取不到填写的配置，或仍读到默认示例，进入 **Worker → Settings → Builds → Build variables and secrets**，填写上述文档源配置，保存并 **Retry build**。重试会使用保存后的构建变量和 Secret。
 
 私有原文档仓库还需要一个步骤：在同一处添加名为 `DOCS_TOKEN` 的 **构建 Secret**，使用仅可读取目标仓库内容的 GitHub Token。优先使用限定目标仓库且 `Contents: Read-only` 的 fine-grained PAT。若初始界面提供 Build variables and secrets，可在首次构建前填写；若只能在创建 Worker 后进入，则补配后重试首次失败的构建。
 
@@ -91,7 +93,7 @@ Cloudflare 仅对同一 Hook 前一次构建仍处于 `queued` 或 `initializing
 
 需要修改站点名称、介绍、顶部导航、主题或品牌资源时，在原文档仓库提交站点 JSON，并设置 `DOCS_CONFIG_PATH`。字段、示例和 frontmatter 写法见 [站点配置](docs/site-config.md)。这是模板实现的受校验 JSON 格式，不是 Nimbus 原生任意配置接口。
 
-`SITE_URL` 留空时站点可以正常浏览，模板不生成 canonical、依赖绝对站点地址的 SEO 输出和 sitemap。绑定正式域名后，将 `SITE_URL` 设置为实际公开地址并重新构建。
+`SITE_URL` 默认是 `https://nimbus.az1n.com`。部署自己的站点时，将它覆盖为包含 `https://` 的实际公开地址并重新构建；设置此变量不会自动绑定域名。显式留空时站点可以正常浏览，模板不生成 canonical、依赖绝对站点地址的 SEO 输出和 sitemap。
 
 ## 模板作者的一次性准备
 

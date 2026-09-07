@@ -71,7 +71,7 @@ test('artifact digests detect edits, path changes, and deleted files', async (t)
 test('Wrangler public defaults can be overridden by Workers Builds variables and its build secret', async () => {
   assert.deepEqual(await loadSettings({}), {
     repo: 'https://github.com/Azincc/nimbus-docs-template.git', branch: 'main',
-    docsPath: 'docs', configPath: 'docs/site.json', siteUrl: undefined, token: undefined,
+    docsPath: 'docs', configPath: 'docs/site.json', siteUrl: 'https://nimbus.az1n.com', token: undefined,
   });
   assert.deepEqual(await loadSettings({
     DOCS_REPO: 'https://github.com/Azincc/nimbus-docs-template.git', DOCS_BRANCH: 'docs/current',

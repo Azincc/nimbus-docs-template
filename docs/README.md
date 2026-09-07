@@ -16,13 +16,15 @@
 
 这个首页没有 frontmatter。模板直接从首个标题提取页面名称；其他示例页面使用 frontmatter 指定标题、描述与侧栏顺序。页面之间的 `.md` 相对链接和上方的本地 SVG 图片会在构建时转换为站点地址。
 
-| 构建配置 | 本站示例值 |
+| 构建变量 | 本站示例值 |
 | --- | --- |
 | `DOCS_REPO` | `https://github.com/Azincc/nimbus-docs-template.git` |
 | `DOCS_BRANCH` | `main` |
 | `DOCS_PATH` | `docs` |
 | `DOCS_CONFIG_PATH` | `docs/site.json` |
-| `SITE_URL` | 留空 |
+| `SITE_URL` | `https://nimbus.az1n.com` |
+
+这些值是模板默认配置，无需逐项重复填写，后续可通过构建变量覆盖。`SITE_URL` 也可显式置空；部署自己的站点时，将它改为实际公开地址。设置这个变量不会自动绑定域名。
 
 ## 内容版本
 

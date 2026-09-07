@@ -23,9 +23,9 @@ pnpm dev
 
 `pnpm dev` 和 `pnpm build` 均以配置的远程仓库为内容源。直接修改本地 `docs/` 不会改变远程文档版本；发布自己的内容时，将修改提交并推送到配置对应的仓库和分支，再重新运行构建。
 
-## 构建配置
+## 构建变量
 
-公开默认值保存在项目根目录的 `wrangler.jsonc`，同名环境变量可以覆盖它们。默认示例可以直接使用：
+公开默认值保存在项目根目录的 `wrangler.jsonc`，无需逐项重复填写，同名环境变量可以覆盖它们。默认示例可以直接使用：
 
 | 变量 | 值 | 作用 |
 | --- | --- | --- |
@@ -33,9 +33,9 @@ pnpm dev
 | `DOCS_BRANCH` | `main` | 拉取的分支 |
 | `DOCS_PATH` | `docs` | 相对仓库根目录的文档路径 |
 | `DOCS_CONFIG_PATH` | `docs/site.json` | 相对仓库根目录的站点配置路径 |
-| `SITE_URL` | 留空 | 获得正式站点地址后再设置 |
+| `SITE_URL` | `https://nimbus.az1n.com` | 站点公开地址，可覆盖或显式置空 |
 
-使用自己的文档时，将仓库、分支和路径改为实际内容的位置。公开仓库不需要 `DOCS_TOKEN`；私有仓库将只读 Token 保存为 Cloudflare Build Secret，仅在 Git 拉取期间使用。
+使用自己的文档时，将仓库、分支和路径改为实际内容的位置，并将 `SITE_URL` 改为包含 `https://` 的实际公开地址。`DOCS_CONFIG_PATH` 可显式置空以使用通用站点配置，`SITE_URL` 可显式置空以不指定正式站点地址。公开仓库不需要 `DOCS_TOKEN`；私有仓库将只读 Token 保存为 Cloudflare Build Secret，仅在 Git 拉取期间使用。
 
 ## 构建与预览
 
@@ -50,8 +50,8 @@ pnpm preview
 
 ## 部署到 Cloudflare
 
-打开[仓库 README](https://github.com/Azincc/nimbus-docs-template/blob/main/README.md) 中的 Deploy to Cloudflare 按钮，按其中的流程创建 Worker 并连接 GitHub 仓库。构建命令使用 `pnpm run build`，部署命令使用 `pnpm run deploy`。
+打开[仓库 README](https://github.com/Azincc/nimbus-docs-template/blob/main/README.md) 中的 Deploy to Cloudflare 按钮，按其中的流程创建 Worker 并连接 GitHub 仓库。在部署配置阶段确定构建命令 `pnpm run build`、部署命令 `pnpm run deploy` 和根目录为仓库根目录；该部署流程确认后不再修改这组构建配置。
 
-需要覆盖默认文档源时，在 Worker 的 **Settings → Builds → Build variables and secrets** 中填写上述公开变量，然后重新触发构建。成功后使用 Cloudflare 提供的站点地址访问；设置自定义域名后，可同步填写 `SITE_URL` 并重新构建。
+构建配置与公开变量分开。后续更换文档源或站点地址时，在 Worker 的 **Settings → Builds → Build variables and secrets** 中调整相应变量，或修改仓库内的公开默认值，然后重新触发构建。变量仍可修改，未填写时继承默认值。成功后使用 Cloudflare 提供的站点地址访问；设置 `SITE_URL` 不会自动绑定自定义域名。
 
 继续阅读[编写文档](./writing-docs.md)，或[返回首页](./README.md)。

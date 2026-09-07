@@ -5,6 +5,7 @@
 ## 已完成
 
 - 默认文档来源改为公开仓库 `https://github.com/Azincc/nimbus-docs-template.git` 的 `main` 分支，使用本仓库 `docs/` 与 `docs/site.json`。
+- `SITE_URL` 默认值为 `https://nimbus.az1n.com`。已核对默认值读取、Build variables 覆盖，以及将 `SITE_URL` 和 `DOCS_CONFIG_PATH` 显式置空的行为；未新增变量必填限制。
 - `docs/` 提供模板首页、快速开始、Markdown 编写和站点配置示例；站点品牌资源位于 `docs/assets/`。
 - `node --test tests/*.test.mjs`：15 项通过，覆盖普通 Markdown/frontmatter、首页与目录路由、链接和锚点、跨目录资源、增删同步、配置转换、凭据隔离与产物检查。
 - 工作区示例通过现有 `prepareContent`、`prepareSiteConfig` 的文档、链接、资源及 JSON 校验，再完成 Astro 静态构建和 Pagefind 索引。生成 4 篇文档和 404 页面；此次本地预检元数据标为 `working-tree`，不冒充远端提交。

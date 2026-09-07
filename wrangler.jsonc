@@ -9,7 +9,7 @@
     "DOCS_BRANCH": "main",
     "DOCS_PATH": "docs",
     "DOCS_CONFIG_PATH": "docs/site.json",
-    "SITE_URL": ""
+    "SITE_URL": "https://nimbus.az1n.com"
   },
   "assets": {
     "directory": "./dist",

@@ -35,6 +35,7 @@
 
 - 公开值优先级：显式构建环境变量 → 模板仓库内的公开配置默认值。
 - `DOCS_REPO`、`DOCS_BRANCH`、`DOCS_PATH`、`DOCS_CONFIG_PATH`、`SITE_URL` 可以放在 Wrangler `vars` 中，用于按钮显示和本地读取；用户也可以在 Build variables 中覆盖。
+- 公开变量无需逐项重复填写；未提供环境变量时继承仓库默认值，后续仍可调整。`SITE_URL` 默认是 `https://nimbus.az1n.com`，部署自己的站点时覆盖为包含 `https://` 的实际公开地址；设置变量不会自动绑定域名。`DOCS_CONFIG_PATH` 和 `SITE_URL` 允许显式置空，分别使用通用站点配置和不指定正式站点地址。
 - `DOCS_TOKEN` 只从构建环境读取，不从 `vars`、站点 JSON 配置或带凭据的仓库 URL 读取。不要把它声明为所有用户必填的运行时 Secret。
 - 不配置 `secrets.required: ["DOCS_TOKEN"]`。该功能验证的是 Worker 必需 Secret，不是构建 Secret；公开仓库也不应被迫提供 Token。
 - 为公开仓库提供可运行的默认示例；不要用静默回退到示例站点掩盖用户所填文档源拉取失败。
@@ -68,6 +69,8 @@ Workers Builds 文档说明保存的构建配置用于下次构建；重试构�
 [Deploy buttons 文档](https://developers.cloudflare.com/workers/platform/deploy-buttons/#best-practices)原文：
 
 > If you are using custom `build` and `deploy` scripts in your `package.json` ... Cloudflare will automatically detect and pre-populate the build and deploy fields.
+
+本项目在部署配置阶段确定 Build command 为 `pnpm run build`、Deploy command 为 `pnpm run deploy`、Root directory 为仓库根目录；该部署流程确认后不再修改这组构建配置。它们与后续可调整的 Build variables 分开：更换文档源或站点地址通过修改变量并重新构建完成。此处只说明该部署流程中的构建配置，不代表所有 Cloudflare 设置都无法修改。
 
 没有 `deploy` 脚本时，默认是 `npx wrangler deploy`；没有 `build` 脚本时，构建命令为空。可以使用这样的分工：
 
