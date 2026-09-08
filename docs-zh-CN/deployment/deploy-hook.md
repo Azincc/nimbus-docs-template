@@ -6,7 +6,7 @@ sidebar:
   order: 30
 ---
 
-Deploy Hook 在 Cloudflare 创建，Webhook 在 `DOCS_REPO` 指定的原文档仓库创建。连接后，原文档仓库的 push 会触发模板重新构建并发布最新内容，公开和私有文档源都可以使用这一流程。
+在 Cloudflare 创建 Deploy Hook，再到 `DOCS_REPO` 指定的原文档仓库创建 Webhook，将两者连接。之后，原文档仓库的 push 就会触发模板重新构建并发布最新内容。公开和私有文档源都适用。
 
 ```text
 原文档仓库 push
@@ -19,9 +19,9 @@ Deploy Hook 在 Cloudflare 创建，Webhook 在 `DOCS_REPO` 指定的原文档�
 
 ## 开始前
 
-先完成站点的首次成功构建，确认 Worker 的 Builds 已连接模板仓库，并且能正确读取 `DOCS_REPO`、`DOCS_BRANCH` 和文档路径。添加原仓库 Webhook 的账号还需要具有该仓库的 Webhook 管理权限。
+站点需先成功构建一次。确认 Worker 的 Builds 已连接模板仓库，能正确读取 `DOCS_REPO`、`DOCS_BRANCH` 和文档路径。用于添加原仓库 Webhook 的账号，还需具备该仓库的 Webhook 管理权限。
 
-文档与模板在同一个 Builds 关联仓库、同一个构建分支时，仓库原有的 push 构建即可更新文档，无需额外 Hook。文档源位于独立仓库，或使用不同分支且没有对应的原生构建触发时，按下文连接。
+文档与模板在同一个 Builds 关联仓库、同一个构建分支时，原有的 push 构建就能更新文档，无需额外 Hook。文档源在独立仓库，或使用不同分支且没有对应的原生构建触发时，再按下文配置。
 
 私有原文档仓库需要先配置 `DOCS_TOKEN` 构建 Secret，见[私有仓库部署](./private-repository.md)。Deploy Hook 负责触发构建，不提供读取私有文档的权限。
 
@@ -32,13 +32,13 @@ Deploy Hook 在 Cloudflare 创建，Webhook 在 `DOCS_REPO` 指定的原文档�
 3. 选择需要构建的**模板仓库分支**。该分支必须包含可用的模板代码及构建配置。
 4. 创建后复制 Cloudflare 生成的实际 Hook URL，下一步将它填入 GitHub。
 
-这里选择的是模板构建分支。构建脚本读取的原文档分支由 `DOCS_BRANCH` 决定，二者是独立配置，可以不同。
+Hook 选择的模板构建分支，与 `DOCS_BRANCH` 指定的原文档分支独立配置，两者可以不同。
 
-现有 Build command、Deploy command 和 Root directory 保持不变。此流程直接使用 GitHub Webhook 与 Cloudflare Deploy Hook，无需新增接收接口或 GitHub Actions 工作流。
+现有 Build command、Deploy command 和 Root directory 保持不变。GitHub Webhook 可直接连接 Cloudflare Deploy Hook，无需新增接收接口或 GitHub Actions 工作流。
 
 ## 2. 在原文档仓库创建 Webhook
 
-打开 `DOCS_REPO` 对应的 GitHub 仓库，进入 **Settings → Webhooks → Add webhook**。确认当前是维护 Markdown 的原文档仓库；如果模板和文档分开存放，不要误填到模板仓库中。
+打开 `DOCS_REPO` 对应的 GitHub 仓库，进入 **Settings → Webhooks → Add webhook**。如果模板和文档分开存放，确认当前打开的是维护 Markdown 的原文档仓库，避免将 Webhook 填到模板仓库中。
 
 | 字段 | 配置 |
 | --- | --- |
@@ -49,36 +49,38 @@ Deploy Hook 在 Cloudflare 创建，Webhook 在 `DOCS_REPO` 指定的原文档�
 | Active | 保持启用 |
 | SSL verification | 保持启用 |
 
-保存 Webhook。GitHub 可能发送一次 `ping` 来检查连接，这不代表文档已经完成自动更新。
+保存 Webhook 后，GitHub 可能发送一次 `ping` 检查连接。收到这次请求并不代表文档已自动更新。
 
-Hook URL 本身就是触发凭据，只保存到需要使用它的 Webhook 设置中，不写入公开变量、文档或仓库。`DOCS_TOKEN` 仅保存在 Cloudflare **Build variables and secrets** 中并选择 **Secret** 类型；它用于 Git fetch，不能作为这个流程的 Webhook Secret。
+Hook URL 本身就是触发凭据，只保存在需要使用它的 Webhook 设置中，不写入公开变量、文档或仓库。
+
+`DOCS_TOKEN` 用于 Git fetch，仅保存在 Cloudflare **Build variables and secrets** 中，并选择 **Secret** 类型。不要将它用作此流程的 Webhook Secret。
 
 ## 3. 验证一次文档更新
 
-向 `DOCS_BRANCH` 对应的原文档分支提交并推送一处容易辨认的正文修改，然后依次检查：
+在 `DOCS_BRANCH` 对应的原文档分支中修改一处容易辨认的正文，提交并推送后依次检查：
 
-1. 在 GitHub 仓库的 **Settings → Webhooks → 对应 Webhook → Recent Deliveries** 中找到这次 `push` 投递，查看响应状态。`2xx` 只表示 Hook 接收了请求，不表示构建或发布已经成功。
+1. 在 GitHub 仓库的 **Settings → Webhooks → 对应 Webhook → Recent Deliveries** 中找到这次 `push` 投递，查看响应状态。`2xx` 仅表示 Hook 已接收请求，不能说明构建或发布成功。
 2. 在目标 Worker 的 **Builds** 中查看对应的新构建，确认模板构建和部署均成功；失败时先查看构建日志。
 3. 打开站点，确认修改后的正文以及相关页面链接、图片正常显示。
 4. 对照构建日志、站点页脚或 `/_build.json` 中的文档提交 SHA，确认发布的文档版本。
 
-构建执行时会拉取 `DOCS_BRANCH` 的最新提交，不会把 Webhook 事件中的提交 SHA 固定为本次文档版本。如果短时间内连续推送多次，实际读取的 SHA 可能比触发事件的提交更新，应以构建记录和站点展示的 SHA 为准。
+构建时会拉取 `DOCS_BRANCH` 的最新提交，不会锁定 Webhook 事件中的提交 SHA。短时间内连续推送多次时，构建实际读取的 SHA 可能比触发事件的提交更新，文档版本应以构建记录和站点展示的 SHA 为准。
 
-一次 `ping` 成功或一次 `push` 获得 `2xx` 都不能替代上述页面更新检查。实际是否完成自动发布，需要结合 Cloudflare 构建结果和站点内容判断。
+即使 `ping` 成功或 `push` 返回 `2xx`，也要完成上述页面更新检查。确认自动发布是否成功，需同时查看 Cloudflare 构建结果和站点内容。
 
 ## 分支与重复触发
 
-GitHub 仓库级 `push` Webhook 也可能收到其他分支的推送，或仅修改非文档文件的推送，从而触发额外构建。本流程没有按文件路径过滤事件，构建始终读取配置的 `DOCS_BRANCH`。
+GitHub 仓库级 `push` Webhook 也可能接收其他分支的推送，或仅修改了非文档文件的推送，因此可能触发额外构建。本流程不按文件路径过滤事件，构建始终读取配置的 `DOCS_BRANCH`。
 
-因此，向其他分支推送成功并不表示那条分支的文档会出现在站点中。需要更换文档分支时，修改 Cloudflare 构建变量 `DOCS_BRANCH` 或模板仓库中的公开默认值，再重新构建。
+向其他分支推送成功，并不能说明该分支的文档会出现在站点中。要更换文档分支，修改 Cloudflare 构建变量 `DOCS_BRANCH` 或模板仓库中的公开默认值，再重新构建。
 
-同一个 Hook 的前次构建仍处于 `queued` 或 `initializing` 时，重复请求会返回已有构建及 `already_exists: true`，不一定新建一条构建记录。前次构建离开这两个阶段后，后续请求仍可能创建新构建。
+同一个 Hook 的前次构建仍处于 `queued` 或 `initializing` 阶段时，重复请求会返回已有构建及 `already_exists: true`，不一定新增构建记录。前次构建离开这两个阶段后，再次请求仍可能创建新构建。
 
 ## 更换或移除 Hook
 
-需要更换 Hook 时，先在 Cloudflare 新建 Hook，将 GitHub Webhook 的 Payload URL 更新为新 URL，保存并验证一次文档推送。确认新连接可用后，再移除旧 Hook。
+更换 Hook 时，先在 Cloudflare 创建新 Hook，再将 GitHub Webhook 的 Payload URL 改为新 URL。保存后推送一次文档修改，验证新连接可用，再移除旧 Hook。
 
-不再需要原文档仓库触发构建时，停用或删除对应的 GitHub Webhook，并移除不再使用的 Cloudflare Hook。更新私有仓库 Token 仍在 Build Secret 中进行，与更换 Hook 分开处理。
+不再需要由原文档仓库触发构建时，停用或删除对应的 GitHub Webhook，并移除不再使用的 Cloudflare Hook。私有仓库 Token 仍在 Build Secret 中更新，与更换 Hook 分开处理。
 
 ## 常见问题
 

@@ -6,15 +6,15 @@ sidebar:
   order: 20
 ---
 
-私有文档源不会自动让生成的站点变为私有；需要限制读者访问时，须另行配置 Cloudflare Access 等访问控制，本模板不会自动完成这项配置。
+使用私有文档源，生成的站点仍不会自动变为私有。需要限制读者访问时，请另行配置 Cloudflare Access 等访问控制；模板不会自动配置。
 
-本文使用公开模板创建 Worker，将你自己的私有 GitHub 仓库作为文档源。部署模板的 GitHub 授权、文档读取 Token 和站点访问权限是三件独立的事。
+这里使用公开模板创建 Worker，文档来自你自己的私有 GitHub 仓库。部署模板的 GitHub 授权、读取文档的 Token 和站点访问权限彼此独立。
 
 ## 1. 用公开模板创建 Worker
 
 打开 [nimbus-docs-template 仓库 README](https://github.com/Azincc/nimbus-docs-template/blob/main/README.md)，点击 Deploy to Cloudflare，完成 Cloudflare 与 GitHub 授权并创建模板副本及 Worker。
 
-在部署配置阶段确认以下构建配置，后续连接私有文档源时保持不变：
+部署时确认以下构建配置，后续连接私有文档源时保持不变：
 
 | 构建配置 | 值 |
 | --- | --- |
@@ -22,15 +22,15 @@ sidebar:
 | Deploy command | `pnpm run deploy` |
 | Root directory | 仓库根目录 |
 
-创建界面如果没有 **Build variables and secrets** 入口，可以先使用公开默认示例创建 Worker，再按下文补充私有文档源变量和 Secret。如果已填写私有仓库但首次拉取失败，同样在 Worker 创建后补配并重试即可。
+如果创建界面没有 **Build variables and secrets** 入口，可以先用默认的公开示例创建 Worker，再按下文补充私有文档源变量和 Secret。已经填写私有仓库但首次拉取失败时，也可以在 Worker 创建后补齐配置并重试。
 
-Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于给模板的文档拉取脚本提供私有仓库凭据。后者通过 `DOCS_TOKEN` 使用 GitHub Personal Access Token（PAT）执行 Git fetch。
+Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于文档拉取脚本所需的私有仓库凭据。文档拉取脚本通过 `DOCS_TOKEN` 使用 GitHub Personal Access Token（PAT）执行 Git fetch。
 
 ## 2. 准备私有仓库中的文档
 
-下文以你自己的私有仓库使用 `docs/` 为例，目录名不限制文档语言。若将本模板的中文示例按原目录复制到私有仓库，则对应使用 `docs-zh-CN/`，并将构建变量 `DOCS_PATH`、`DOCS_CONFIG_PATH` 分别设为 `docs-zh-CN`、`docs-zh-CN/site.json`。
+下文以私有仓库中的 `docs/` 目录为例，目录名不限制文档语言。如果将本模板的中文示例按原目录复制到私有仓库，使用的目录就是 `docs-zh-CN/`，构建变量 `DOCS_PATH`、`DOCS_CONFIG_PATH` 应分别设为 `docs-zh-CN`、`docs-zh-CN/site.json`。
 
-在目标私有仓库的文档分支中创建 `docs/README.md`，写入标题和正文并提交。该文件将成为站点首页；更多页面与图片的写法见[编写文档](../writing-docs.md)。
+在目标私有仓库的文档分支中创建 `docs/README.md`，写好标题和正文后提交。这个文件会成为站点首页。添加更多页面和图片的方法见[编写文档](../writing-docs.md)。
 
 需要自定义站点名称、导航或品牌资源时，可以再添加 `docs/site.json`。最小配置为：
 
@@ -40,26 +40,26 @@ Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于�
 }
 ```
 
-其他字段按需添加，见[站点配置](../site-config.md)。没有这个文件时，稍后将 `DOCS_CONFIG_PATH` 显式设为空字符串；仅省略变量会继承模板默认的 `docs/site.json` 路径。
+其他字段按需添加，详见[站点配置](../site-config.md)。没有配置文件时，稍后需将 `DOCS_CONFIG_PATH` 显式设为空字符串。省略这个变量会继承模板默认的 `docs/site.json` 路径。
 
-记下私有仓库的 HTTPS 克隆地址、文档所在分支，以及文档目录和配置文件相对仓库根目录的路径。仓库地址从该仓库的 **Code → HTTPS** 中复制，不在地址中添加 Token。
+从私有仓库的 **Code → HTTPS** 复制 HTTPS 克隆地址，地址中不要添加 Token。同时记下文档所在分支，以及文档目录、配置文件相对于仓库根目录的路径。
 
 ## 3. 创建只读 GitHub Token
 
 使用具有目标私有仓库读取权限的 GitHub 账号：
 
 1. 打开个人 **Settings → Developer settings → Personal access tokens → Fine-grained tokens**，选择 **Generate new token**。
-2. 为 Token 填写便于识别的名称和到期时间。到期后构建将无法继续读取私有仓库，需要更新凭据；组织可能限制最长有效期。
+2. 填写便于识别的 Token 名称和到期时间，组织可能限制最长有效期。Token 到期后，构建将无法继续读取私有仓库，需要更新凭据。
 3. 在 **Resource owner** 选择私有仓库所属的个人账号或组织。
 4. 在 **Repository access** 选择 **Only select repositories**，仅勾选目标私有文档仓库。
 5. 在 **Repository permissions** 将 **Contents** 设为 **Read-only**。GitHub 会自动提供所需的 **Metadata: Read-only**，不需要写入权限。
-6. 生成 Token。若组织要求审批，等待组织管理员批准后再用于构建；处于 pending 状态的 Token 不能读取该组织的私有内容。
+6. 生成 Token。若组织要求审批，需等待组织管理员批准后才能用于构建。处于 pending 状态的 Token 不能读取该组织的私有内容。
 
-将生成的 Token 保存到下一步的 Cloudflare 构建 Secret。不要将它写入文档、仓库配置、Git URL 或聊天消息。若无法选择目标组织或仓库，先确认账号权限以及组织是否允许使用 fine-grained PAT。
+下一步将生成的 Token 保存到 Cloudflare 构建 Secret，不要写入文档、仓库配置、Git URL 或聊天消息。若无法选择目标组织或仓库，先检查账号权限，并确认组织允许使用 fine-grained PAT。
 
 ## 4. 配置构建变量和 Secret
 
-打开目标 Worker 的 **Settings → Builds → Build variables and secrets**，按下表配置。文档源与站点参数使用普通变量，`DOCS_TOKEN` 单独选择 **Secret** 类型；Logo 和 favicon 是可选项。
+打开目标 Worker 的 **Settings → Builds → Build variables and secrets**，按下表配置。文档源与站点参数使用普通变量，其中 Logo 和 favicon 可选；`DOCS_TOKEN` 单独选择 **Secret** 类型。
 
 | 名称 | 类型 | 填写内容 |
 | --- | --- | --- |
@@ -72,21 +72,23 @@ Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于�
 | `SITE_FAVICON` | Variable，可选 | favicon 的 HTTP(S) 图片 URL 或相对私有文档源仓库根目录的路径，例如 `docs/assets/nimbus-mark.svg`；默认空 |
 | `DOCS_TOKEN` | Secret | 上一步生成且已获得所需组织批准的只读 GitHub Token |
 
-未提供同名构建变量时，模板会读取 `wrangler.jsonc` 中的公开默认值，因此无需重复填写仍适用的值。`DOCS_REPO` 必须覆盖为你的私有仓库地址，否则仍会读取公开示例。
+未设置同名构建变量时，模板会读取 `wrangler.jsonc` 中的公开默认值。仍适用的默认值无需重复填写，但 `DOCS_REPO` 必须改为你的私有仓库地址，否则仍会读取公开示例。
 
-`SITE_LOGO` 和 `SITE_FAVICON` 的最终非空值分别覆盖 JSON 的 `brand.logo` 和 `brand.favicon`，最终为空则继承 JSON。变量路径以 `DOCS_REPO` 仓库根目录为基准，不依赖站点 JSON 是否存在或放在哪里；JSON 内原有本地资源仍相对 JSON 文件。只读 Token 同时允许构建读取这些仓库图片，无需为图片添加另一份凭据。
+`SITE_LOGO` 和 `SITE_FAVICON` 的最终值非空时，分别覆盖 JSON 的 `brand.logo` 和 `brand.favicon`；最终值为空时，沿用 JSON 中的设置。
 
-`SITE_URL` 不会自动绑定域名。使用自己的正式地址前，先完成对应的域名配置；暂时置空仍可浏览站点，但不生成依赖正式站点地址的 canonical、SEO 输出和 sitemap。
+这两个变量的路径都相对于 `DOCS_REPO` 仓库根目录，与站点 JSON 是否存在、存放在哪里无关。JSON 内的本地资源路径仍相对于 JSON 文件。构建可以用同一个只读 Token 读取仓库图片，无需额外添加图片凭据。
 
-这里的 **Build variables and secrets** 提供给构建进程。普通 **Settings → Variables & Secrets** 中的 Worker 运行时变量和 Secret 不会自动提供给静态构建，把 `DOCS_TOKEN` 只填在运行时区域无法满足文档拉取所需的认证。Logo 和 favicon 的普通构建变量也需要保存后重新构建才能生效。
+`SITE_URL` 不会自动绑定域名，使用自己的正式地址前需先完成域名配置。暂时留空也能浏览站点，但不会生成依赖正式站点地址的 canonical、SEO 输出和 sitemap。
 
-保存后在构建记录中选择 **Retry build**。如果初始部署没有 Build Secret 入口，这就是在 Worker 创建后补齐配置并完成私有文档首次构建的步骤。后续更换文档源或 Token 仍修改这些变量和 Secret，构建命令、部署命令及根目录保持不变。
+这里的 **Build variables and secrets** 供构建进程使用。普通 **Settings → Variables & Secrets** 设置的是 Worker 运行时变量和 Secret，不会自动传给静态构建。因此，只在运行时区域填写 `DOCS_TOKEN`，文档拉取仍无法获得认证。Logo 和 favicon 的普通构建变量也需要保存后重新构建才会生效。
+
+保存后，在构建记录中选择 **Retry build**。如果初始部署没有 Build Secret 入口，就在 Worker 创建后补齐上述配置，再重试构建，完成私有文档的首次构建。后续更换文档源或 Token，也在这里修改变量和 Secret，构建命令、部署命令及根目录保持不变。
 
 ## 5. 确认首次发布
 
-构建和部署成功后，完成以下核心检查：
+构建和部署成功后，检查以下几项：
 
-- 查看构建日志中的文档提交 SHA，与私有仓库所选分支的提交对应。它是文档源版本，不一定等于 Cloudflare 显示的模板仓库提交。
+- 查看构建日志中的文档提交 SHA，核对它是否对应私有仓库所选分支的提交。这是文档源版本，不一定与 Cloudflare 显示的模板仓库提交相同。
 - 打开 Worker 的站点地址，确认首页显示私有源中的正文，文档链接和图片可以访问。
 - 查看页脚或 `/_build.json` 中的提交 SHA，确认线上页面使用的是本次读取的文档版本。
 
@@ -94,12 +96,12 @@ Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于�
 
 ## 6. 让文档推送触发更新
 
-逐项表单说明、推送验证和故障排查见[原文档仓库构建挂钩](./deploy-hook.md)。公开与私有仓库使用相同的触发流程；私有文档仍通过构建 Secret 中的 `DOCS_TOKEN` 读取。
+表单各字段的说明、推送验证和故障排查见[原文档仓库构建挂钩](./deploy-hook.md)。公开与私有仓库的触发流程相同，私有文档仍通过构建 Secret 中的 `DOCS_TOKEN` 读取。
 
-私有文档源与 Builds 关联的模板仓库相互独立时，需要把原文档仓库的 push 连接到 Cloudflare Deploy Hook。首次构建不依赖 Webhook，可以在发布成功后配置：
+私有文档源与 Builds 关联的模板仓库分开存放时，需要将原文档仓库的 push 连接到 Cloudflare Deploy Hook。首次构建不依赖 Webhook，发布成功后再配置即可：
 
 1. 在 Worker 的 **Settings → Builds → Deploy Hooks** 创建 Hook，选择模板仓库的构建分支，复制生成的 URL。
-2. 打开私有文档仓库的 **Settings → Webhooks → Add webhook**，填写下表并保存。管理 Webhook 需要相应的仓库管理权限，这与只读文档 Token 的权限分别管理。
+2. 打开私有文档仓库的 **Settings → Webhooks → Add webhook**，按下表填写并保存。管理 Webhook 需要相应的仓库管理权限，与只读文档 Token 的权限分开管理。
 
 | Webhook 字段 | 值 |
 | --- | --- |
@@ -108,15 +110,15 @@ Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于�
 | Secret | 留空；不要在此填写 `DOCS_TOKEN` |
 | Events | `Just the push event` |
 
-Deploy Hook URL 本身就是触发凭据，保存在 Webhook 设置中，不提交到仓库。`DOCS_TOKEN` 只负责构建时读取文档，不能作为这个流程的 Webhook Secret 使用。
+Deploy Hook URL 本身就是触发凭据，请保存在 Webhook 设置中，不要提交到仓库。`DOCS_TOKEN` 仅用于构建时读取文档，不能用作此流程的 Webhook Secret。
 
-向 `DOCS_BRANCH` 对应分支推送一次文档修改，在 GitHub Webhook 的 **Recent Deliveries** 查看请求结果，再在 Cloudflare 查看新构建及站点内容。Hook 选择的是模板分支，构建读取的文档分支由 `DOCS_BRANCH` 决定；二者可以不同。
+向 `DOCS_BRANCH` 对应分支推送一次文档修改，先在 GitHub Webhook 的 **Recent Deliveries** 查看请求结果，再到 Cloudflare 查看新构建，并检查站点内容。Hook 选择的是模板分支，读取哪个文档分支则由 `DOCS_BRANCH` 决定，二者可以不同。
 
 文档与模板若已在同一个 Builds 关联仓库、同一个分支，仓库自身的 push 会触发构建，无需重复设置这条 Webhook 链路。
 
 ## 7. 更新或更换 Token
 
-Token 到期、被撤销或需要轮换时，按第 3 步创建新的只读 Token，完成组织审批后，更新该 Worker 的 **Build variables and secrets → DOCS_TOKEN**，保存并重新构建。确认新凭据可用后撤销不再使用的旧 Token。
+Token 到期、被撤销或需要轮换时，按第 3 步创建新的只读 Token。完成组织审批后，更新该 Worker 的 **Build variables and secrets → DOCS_TOKEN**，保存并重新构建。确认新凭据可用，再撤销不再使用的旧 Token。
 
 更换私有仓库时，同时更新 `DOCS_REPO`，并确保新 Token 的 **Resource owner** 和所选仓库覆盖新的文档源。无需把 Token 写回模板仓库，也无需修改 Webhook Secret。
 

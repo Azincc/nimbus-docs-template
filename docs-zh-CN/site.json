@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "title": "Nimbus Docs Template",
-  "description": "使用 GitHub Markdown 构建文档站点；本仓库 docs-zh-CN/ 即为完整中文示例。",
+  "description": "将 GitHub 仓库中的 Markdown 发布为文档站点，完整中文示例保存在本仓库的 docs-zh-CN/ 目录中。",
   "locale": "zh-CN",
   "homeLabel": "首页",
   "github": "https://github.com/Azincc/nimbus-docs-template.git",
