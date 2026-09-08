@@ -90,7 +90,7 @@ pnpm preview:cf
 
 预览时，打开[编写文档](./writing-docs.md)和[站点配置](./site-config.md)，检查示例页面、相对链接和主题效果。页脚显示本次构建实际读取的文档提交 SHA。
 
-确认构建产物后，可以运行 `pnpm deploy` 发布到 Cloudflare，发布需要 Cloudflare 部署授权。部署命令只接受成功构建且未被修改的产物。修改站点后，要先重新执行 `pnpm build`。
+确认构建产物后，可以运行 `pnpm run deploy` 发布到 Cloudflare，发布需要 Cloudflare 部署授权。部署命令只接受成功构建且未被修改的产物。修改站点后，要先重新执行 `pnpm build`。
 
 开发模板时，使用 `pnpm test` 运行核心测试，构建后使用 `pnpm check` 检查 Astro 与 TypeScript（`pnpm typecheck` 为同义命令）。`pnpm e2e:dev --port 8787` 用于启动已构建产物，供浏览器测试访问。
 

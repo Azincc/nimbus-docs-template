@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "nimbus-docs-template",
+  // Preserve the existing deployment target in this standalone repository.
+  "name": "nimbus-template",
   // Kept in sync with the cloudflare/templates repository linter.
   "compatibility_date": "2025-10-08",
   "observability": { "enabled": true },

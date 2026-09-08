@@ -77,13 +77,13 @@ pnpm build
 pnpm preview:cf
 ```
 
-确认构建产物后，运行 `pnpm deploy` 发布到 Cloudflare。部署需要 Cloudflare 授权，脚本只接受本次成功构建且未被修改的产物。
+确认构建产物后，运行 `pnpm run deploy` 发布到 Cloudflare。部署需要 Cloudflare 授权，脚本只接受本次成功构建且未被修改的产物。
 
 | 命令 | 用途 |
 | --- | --- |
 | `pnpm build` | 构建静态页面与搜索索引 |
 | `pnpm preview:cf` | 使用 Workers 本地预览构建产物 |
-| `pnpm deploy` | 发布已构建的产物 |
+| `pnpm run deploy` | 发布已构建的产物 |
 | `pnpm config:probe` | 查看构建配置及其来源 |
 | `pnpm test` | 运行核心测试 |
 | `pnpm check` | 构建后检查 Astro 与 TypeScript，`typecheck` 为同义命令 |

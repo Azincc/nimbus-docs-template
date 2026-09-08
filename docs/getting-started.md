@@ -85,7 +85,7 @@ The build fetches documents, converts Markdown and assets, validates site settin
 
 Open [Writing documentation](./writing-docs.md) and [Site configuration](./site-config.md) in the preview to inspect the example pages, relative links, and theme. The footer shows the document commit SHA used by this build.
 
-After reviewing the output, run `pnpm deploy` to publish it to Cloudflare. This requires Cloudflare deployment authorization. The deploy command accepts only successfully built, unchanged artifacts; run `pnpm build` again after changing the site.
+After reviewing the output, run `pnpm run deploy` to publish it to Cloudflare. This requires Cloudflare deployment authorization. The deploy command accepts only successfully built, unchanged artifacts; run `pnpm build` again after changing the site.
 
 For template development, run core tests with `pnpm test` and check Astro and TypeScript after building with `pnpm check` (`pnpm typecheck` is an alias). Use `pnpm e2e:dev --port 8787` to serve completed build artifacts for browser tests.
 

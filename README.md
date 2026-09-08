@@ -73,13 +73,13 @@ pnpm build
 pnpm preview:cf
 ```
 
-After reviewing the build, run `pnpm deploy` to publish it with your Cloudflare credentials. The deploy script requires a successful build and rejects changed build artifacts.
+After reviewing the build, run `pnpm run deploy` to publish it with your Cloudflare credentials. The deploy script requires a successful build and rejects changed build artifacts.
 
 | Command | Purpose |
 | --- | --- |
 | `pnpm build` | Build static pages and the search index |
 | `pnpm preview:cf` | Preview built assets in the local Workers runtime |
-| `pnpm deploy` | Deploy previously built assets |
+| `pnpm run deploy` | Deploy previously built assets |
 | `pnpm config:probe` | Inspect build settings and their sources |
 | `pnpm test` | Run core tests |
 | `pnpm check` | Check Astro and TypeScript after a build (`typecheck` is an alias) |

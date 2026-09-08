@@ -58,7 +58,7 @@ Use Git, Node.js 22.12.0 or later, and pnpm 10.2.0. Install with `pnpm install -
 | Check Astro and TypeScript after a build | `pnpm check` (`pnpm typecheck` is an alias) |
 | Serve a completed build for browser tests | `pnpm e2e:dev --port 8787` |
 | Inspect source settings | `pnpm config:probe` |
-| Deploy a successful build | `pnpm deploy` |
+| Deploy a successful build | `pnpm run deploy` |
 
 Deployment needs Cloudflare authorization and is a separate action from a local build. A build records the actual document SHA in the footer and `/_build.json`; it does not currently identify the template commit.
 
