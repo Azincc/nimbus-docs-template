@@ -13,7 +13,7 @@
 - [修改部署配置](./deployment/configuration.md)：不用编写代码，直接在 Cloudflare 填写文档源、站点地址、Logo 和浏览器图标。
 - [私有仓库部署](./deployment/private-repository.md)：创建只读 Token，通过 Cloudflare Build Secret 读取私有文档。
 - [原文档仓库构建挂钩](./deployment/deploy-hook.md)：连接 GitHub Webhook 与 Cloudflare Deploy Hook，让文档推送自动触发构建。
-- [更新模板](./deployment/template-update.md)：应用模板后同步官方更新，或复制提示词交给 Agent 协助。
+- [更新模板](./deployment/template-update.md)：应用模板后同步官方更新，或将独立的 Agent 操作说明交给 Agent 协助。
 - [markdown显示测试](./markdown测试/markdown显示测试.md)：查看“markdown测试”分类中的常见 Markdown 样式。
 
 ## 示例如何工作

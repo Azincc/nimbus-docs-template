@@ -81,7 +81,7 @@ pnpm dev
 | [修改部署配置](docs/deployment/configuration.md) | 在 Cloudflare 页面填写和修改构建参数 |
 | [私有仓库部署](docs/deployment/private-repository.md) | Token 授权与部署排障 |
 | [构建挂钩](docs/deployment/deploy-hook.md) | 文档推送后自动更新 |
-| [更新模板](docs/deployment/template-update.md) | GitHub 同步步骤与可复制的 Agent 更新提示词 |
+| [更新模板](docs/deployment/template-update.md) | 面向用户的更新指南，附独立 Agent 操作说明入口 |
 | [Markdown 显示测试](docs/markdown测试/markdown显示测试.md) | 常见 Markdown 样式示例 |
 
 ## 项目信息
