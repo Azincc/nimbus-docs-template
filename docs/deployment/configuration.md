@@ -1,102 +1,123 @@
 ---
 title: 修改部署配置
-description: 部署后通过 GitHub 或 Cloudflare 修改文档源、站点地址、Logo 和 favicon，并重新构建使配置生效。
+description: 不用编写代码，直接在 Cloudflare 控制台填写文档源、站点地址和图片参数，保存后重新构建。
 sidebar:
   label: 修改部署配置
   order: 10
 ---
 
-部署后看到“构建 → 变量和机密：未配置构建变量或密钥”，表示 Cloudflare 尚未保存额外的构建变量。模板仍会读取根目录 `wrangler.jsonc` 中的 `vars` 默认值，这些文件配置不会自动列在构建变量区域。
+文档仓库、分支、目录、站点地址和图片都可以在 Cloudflare 页面中填写。日常修改这些参数，不需要安装开发工具，也不用编辑代码或 JSON 文件。
 
-如果找不到控制台的添加或编辑入口，可以直接在 GitHub 修改公开参数，再重新构建。
+基本操作是：**打开构建设置 → 添加或修改变量 → 保存 → 重新构建**。
 
-## 方式一：在 GitHub 修改配置文件
+## 1. 找到构建变量入口
 
-### 1. 找到实际参与构建的仓库
+1. 登录 Cloudflare，进入 **Workers 和 Pages**。
+2. 点击你部署的 Worker。
+3. 打开 **设置（Settings）**，向下找到 **构建（Builds）**。
+4. 在构建区域找到 **变量和机密（Build variables and secrets）**，点击该区域的 **添加**。
 
-打开 Cloudflare 的 **Workers & Pages → 你的 Worker → Settings（设置）→ Builds（构建）**，查看关联的 GitHub 仓库和构建分支。
+请使用“构建”下面的变量入口。页面上方的“运行时变量和机密”用于另一种用途；本模板是静态网站，该区域可能提示“不能将变量添加到只有静态资产的 Worker”，不影响下面的构建变量。
 
-在 GitHub 打开这个仓库，并切换到对应分支。通过部署按钮创建站点时，这通常是复制到你账号下的模板仓库。
+如果显示“未配置构建变量或密钥”，可以直接点击“添加”。此时网站正在使用模板自带的默认值，不代表部署失败。首次把常用参数添加到这里后，今后就能直接在列表中修改它们。
 
-模板仓库保存构建代码和 `wrangler.jsonc`；文档源仓库由 `DOCS_REPO` 指定，保存 Markdown、图片和站点 JSON。它们可以是同一个仓库，也可以分开。
+## 2. 填写基础参数
 
-### 2. 编辑根目录的 wrangler.jsonc
+点击“添加”后，会出现 **类型、名称、值** 三个输入项：
 
-在 GitHub 文件列表打开 `wrangler.jsonc`，点击铅笔图标编辑。找到 `"vars"`，将它的对象改为自己的配置。下面是对象内容示例：
+- **类型**：以下公开参数都选 **变量（Variable）**。
+- **名称**：从下表复制英文名称，大小写保持一致。
+- **值**：填写自己的内容，不加引号。名称和值分开填，不要把 `DOCS_BRANCH=main` 整行填到一个输入框。
 
-```json
-{
-  "DOCS_REPO": "https://github.com/example-user/project-docs.git",
-  "DOCS_BRANCH": "main",
-  "DOCS_PATH": "docs",
-  "DOCS_CONFIG_PATH": "docs/site.json",
-  "SITE_URL": "https://docs.example.com",
-  "SITE_LOGO": "",
-  "SITE_FAVICON": ""
-}
-```
+每填完一项，点击“添加”继续填写下一项。建议首次把下面五项都列出来，便于以后集中管理；仍适用的默认值也可以不添加。
 
-请将示例仓库和域名替换为实际值。只替换 `vars` 对象，保留外层配置及 `name`、`compatibility_date`、`assets` 等其他字段。
+| 想修改什么 | 名称 | 值怎么填 |
+| --- | --- | --- |
+| 文档放在哪个 GitHub 仓库 | `DOCS_REPO` | 仓库的 HTTPS 地址，例如 `https://github.com/example-user/project-docs.git`；将示例换成自己的仓库 |
+| 使用哪个分支 | `DOCS_BRANCH` | 例如 `main`；填写文档所在的实际分支 |
+| 使用哪个文件夹 | `DOCS_PATH` | 例如 `docs`；文档就在仓库最外层时填一个英文句点 `.` |
+| 站点配置文件在哪里 | `DOCS_CONFIG_PATH` | 仓库中有该文件时填 `docs/site.json`；没有配置文件时保留这一项，把值输入框留空 |
+| 网站的访问地址 | `SITE_URL` | 例如 `https://你的Worker.你的子域.workers.dev`，或已绑定的自定义域名；包含 `https://`，不附带页面路径 |
 
-| 参数 | 修改方法 |
+这里的 `example-user/project-docs` 是填写格式示例，需要替换成自己的仓库。在 GitHub 打开文档仓库，点击 **Code → HTTPS**，可以复制仓库地址；文件列表上方可以查看分支名。默认文档源为 `https://github.com/Azincc/nimbus-docs-template.git`，复制模板不会自动将它改成你的仓库。
+
+文件夹和配置文件路径都从文档仓库的最外层开始填写。例如文档在 `manual` 文件夹，配置文件在 `config/site.json`，就分别填写这两个值。不需要在路径前加仓库地址。
+
+**在 Cloudflare 输入框里，“留空”就是不输入任何字符，不要输入两个引号 `""`。** 新文档仓库没有站点配置文件时，要添加 `DOCS_CONFIG_PATH` 并将值留空；仅省略这一项会继续使用模板默认的 `docs/site.json`。
+
+`SITE_URL` 默认是示例站点 `https://nimbus.az1n.com`。部署自己的站点时，将它改为自己的实际访问地址。暂时不确定地址也可以把值留空，网站仍可浏览，但不会生成依赖正式地址的搜索引擎链接和站点地图。填写自定义域名不会自动绑定它，需要先在 Worker 的“域”页面完成域名配置。
+
+## 3. 按需设置 Logo 和浏览器图标
+
+使用当前模板版本时，可以再添加以下普通变量。它们是可选项，不设置时沿用站点配置中的图片。
+
+| 想修改什么 | 名称 | 值怎么填 |
+| --- | --- | --- |
+| 网站 Logo | `SITE_LOGO` | 可以直接打开图片的 HTTP(S) 地址，或文档仓库内的图片路径，例如 `docs/assets/logo.svg` |
+| 浏览器标签页的小图标 | `SITE_FAVICON` | 图片的 HTTP(S) 地址，或文档仓库内的图片路径，例如 `docs/assets/favicon.png` |
+
+填写图片地址时，使用图片本身的地址；GitHub 的文件预览页面地址不是图片地址。图片放在文档仓库时，填写文件路径即可，路径从仓库最外层开始计算。
+
+这两项分别生效：修改 Logo 不会同时改变浏览器图标。保留变量并将值留空时，恢复使用站点配置中的对应图片。
+
+较早创建的部署副本可能尚未支持这两个变量。若修改后重新构建仍无变化，先由模板维护者同步新版构建脚本；只添加变量不会自动升级部署副本。
+
+## 4. 私有仓库再添加机密
+
+公开仓库无需添加机密。私有文档仓库需要单独添加：
+
+| 类型 | 名称 | 值 |
+| --- | --- | --- |
+| **机密（Secret）** | `DOCS_TOKEN` | 仅授权目标仓库、具有 Contents 只读权限的 GitHub Token |
+
+Token 的创建方法见[私有仓库部署](./private-repository.md)。直接把 Token 填到 Cloudflare 的机密输入框，不要填进仓库地址、普通变量、文档或代码文件。
+
+## 5. 保存并重新构建
+
+1. 检查刚填写的名称和值，点击页面底部的 **保存（Save）**。
+2. 等待保存请求完成。若“未保存的更改”提示仍在，先查看是否有错误提示；没有错误时，刷新设置页，确认刚填写的变量和值仍然存在，即表示保存成功。
+3. 打开 **部署（Deployments）**，进入构建记录，选择 **重试构建（Retry build）**。
+4. 等待构建和部署成功，再打开网站查看结果。
+
+保存变量不会直接改变已经发布的静态页面，需要重新构建。只修改这些参数时，无需重新复制模板、再次点击部署按钮，也不用修改构建命令、部署命令或根目录。
+
+如果构建失败，查看日志中的错误并修正对应输入，再重试。例如“配置文件不存在”通常是 `DOCS_CONFIG_PATH` 没有指向真实文件；没有该文件时将值留空。
+
+## 以后如何修改或恢复默认值
+
+再次打开 **设置 → 构建 → 变量和机密**，修改列表中对应的值，保存后重新构建即可。
+
+这里保存的值优先于模板文件中的默认值。即使以后模板更新了某个默认值，你已经保存的构建变量仍然优先，方便用户保持自己的配置。
+
+要恢复模板默认值，删除对应构建变量，保存后重新构建。“删除变量”和“保留变量但将值留空”含义不同：
+
+| 操作 | 生效结果 |
 | --- | --- |
-| `DOCS_REPO` | 填文档所在 GitHub 仓库的 HTTPS 地址，例如从仓库 **Code → HTTPS** 复制的克隆地址；地址中不包含 Token |
-| `DOCS_BRANCH` | 填文档所在的实际分支，例如 `main`；这是文档源分支，可以与模板的构建分支不同 |
-| `DOCS_PATH` | 填相对文档源仓库根目录的文档目录，例如 `docs`、`manual`；文档位于根目录时填 `.` |
-| `DOCS_CONFIG_PATH` | 填相对文档源仓库根目录的站点 JSON 路径，例如 `docs/site.json`；没有此文件时填 `""` |
-| `SITE_URL` | 填包含 `https://` 的实际站点地址，例如 `https://你的Worker.你的子域.workers.dev`；不附带页面路径、查询参数或锚点，也可填 `""` |
-| `SITE_LOGO` | 可选；默认 `""`。填 Logo 的 HTTP(S) 图片 URL 或相对文档源仓库根目录的文件路径，例如 `docs/assets/nimbus-mark.svg` |
-| `SITE_FAVICON` | 可选；默认 `""`。填 favicon 的 HTTP(S) 图片 URL 或相对文档源仓库根目录的文件路径，例如 `docs/assets/nimbus-mark.svg` |
+| 删除变量 | 重新读取模板的默认值 |
+| 将 `DOCS_CONFIG_PATH` 的值留空 | 使用通用站点配置，不读取站点 JSON |
+| 将 `SITE_URL` 的值留空 | 不指定正式站点地址 |
+| 将 `SITE_LOGO` 或 `SITE_FAVICON` 的值留空 | 沿用站点配置中的对应图片 |
 
-复制模板不会自动把 `DOCS_REPO` 改成你的仓库。默认值仍为 `https://github.com/Azincc/nimbus-docs-template.git`；要发布自己副本里的 `docs/`，必须把它改成自己的仓库地址。
-
-`DOCS_CONFIG_PATH` 与 `DOCS_PATH` 都从文档源仓库根目录计算。例如文档放在 `manual/`、配置放在 `config/site.json`，分别填写 `manual` 和 `config/site.json`。
-
-`SITE_LOGO` 和 `SITE_FAVICON` 的本地路径也从 `DOCS_REPO` 文档源仓库根目录计算，不依赖 `DOCS_CONFIG_PATH`；没有站点 JSON 也能使用。JSON 中已有的 `brand.logo`、`brand.favicon` 本地路径继续相对 JSON 文件解析。
-
-没有站点 JSON 时保留 `"DOCS_CONFIG_PATH": ""`，模板会使用通用站点配置。`SITE_URL` 置空后仍可浏览站点，但不会生成 canonical、依赖正式站点地址的 SEO 输出和 sitemap。填写 `SITE_URL` 不会自动绑定自定义域名，需要先在 Cloudflare 完成域名配置。
-
-### 3. 提交并等待新构建
-
-在 GitHub 点击 **Commit changes**，把修改提交到 Cloudflare 关联的构建分支。如果通过 Pull Request 修改，需合并到该分支后才会进入对应构建。
-
-启用该分支的自动构建时，提交会触发一次新构建。在 Cloudflare 查看此次提交对应的构建记录，等待构建和部署成功。如果没有自动触发，检查 Builds 的仓库、分支和自动构建设置，或使用已配置的 Deploy Hook 触发该分支构建。
-
-修改仓库文件后，要确认新构建包含这次配置提交；重试旧提交的构建不能代替构建最新的模板代码。
-
-## 方式二：在 Cloudflare 添加构建变量
-
-如果希望直接在控制台管理参数，打开 **你的 Worker → Settings（设置）→ Builds（构建）→ Build variables and secrets（构建变量和机密）**。
-
-在该区域添加或编辑需要覆盖的变量，名称与上表完全一致，大小写保持一致。公开参数使用普通变量类型，只填写需要修改的项，然后保存并重新触发构建；仅修改控制台参数时，可以在构建记录中选择 **Retry build**。
-
-公开参数的读取顺序是：
-
-1. 当前构建环境中的同名变量。
-2. 模板仓库 `wrangler.jsonc` 中的 `vars` 默认值。
-
-因此，如果 Cloudflare 已设置 `DOCS_REPO`，修改文件中的 `DOCS_REPO` 不会覆盖它。需要同步修改控制台中的值，或删除该构建变量以恢复读取文件默认值。
-
-`DOCS_CONFIG_PATH` 和 `SITE_URL` 的空字符串也是有效覆盖。删除构建变量会恢复文件默认值，与显式设为空字符串不同。
-
-`SITE_LOGO` 和 `SITE_FAVICON` 也按上述顺序读取。最终非空值分别覆盖 JSON 的 `brand.logo`、`brand.favicon`；最终为空时继承 JSON 对应设置。显式空构建变量会覆盖 Wrangler 中的非空默认值并恢复 JSON 设置；删除变量才恢复读取 Wrangler 默认值。因此默认留空即可沿用已有品牌资源，只在需要覆盖时填写。两项都使用普通变量类型，不需要 Secret。
-
-如果界面没有添加或编辑入口，公开参数可按方式一修改。私有文档仓库所需的 `DOCS_TOKEN` 仍必须保存为这里的 **Secret（机密）**，不能写入 `wrangler.jsonc`、站点 JSON 或仓库 URL。普通 **Settings → Variables & Secrets** 中的运行时变量和 Secret 不会自动提供给静态构建。具体操作见[私有仓库部署](./private-repository.md)。
-
-## 确认修改生效
-
-构建与部署成功后，打开站点，确认正文来自预期的文档仓库。页脚或 `/_build.json` 中的文档提交 SHA 应对应 `DOCS_REPO` 和 `DOCS_BRANCH` 实际读取的提交。
-
-Cloudflare 构建记录显示的模板提交与页面显示的文档提交可以不同。仅修改 `SITE_URL` 等模板配置时，文档提交 SHA 也可能保持不变；此时结合新构建记录和对应页面输出确认生效。
+## 常见问题
 
 | 遇到的情况 | 处理方法 |
 | --- | --- |
-| 仍然显示模板示例文档 | 确认 `DOCS_REPO` 已指向自己的仓库，并检查控制台是否有同名构建变量覆盖文件值 |
-| 提示站点配置文件不存在 | 核对 `DOCS_CONFIG_PATH` 相对文档源仓库根目录的路径；没有配置文件时显式设为 `""` |
-| 修改文件后站点没有更新 | 确认提交到了 Builds 关联的模板仓库与分支，并且该提交的构建和部署均成功 |
-| 修改了独立文档源但没有触发构建 | 按[原文档仓库构建挂钩](./deploy-hook.md)连接文档推送与模板构建 |
-| Logo 或 favicon 没有变化 | 确认变量设在 Builds 区域并已重新构建；检查非空值是否覆盖了 JSON、本地路径是否相对文档源仓库根目录 |
+| 找不到添加按钮 | 向下找到“构建”区域中的“变量和机密”，不要停留在页面上方的运行时变量区域 |
+| 保存后还是提示未保存 | 等待保存请求完成并检查错误提示；无错误时刷新页面，核对变量和值是否仍在，提示可能未及时更新 |
+| 仍然显示模板示例文档 | 将 `DOCS_REPO` 改为自己的文档仓库，保存并重新构建 |
+| 找不到站点配置文件 | 有文件时核对路径；没有文件时保留 `DOCS_CONFIG_PATH` 并把值留空 |
+| 私有仓库无法拉取 | 确认 `DOCS_TOKEN` 类型为机密，且 Token 有目标仓库的读取权限 |
+| Logo 或图标没变化 | 检查图片地址、保存状态和构建结果；较早的部署副本还需确认构建脚本支持图片变量 |
+| 文档仓库更新后网站没变化 | 为独立文档源设置[构建挂钩](./deploy-hook.md)，让文档推送自动触发构建 |
 
-Logo 和 favicon 可以直接用上面的构建变量调整。站点名称、导航、主题、Logo 替代文字及完整品牌配置仍可在文档源仓库中 `DOCS_CONFIG_PATH` 指定的 JSON 维护，具体字段与优先级见[站点配置](../site-config.md)。
+站点名称、导航、主题和侧栏顺序还有各自的设置方法，见[站点配置](../site-config.md)与[侧栏顺序](../sidebar-order.md)。本文的构建变量只覆盖上面列出的参数，不会把所有站点设置自动变成控制台表单。
 
-Cloudflare 官方说明：[构建配置](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)与[构建变量设置入口](https://developers.cloudflare.com/workers/ci-cd/builds/build-image/#advanced-settings)。
+## 供模板维护者参考
+
+公开默认值保存在部署关联的模板仓库根目录 `wrangler.jsonc` 的 `vars` 中。构建脚本优先读取构建环境中的同名变量，没有设置时再读取这些默认值；`DOCS_TOKEN` 只从构建环境读取。
+
+仓库默认值不会自动出现在 Cloudflare 的构建变量列表。为新用户初始化该列表时，在构建设置中添加一次即可；文档源、分支、目录和站点地址填写后，用户的日常调整可以完全在 Cloudflare 完成。
+
+维护者也可以直接编辑仓库默认值并提交，但已经保存的同名构建变量会优先。此时要构建包含该次修改的新模板提交；重试旧提交不会读取尚未包含的文件改动。
+
+官方参考：[Workers Builds 配置](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)。

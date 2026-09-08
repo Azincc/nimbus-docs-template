@@ -13,33 +13,38 @@
 
 ## 快速部署
 
-无需在本地安装 Node.js。
+无需安装开发工具或编辑配置文件，直接在 Cloudflare 页面填写参数即可。
 
 1. 点击 **Deploy to Cloudflare**，授权 GitHub，创建自己的模板仓库和 Worker。
 2. 确认构建命令为 `pnpm run build`、部署命令为 `pnpm run deploy`，根目录为仓库根目录。
-3. 等待构建完成，通过 Cloudflare 提供的 `workers.dev` 地址访问站点。
+3. 打开该 Worker 的 **设置（Settings）→ 构建（Builds）→ 变量和机密（Variables and secrets）**，点击 **添加**，按下表填写自己的文档仓库等参数。以后在同一位置修改对应的值即可。
+4. 保存后，进入构建记录，对最新一次构建选择 **重试构建（Retry build）**。构建成功后，通过 Cloudflare 提供的 `workers.dev` 地址访问站点。
 
-默认读取本仓库的示例文档。要发布自己的内容，按下节修改文档源并重新构建。复制模板后，`DOCS_REPO` 不会自动变成你的仓库地址。
+首次部署可能先显示本仓库的示例文档；构建变量列表为空时，也会使用模板默认值。复制模板不会自动将 `DOCS_REPO` 改成你的仓库地址，发布自己的文档时需要填写它。
 
 ## 构建变量
 
-在 **Worker → Settings → Builds → Build variables and secrets** 中设置普通变量。只填写需要覆盖的项，其余读取 [wrangler.jsonc](wrangler.jsonc) 的默认值。
+以下 7 项都可以在上述位置设为普通变量。**名称和值分开填写，值不加引号**。例如名称填 `DOCS_BRANCH`，值填 `main`。只添加需要修改的项，未添加的项使用下表默认值。
 
 | 变量 | 默认值 | 用途 |
 | --- | --- | --- |
-| `DOCS_REPO` | `https://github.com/Azincc/nimbus-docs-template.git` | 文档源仓库的 HTTPS 地址 |
+| `DOCS_REPO` | `https://github.com/Azincc/nimbus-docs-template.git` | 改成存放自己文档的 GitHub 仓库 HTTPS 地址 |
 | `DOCS_BRANCH` | `main` | 文档分支 |
 | `DOCS_PATH` | `docs` | 相对文档源仓库根目录的文档路径 |
-| `DOCS_CONFIG_PATH` | `docs/site.json` | 站点 JSON 路径；没有此文件时显式置空 |
-| `SITE_URL` | `https://nimbus.az1n.com` | 可选站点地址；改为实际域名或显式置空 |
+| `DOCS_CONFIG_PATH` | `docs/site.json` | 站点配置文件路径；没有此文件时添加此变量并将值留空 |
+| `SITE_URL` | `https://nimbus.az1n.com` | 改为自己的完整站点地址，如 `https://你的Worker.你的子域.workers.dev`；暂不确定时添加此变量并将值留空 |
 | `SITE_LOGO` | 空 | Logo 的 HTTP(S) 图片地址或相对文档源仓库根目录的路径 |
 | `SITE_FAVICON` | 空 | favicon 的 HTTP(S) 图片地址或相对文档源仓库根目录的路径 |
 
-构建变量可以随时修改，保存后重新构建生效；也可以直接修改仓库中的默认值。普通 **Settings → Variables & Secrets** 中的运行时变量不会自动提供给构建。如果首次部署仍显示默认示例，在 Builds 中保存变量后选择 **Retry build**。
+“将值留空”是清空输入框，**不要输入两个引号 `""`**。未添加变量会继承模板默认值，与添加后留空不同。参数可以随时编辑，保存后选择 **Retry build** 才会更新网站。详细步骤见[修改部署配置](docs/deployment/configuration.md)。
+
+请确认进入的是 **构建** 区域中的变量和机密；普通 **Settings → Variables & Secrets** 中的运行时变量不会自动提供给构建。
 
 `SITE_URL` 用于 SEO，不会绑定域名；置空仍可访问，但不生成依赖正式域名的 canonical 和 sitemap。`SITE_LOGO`、`SITE_FAVICON` 非空时覆盖 JSON 配置，留空则沿用 JSON。
 
-私有文档源还需添加 `DOCS_TOKEN`，类型选择 **Secret**，使用仅授权目标仓库、具有 **Contents: Read-only** 权限的 GitHub Token。不要把 Token 写入仓库文件或 URL。私有仓库中的文档默认仍会发布为公开网站。详见[私有仓库部署](docs/deployment/private-repository.md)。
+较早创建的部署副本可能尚未支持 `SITE_LOGO` 和 `SITE_FAVICON`，需要先由模板维护者同步新版构建脚本；只添加变量不会自动升级副本。
+
+公开文档仓库不需要机密。私有文档源还需在同一个 **构建 → 变量和机密** 区域添加 `DOCS_TOKEN`，类型选择 **Secret**，使用仅授权目标仓库、具有 **Contents: Read-only** 权限的 GitHub Token。不要把 Token 写入仓库文件或 URL。私有仓库中的文档默认仍会发布为公开网站。详见[私有仓库部署](docs/deployment/private-repository.md)。
 
 文档和模板位于同一构建仓库、同一分支时，可通过推送触发自动构建。使用独立文档源时，按[构建挂钩指南](docs/deployment/deploy-hook.md)连接 GitHub Webhook 与 Cloudflare Deploy Hook。
 
@@ -73,9 +78,10 @@ pnpm dev
 | [编写文档](docs/writing-docs.md) | 首页、目录、Markdown 链接与图片 |
 | [侧栏顺序](docs/sidebar-order.md) | 页面和分类排序 |
 | [站点配置](docs/site-config.md) | 标题、导航、主题与品牌资源 |
-| [修改部署配置](docs/deployment/configuration.md) | 通过 GitHub 或 Cloudflare 调整变量 |
+| [修改部署配置](docs/deployment/configuration.md) | 在 Cloudflare 页面填写和修改构建参数 |
 | [私有仓库部署](docs/deployment/private-repository.md) | Token 授权与部署排障 |
 | [构建挂钩](docs/deployment/deploy-hook.md) | 文档推送后自动更新 |
+| [更新模板](docs/deployment/template-update.md) | GitHub 同步步骤与可复制的 Agent 更新提示词 |
 | [Markdown 显示测试](docs/markdown测试/markdown显示测试.md) | 常见 Markdown 样式示例 |
 
 ## 项目信息
@@ -97,4 +103,4 @@ pnpm dev
 
 `src/content/docs/`、`public/_source/` 和 `dist/` 是生成目录，不在其中维护文档。迁移模板仓库时，运行 `node scripts/configure-template.mjs <仓库 HTTPS 地址>`，同步更新 README 和快速入门中的部署按钮。
 
-已完成本地构建与核心验证；部署按钮首次变量传递、私有仓库认证和 Webhook 自动更新尚待云端实测。
+已完成本地构建与核心验证；私有仓库认证和 Webhook 自动更新尚待云端实测。
