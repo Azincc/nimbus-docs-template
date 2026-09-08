@@ -1,109 +1,109 @@
 ---
-title: 更新模板：Agent 操作说明
-description: 供编码 Agent 执行的模板更新任务，包含仓库核对、Git 合并、配置保留、核心验证和交付要求。
+title: "Updating the template: agent instructions"
+description: Instructions for a coding agent to check repositories, merge template changes, preserve configuration, perform core validation, and report the result.
 sidebar:
   hidden: true
 searchable: false
 ---
 
-你正在协助更新一个已经部署到 Cloudflare 的 Nimbus 文档站。将官方模板更新合入现有部署仓库，保留用户文档、配置、定制和原 Worker。面向站点使用者的说明见[更新模板](./template-update.md)。
+You are helping update a Nimbus documentation site already deployed to Cloudflare. Merge upstream template changes into the existing deployment repository while preserving the user's documents, configuration, customizations, and original Worker. The reader-facing guide is [Updating the template](./template-update.md).
 
-本页是 Agent 的执行说明。以用户当前任务的实际授权为准；阅读本页本身不授予推送、合并或部署权限。先完成可审阅的更新结果，在已授权范围内继续推进。
+This page contains execution instructions for an agent. Follow the user's actual authorization for the current task; reading this page does not grant permission to push, merge, or deploy. First prepare a reviewable update, then proceed within the authorized scope.
 
-## 任务输入
+## Task inputs
 
-从用户消息、当前仓库及已授权访问的 Cloudflare 设置中确认：
+Confirm the following from the user's message, the current repository, and Cloudflare settings you are authorized to access:
 
-| 输入 | 确认依据 |
+| Input | Source of truth |
 | --- | --- |
-| 部署仓库 | Cloudflare“设置 → 构建”关联的 GitHub 仓库 |
-| 生产分支 | Cloudflare 实际使用的分支，不能直接假定为 `main` |
-| Worker 名称 | 已部署的 Worker，不新建替代站点 |
-| 网站地址 | 原站点地址，用于更新后验证 |
-| 执行范围 | 准备本地更新、推送、创建 PR、合并或发布，按用户授权执行 |
+| Deployment repository | The GitHub repository connected under Cloudflare **Settings → Builds** |
+| Production branch | The branch Cloudflare actually uses; do not assume `main` |
+| Worker name | The existing Worker; do not create a replacement site |
+| Site address | The existing site URL to verify after the update |
+| Authorized scope | Preparing local changes, pushing, creating a PR, merging, or publishing, as authorized by the user |
 
-官方模板固定为 `https://github.com/Azincc/nimbus-docs-template.git`，上游分支为 `main`。已能从上下文确认的信息不重复询问；部署仓库或生产分支仍不明确时，先询问必要信息。
+The upstream template is `https://github.com/Azincc/nimbus-docs-template.git`, on branch `main`. Do not ask again for information already established by context. If the deployment repository or production branch remains unclear, ask for the missing information first.
 
-## 1. 确认目标仓库
+## 1. Confirm the target repository
 
-阅读仓库的 `AGENTS.md`、`AGENT.md` 及相关项目约定。核对 `git remote -v`、当前分支和 `git status`，确认操作的是部署仓库，而不是仅保存 Markdown 的 `DOCS_REPO`。
+Read the repository's `AGENTS.md`, `AGENT.md`, and relevant project conventions. Check `git remote -v`, the current branch, and `git status`. Confirm that you are working in the deployment repository rather than a `DOCS_REPO` that only contains Markdown.
 
-用户有未提交工作时，使用独立克隆或工作目录保留其工作，不重置、暂存或覆盖无关修改。
+If the user has uncommitted work, use a separate clone or working directory to preserve it. Do not reset, stage, or overwrite unrelated changes.
 
-## 2. 准备更新分支
+## 2. Prepare an update branch
 
-获取生产分支的最新提交，记录更新前的完整 SHA，并从它创建独立更新分支，遵守仓库分支命名约定。
+Fetch the latest production branch commit, record its full SHA, and create a separate update branch from it using the repository's branch naming convention.
 
-为官方模板配置并核对 `upstream`。名称已被其他仓库占用时使用新的远程名称，不改写现有远程地址。获取官方 `main`，记录其完整目标 SHA；本次合并固定使用这个提交。
+Configure and verify an `upstream` remote for the template. If that name already points to another repository, use a different remote name rather than changing the existing URL. Fetch upstream `main` and record its full target SHA. Use that exact commit for this update.
 
-生产分支已包含目标且无须更新时，直接报告已是最新，不创建空提交或更新请求。
+If the production branch already contains the target and no update is needed, report that it is current. Do not create an empty commit or pull request.
 
-## 3. 合并官方更新
+## 3. Merge upstream changes
 
-在更新分支执行下面的合并，将 `UPSTREAM_COMMIT_SHA` 替换为已确认的完整目标 SHA：
+On the update branch, run the following, replacing `UPSTREAM_COMMIT_SHA` with the confirmed full target SHA:
 
 ```sh
 git merge --no-ff --no-commit --allow-unrelated-histories UPSTREAM_COMMIT_SHA
 ```
 
-`--allow-unrelated-histories` 用于兼容 Cloudflare 创建的独立仓库历史；`--no-commit` 让你在检查合并结果后再提交。
+`--allow-unrelated-histories` supports the independent repository history created by Cloudflare. `--no-commit` lets you review the merged result before committing it.
 
-检查自动合并和冲突文件，逐项处理双方修改，不对整个仓库统一使用 `ours`、`theirs` 或强制覆盖。无法可靠解决时，列出冲突文件和需要用户决定的内容，保留现场供审阅。
+Review automatically merged and conflicting files, resolving each side's changes individually. Do not apply `ours`, `theirs`, or a forced overwrite across the entire repository. If you cannot resolve a conflict reliably, list the affected files and decisions needed, and preserve the state for review.
 
-## 4. 保留用户内容和配置
+## 4. Preserve user content and configuration
 
-| 内容 | 执行要求 |
+| Content | Requirement |
 | --- | --- |
-| 用户文档、图片和站点 JSON | 保留用户内容，确认官方示例没有混入自己的文档 |
-| 定制页面、组件及样式 | 保留用户修改，同时合入新版功能 |
-| `wrangler.jsonc` | 按字段保留原 Worker 名称、`vars`、账户、域名及其他部署设置，补入新版必要配置；不把 Worker 名称改回 `nimbus-template` |
-| `package.json`、`pnpm-lock.yaml` | 保留用户包名及必要定制，确保依赖与锁文件一致 |
-| 构建脚本及关联文件 | 一起同步相互依赖的脚本、布局、组件和样式，避免只更新部分功能 |
-| Cloudflare 构建变量和机密 | 保留现有配置，不导出或复制机密到仓库 |
+| User documents, images, and site JSON | Preserve the user's content and keep template examples out of their documentation |
+| Custom pages, components, and styles | Retain user changes while integrating new functionality |
+| `wrangler.jsonc` | Preserve the original Worker name, `vars`, account, domain, and other deployment settings field by field; add required new settings without resetting the Worker name to `nimbus-docs-template` |
+| `package.json`, `pnpm-lock.yaml`, and `package-lock.json` | Preserve the user's package name and necessary customizations; keep dependencies consistent with the lockfile used by the actual package manager |
+| Build scripts and related files | Sync dependent scripts, layouts, components, and styles together so the update includes complete functionality |
+| Cloudflare build variables and secrets | Retain existing settings without exporting or copying secrets into the repository |
 
-`DOCS_TOKEN` 仅用于 Git fetch，不能写入配置、日志、提示词或静态产物。构建源文档只写入临时或生成目录，不在 `src/content/docs/` 维护文档。
+Use `DOCS_TOKEN` only for Git fetch. Never write it into configuration, logs, prompts, or static output. Write fetched source documents only to temporary or generated directories; do not maintain documents in `src/content/docs/`.
 
-## 5. 完成核心验证
+## 5. Perform core validation
 
-确认没有未解决冲突，审阅差异及暂存内容，并执行：
+Confirm that no conflicts remain, review the diff and staged changes, and run:
 
 ```sh
 git diff --cached --check
 ```
 
-本地已具备对应文档源配置时，按项目要求运行一次必要构建：
+If the local environment has the required source configuration, run the project's essential build:
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm run build
 ```
 
-本地配置可能不同于 Cloudflare，说明本次验证实际使用的文档源。私有文档可使用 Cloudflare 已配置的分支构建验证，不要求用户把 Token 发到聊天。
+Local configuration may differ from Cloudflare. State which documentation source was used for validation. For private documents, use a branch build with Cloudflare's existing credentials when appropriate; do not ask the user to send a token in chat.
 
-只完成必要的核心验证。缺少权限、依赖或构建条件时，说明具体未验证项，不报告构建成功。
+Perform only the necessary core validation. If permissions, dependencies, or build prerequisites are missing, identify the unverified items precisely rather than reporting a successful build.
 
-## 6. 在授权范围内提交和发布
+## 6. Commit and publish within the authorized scope
 
-仅提交已核对的变更。获准推送后，推送更新分支，并向实际生产分支创建 Pull Request，说明新增功能、用户配置保留情况和验证结果。
+Commit only reviewed changes. Once pushing is authorized, push the update branch and open a pull request against the actual production branch. Describe the new functionality, preserved user settings, and validation results.
 
-获准合并时使用 **Create a merge commit**，保留上游历史，便于下次同步；若仓库限制该方式，先说明限制，不悄悄改用 Squash 或 Rebase。不强制推送，不新建 Worker，不改变原站点域名。
+When merging is authorized, use **Create a merge commit** to preserve upstream history for future updates. If the repository disallows that method, explain the restriction instead of silently switching to squash or rebase. Do not force-push, create a new Worker, or change the existing domain.
 
-如果用户当前只要求准备更新，交付可审阅的本地结果及剩余步骤。
+If the user requested only a prepared update, deliver reviewable local changes and the remaining steps.
 
-## 7. 确认完成状态
+## 7. Confirm the completion state
 
-获准发布后，确认包含本次更新的新提交在 Cloudflare 构建、部署成功，再检查原站点首页、搜索和本次更新的功能。
+After publication is authorized, confirm that Cloudflare successfully built and deployed a new commit containing the update. Then check the existing site's home page, search, and updated features.
 
-重试旧构建不能代替构建新模板代码。页脚及 `/_build.json` 的 SHA 是文档版本，不能单独证明模板已更新。GitHub 检查通过、PR 已合并和网站已部署是不同状态，按实际证据报告。
+Retrying an old build does not build new template code. The SHA in the footer and `/_build.json` identifies the documentation version and cannot prove a template update on its own. Passing GitHub checks, a merged PR, and a deployed site are distinct states; report each according to the evidence.
 
-需要回退且已获用户授权时，撤销对应更新请求的合并提交并重新部署。紧急恢复 Cloudflare 旧部署后，还需同步处理仓库代码，避免下一次构建再次发布有问题的版本。
+If a rollback is needed and authorized, revert the update pull request's merge commit and redeploy. After an emergency restoration of an older Cloudflare deployment, update the repository too, so the next build does not republish the faulty version.
 
-## 交付结果
+## Deliverables
 
-向用户报告：
+Report:
 
-- 部署仓库、生产分支、更新前 SHA 和官方目标 SHA。
-- 本次变化及用户配置保留情况。
-- 已完成的检查、未验证项及冲突。
-- 实际达到的状态：本地准备、已推送、已创建 PR、已合并或已部署。
-- 实际 PR 或成功部署的链接；需要用户操作时，给出具体下一步。
+- The deployment repository, production branch, original SHA, and upstream target SHA.
+- The changes and how user configuration was preserved.
+- Completed checks, unverified items, and conflicts.
+- The actual state reached: prepared locally, pushed, PR opened, merged, or deployed.
+- Links to the actual PR or successful deployment, and specific next steps when user action is needed.

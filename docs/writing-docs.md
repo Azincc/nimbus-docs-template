@@ -1,16 +1,18 @@
 ---
-title: 编写文档
-description: 使用普通 Markdown 编写页面、组织目录，并添加相对链接和本地图片。
+title: Writing documentation
+description: Write pages in plain Markdown, organize directories, and add relative links and local images.
 sidebar:
-  label: 编写文档
+  label: Writing documentation
   order: 20
 ---
 
-在文档源仓库的 `docs/` 中维护 `.md` 文件。模板会自动发现页面，保留原始文件不变，只向临时和生成目录写入构建内容。
+Maintain `.md` files in the document source repository's `docs/` directory. The template discovers pages automatically, leaves the originals unchanged, and writes build content only to temporary and generated directories.
 
-## 组织页面
+[中文文档](https://github.com/Azincc/nimbus-docs-template/blob/main/docs-zh-CN/writing-docs.md)
 
-本示例的文档结构如下：
+## Organize pages
+
+This example has the following structure:
 
 ```text
 docs/
@@ -23,16 +25,18 @@ docs/
 ├── deployment/
 │   ├── configuration.md
 │   ├── private-repository.md
-│   └── deploy-hook.md
-├── markdown测试.md
-├── markdown测试/
-│   └── markdown显示测试.md
+│   ├── deploy-hook.md
+│   ├── template-update.md
+│   └── template-update-agent.md
+├── markdown-test.md
+├── markdown-test/
+│   └── markdown-display-test.md
 ├── site.json
 └── assets/
     └── nimbus-mark.svg
 ```
 
-| 文档路径 | 站点路由 |
+| Document path | Site route |
 | --- | --- |
 | `docs/README.md` | `/` |
 | `docs/getting-started.md` | `/getting-started` |
@@ -43,75 +47,77 @@ docs/
 | `docs/deployment/configuration.md` | `/deployment/configuration` |
 | `docs/deployment/private-repository.md` | `/deployment/private-repository` |
 | `docs/deployment/deploy-hook.md` | `/deployment/deploy-hook` |
-| `docs/markdown测试.md` | `/markdown测试` |
-| `docs/markdown测试/markdown显示测试.md` | `/markdown测试/markdown显示测试` |
+| `docs/deployment/template-update.md` | `/deployment/template-update` |
+| `docs/deployment/template-update-agent.md` | `/deployment/template-update-agent` |
+| `docs/markdown-test.md` | `/markdown-test` |
+| `docs/markdown-test/markdown-display-test.md` | `/markdown-test/markdown-display-test` |
 
-子目录也可以添加 `README.md` 或 `index.md` 作为目录首页。同一目录只保留其中一个，避免两个文件竞争同一路由。普通文件按照路径生成小写 slug。
+A subdirectory can also contain `README.md` or `index.md` as its landing page. Keep only one of these in each directory to avoid competing for the same route. Regular files generate lowercase slugs from their paths.
 
-常见语法的实际渲染效果见 [markdown显示测试](./markdown测试/markdown显示测试.md)。
+See [Markdown display test](./markdown-test/markdown-display-test.md) for rendered examples of common syntax.
 
-## 标题和侧栏
+## Titles and sidebar
 
-普通 Markdown 可以直接以一级标题开头，像本示例的[首页](./README.md)一样，模板会从首个标题提取页面标题。
+Plain Markdown can begin with an H1, as on this example's [home page](./README.md). The template extracts the page title from the first heading.
 
-需要设置描述、侧栏名称或顺序时，在文件开头加入 frontmatter：
+To set a description, sidebar label, or order, add frontmatter at the start of the file:
 
 ```md
 ---
-title: 编写文档
-description: 使用 Markdown 维护文档页面。
+title: Writing documentation
+description: Maintain documentation pages with Markdown.
 sidebar:
-  label: 编写文档
+  label: Writing documentation
   order: 20
 ---
 
-从这里开始编写正文。
+Start writing the page here.
 
-## 添加内容
+## Add content
 
-使用普通 Markdown 的标题、列表、表格和代码块。
+Use ordinary Markdown headings, lists, tables, and code blocks.
 ```
 
-页面会显示 `title` 作为主标题，无需在正文重复。侧栏自动收录页面；较小的 `sidebar.order` 排在前面。
+The page displays `title` as its main heading, so you do not need to repeat it in the body. The sidebar includes pages automatically; smaller `sidebar.order` values appear first.
 
-本示例使用 `10、20、30…` 为同级页面排序，方便在中间插入新页面。分类的顺序由同级同名 Markdown 文件控制，例如 [deployment.md](./deployment.md) 设置整个“部署指南”分类的位置，`deployment/` 内各页面的 `sidebar.order` 设置分类内的顺序。
+This example uses `10, 20, 30…` to order siblings, leaving space to insert new pages. A category's position is controlled by a Markdown file beside the directory with the same name. For example, [deployment.md](./deployment.md) positions the entire Deployment guide category, while each page's `sidebar.order` inside `deployment/` controls its position within that category.
 
-逐项操作、完整配置示例和当前文档的顺序对照见[配置侧栏顺序](./sidebar-order.md)。
+See [Sidebar order](./sidebar-order.md) for step-by-step instructions, complete examples, and the current document order.
 
-非首页页面可以设置 `slug` 自定义路由，例如 `slug: writing-docs`，不要添加开头或结尾的 `/`。目录首页保留自动映射，不另设 slug。
+Non-index pages can set `slug` to customize their route, such as `slug: writing-docs`. Do not add leading or trailing `/` characters. Directory landing pages keep their automatic mapping and should not set a custom slug.
 
-## 相对链接
+## Relative links
 
-用文档文件之间的相对路径书写链接：
+Write links using paths between document files:
 
 ```md
-[快速入门](./getting-started.md)
-[站点配置](./site-config.md)
-[页面首页](./README.md)
+[Quick start](./getting-started.md)
+[Site configuration](./site-config.md)
+[Home](./README.md)
 ```
 
-构建后这些链接指向对应站点页面，也支持保留 `#` 后的标题锚点。例如：[站点主题](./site-config.md#主题)。
+The build rewrites these links to their corresponding site pages and preserves heading anchors after `#`. For example: [Site theme](./site-config.md#theme).
 
-目标文件必须存在。文档目录外的 Markdown 不会生成本站页面，引用仓库 README 等文件时使用完整 GitHub 地址。
+Target files must exist. Markdown outside the selected document directory does not become a page on this site. Use full GitHub URLs when linking to the repository README or the separate [Chinese documentation](https://github.com/Azincc/nimbus-docs-template/tree/main/docs-zh-CN).
 
-## 图片和资源
+## Images and assets
 
-图片路径以当前 Markdown 文件为基准。本示例的首页引用 `docs/assets/nimbus-mark.svg`：
+Image paths are relative to the Markdown file that references them. This example's home page uses `docs/assets/nimbus-mark.svg`:
 
 ```md
-![Nimbus 文档标识](./assets/nimbus-mark.svg)
+![Official Nimbus logo](./assets/nimbus-mark.svg)
 ```
 
-模板会复制被引用的本地资源并重写地址。图片可以放在原仓库的其他普通目录中，但路径不能越出仓库；隐藏文件、隐藏目录和符号链接不会被发布。
+The template copies referenced local assets and rewrites their URLs. Images can live in other ordinary directories in the source repository, but paths cannot escape the repository. Hidden files, hidden directories, and symbolic links are not published.
 
-品牌 Logo 和 favicon 也可以通过可选的普通构建变量 `SITE_LOGO`、`SITE_FAVICON` 设置：接受 HTTP(S) 图片 URL，或相对 `DOCS_REPO` 文档源仓库根目录的路径，例如 `docs/assets/nimbus-mark.svg`，不依赖站点 JSON 的位置。JSON 中的 `brand.logo`、`brand.favicon` 本地路径仍以 JSON 文件为基准。构建变量的最终非空值覆盖对应 JSON 字段，最终为空则继承 JSON；在 Cloudflare Builds 区域保存变量后重新构建生效。具体见[品牌资源](./site-config.md#品牌资源)。
+You can also set the logo and favicon through the optional ordinary build variables `SITE_LOGO` and `SITE_FAVICON`. They accept HTTP(S) image URLs or paths relative to the `DOCS_REPO` repository root, such as `docs/assets/nimbus-mark.svg`, regardless of the site JSON location. Local `brand.logo` and `brand.favicon` paths in JSON remain relative to the JSON file. A final nonempty build variable overrides the corresponding JSON field; an empty value inherits JSON. Save the variables in Cloudflare Builds and rebuild to apply them. See [Branding](./site-config.md#branding).
 
-## 发布更新
+## Publish updates
 
-提交并推送文档修改后，重新触发站点构建。构建会重新生成页面与自动侧栏；删除文件后，对应页面也会从下次产物中移除。若顶部导航手动引用了删除的页面，同时修改 `docs/site.json`。
+Commit and push document changes, then trigger a site build. The build regenerates pages and the sidebar; deleted files disappear from the next output. If the top navigation explicitly references a deleted page, also update `docs/site.json`.
 
-独立文档源可以通过[构建挂钩](./deployment/deploy-hook.md)在 push 后自动重建，省去每次手动触发的步骤。
+A separate document source can use a [Deploy hook](./deployment/deploy-hook.md) to rebuild automatically after a push.
 
-当前文档输入仅处理 `.md`，忽略 `.mdx`；文档源不执行 JavaScript 或 MDX 组件。需要调整模板代码时，直接修改模板项目，并参考[仓库维护说明](https://github.com/Azincc/nimbus-docs-template/blob/main/AGENT.md)。
+The current document input handles `.md` files and ignores `.mdx`. It does not execute JavaScript or MDX components from the document source. To change template code, edit the template project itself and consult the [repository maintenance instructions](https://github.com/Azincc/nimbus-docs-template/blob/main/AGENT.md).
 
-继续阅读[站点配置](./site-config.md)，或[返回首页](./README.md)。
+Continue to [Site configuration](./site-config.md), or [return home](./README.md).

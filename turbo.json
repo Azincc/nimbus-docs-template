@@ -1,0 +1,12 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "cache": false,
+      "env": ["DOCS_REPO", "DOCS_BRANCH", "DOCS_PATH", "DOCS_CONFIG_PATH", "SITE_URL", "SITE_LOGO", "SITE_FAVICON"],
+      "passThroughEnv": ["DOCS_TOKEN"],
+      "outputs": ["dist/**", ".astro/**", ".generated/**", "src/content/docs/**", "public/_source/**", "public/_build.json"]
+    }
+  }
+}

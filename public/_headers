@@ -1,0 +1,6 @@
+# Static hosting does not preserve Astro's prerendered response headers.
+/*.md
+  Content-Type: text/markdown; charset=utf-8
+
+/*.mdx
+  Content-Type: text/mdx; charset=utf-8

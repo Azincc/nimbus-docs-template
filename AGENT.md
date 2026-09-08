@@ -1,109 +1,85 @@
-# This Nimbus docs site
+# Maintaining this Nimbus template
 
-Astro-based docs. The `nimbus-docs` package handles content schemas, sidebar/TOC, MDX→markdown, build hooks, and the `nimbus` CLI. Everything in `src/` is yours to edit.
+This project wraps the Nimbus Astro starter with a GitHub Markdown source pipeline. Follow `AGENTS.md` for project rules. Keep verification focused on the changed behavior and core build flow.
 
-## File layout
+## Content and generated files
 
-```
-astro.config.ts              # imports nimbus + defineNimbusConfig
-src/
-├── components.ts            # MDX globals registry — every component used in .mdx must be listed
-├── components/              # AgentDirective, Header, Render + ui/<slug>/
-├── content/
-│   ├── docs/*.mdx
-│   └── partials/*.mdx       # referenced via <Render file="..." />
-├── content.config.ts        # registers docsCollection() + partialsCollection()
-├── layouts/                 # BaseLayout (NimbusHead), DocsLayout (sidebar/TOC/breadcrumbs)
-├── lib/cn.ts                # Tailwind className merger
-├── pages/
-│   ├── [...slug].astro
-│   ├── [...slug]/index.md.ts   # per-page markdown alternate
-│   ├── llms.txt.ts
-│   ├── og.png.ts                # site-level OG card
-│   ├── og/
-│   │   ├── _og-card-config.ts   # shared OG theme tokens (underscore = not a route)
-│   │   └── [...slug].ts         # per-page OG cards
-│   └── robots.txt.ts
-└── styles/                  # globals.css, prose.css
-```
+- `docs/` is the default English document source, with site settings in `docs/site.json`.
+- `docs-zh-CN/` preserves the Chinese edition, with its own `site.json`. Keep corresponding guides in sync when behavior changes.
+- `README.md` is the primary English repository guide; `README.zh-CN.md` is its Chinese counterpart.
+- Users select a source repository, branch, and directory through `DOCS_REPO`, `DOCS_BRANCH`, and `DOCS_PATH`.
+- `src/content/docs/` contains generated content. Do not create or maintain source documents there.
+- `.cache/`, `.generated/`, `.astro/`, `.nimbus/`, `public/_source/`, `public/_build.json`, and `dist/` are disposable build outputs.
+- Builds fetch the remote source. Local edits to either document set become part of a normal build only after they reach the configured source branch.
+- Do not modify the fetched source repository. Write conversions only to temporary or generated directories.
+- `DOCS_TOKEN` is a build secret used only for Git fetch. Never persist it in configuration, logs, URLs, or static output.
 
-Cloudflare deploys also have `wrangler.jsonc` at the project root.
+Source documents use ordinary `.md`, optionally with frontmatter. The pipeline does not execute MDX or JavaScript from the document source. Use the document root's `README.md` or `index.md` for the home page; do not include both. If neither exists, the build generates an index.
 
-## Writing docs
-
-Frontmatter validates against `docsSchema` (`nimbus-docs/schemas`). Required: `title`.
-
-```mdx
+```md
 ---
 title: My page
 description: One-line summary.
 ---
 
-Content here. The page H1 comes from `title` — don't repeat it in the body.
-
 ## Section heading
+
+Content here. The page H1 comes from the title.
 ```
 
-Rules:
+See `docs/writing-docs.md`, `docs/sidebar-order.md`, and `docs/site-config.md` for source authoring and configuration.
 
-- **Components must be PascalCase and registered in `src/components.ts`.** A pre-build validator catches typos with a "did you mean" hint.
-- **Partials use `<Render file="..." />`.** Don't import `.mdx` directly. Shared content lives in `src/content/partials/<slug>.mdx`.
-- **Icons use `astro-icon` + Phosphor.** `<Icon name="ph:<glyph>" class="w-4 h-4" />` from `astro-icon/components`. Glyphs: [phosphoricons.com](https://phosphoricons.com).
-- **Don't remove `<AgentDirective />` from `BaseLayout.astro`.** It points agents at `/llms.txt`.
+## File layout
 
-## Adding things
+| Path | Role |
+| --- | --- |
+| `astro.config.ts` | Nimbus integration and generated site settings |
+| `wrangler.jsonc` | Worker configuration and public build defaults |
+| `scripts/source.mjs` | Validate source settings and fetch a branch |
+| `scripts/content.mjs` | Convert Markdown routes, links, and assets |
+| `scripts/site-config.mjs` | Validate and map source site configuration |
+| `scripts/build.mjs` | Prepare content, build Astro, and index search |
+| `scripts/deploy.mjs` | Verify and deploy completed build artifacts |
+| `src/components.ts` | Nimbus internal MDX component registry |
+| `src/components/`, `src/layouts/`, `src/styles/` | Site presentation |
+| `src/pages/` | Document routes, Markdown alternates, AI metadata, and OG images |
+| `tests/` | Core behavior tests |
+
+## Local commands
+
+Use Git, Node.js 22.12.0 or later, and pnpm 10.2.0. Install with `pnpm install --frozen-lockfile`, or `npm ci` when using npm.
+
+| Goal | Command |
+| --- | --- |
+| Develop the site with remote source docs | `pnpm dev` |
+| Build pages and search | `pnpm build` |
+| Preview built assets on Workers locally | `pnpm preview:cf` |
+| Test core behavior | `pnpm test` |
+| Check Astro and TypeScript after a build | `pnpm check` (`pnpm typecheck` is an alias) |
+| Serve a completed build for browser tests | `pnpm e2e:dev --port 8787` |
+| Inspect source settings | `pnpm config:probe` |
+| Deploy a successful build | `pnpm deploy` |
+
+Deployment needs Cloudflare authorization and is a separate action from a local build. A build records the actual document SHA in the footer and `/_build.json`; it does not currently identify the template commit.
+
+## Nimbus UI maintenance
+
+The copied UI files under `src/` belong to this template. Updating the Nimbus package does not automatically update these files. Review upstream changes before applying them, preserving the Markdown source pipeline and generated configuration.
 
 | Goal | Action |
-|---|---|
-| New doc page | Create `src/content/docs/<slug>.mdx`. Sidebar picks it up. |
-| New partial | Create `src/content/partials/<slug>.mdx`. Use via `<Render file="<slug>" />`. |
-| UI from registry | `pnpm exec nimbus-docs add <slug>`. Register in `src/components.ts` if used in MDX. |
-| Feature recipe | `pnpm exec nimbus-docs add <feature-slug>`. Pipe the printed brief to your agent. |
-| Check it builds | `pnpm exec nimbus-docs check` — build-free preflight (env + structure + authoring + types). `--json` for an agent loop, `--fix` to repair what's safe. |
-| Custom page route | Add a file under `src/pages/`. |
-| Custom OG style | Edit `src/pages/og/_og-card-config.ts`. |
-| Check for updates | `pnpm exec nimbus-docs outdated` — starter files behind their tag + registry components behind. |
-| Upgrade a starter file | `pnpm exec nimbus-docs diff <file>` to review, `diff --apply <file>` to pull a clean upstream change. |
-| Upgrade a registry component | `pnpm exec nimbus-docs add <slug> --overwrite`, then review with `git diff`. |
+| --- | --- |
+| Add a source page | Add `.md` in the configured source directory; use `docs/` for this repository's example |
+| Add a custom route | Add a file under `src/pages/` |
+| Change OG styling | Edit `src/pages/og/_og-card-config.ts` |
+| List Nimbus UI items | `pnpm exec nimbus-docs list` |
+| Add a Nimbus UI item | `pnpm exec nimbus-docs add <slug>`, then review the changes |
+| Check copied starter files | `pnpm exec nimbus-docs outdated` |
+| Review a starter update | `pnpm exec nimbus-docs diff <file>` |
 
-List installable items: `pnpm exec nimbus-docs list`.
+Register any internal PascalCase MDX components in `src/components.ts`. Internal partials use `<Render file="..." />`; do not import `.mdx` directly. These facilities belong to the site's implementation and do not enable MDX in fetched source documents.
 
-## Audit this site
+Preserve `<AgentDirective />` in `BaseLayout.astro`, Markdown alternate links, document routes, and the `data-pagefind-body` search container. Use `astro-icon` and the existing Phosphor icon set for UI icons. Inspect generated search and routes when changing their implementation.
 
-Start with `pnpm exec nimbus-docs check --json`. It runs the environment, structural, authoring, and type checks build-free — config validity, `site` placeholder, route collisions, MDX component resolution, the lint rules, and a `tsc` type-check — and returns three top-level signals plus per-scope detail:
+Nimbus CLI checks can supplement targeted verification, but inspect findings before changing source code: generated files may require preparation, and platform-specific CLI issues are not automatically project defects.
 
-- **`status`** (`passed` | `failed` | `partial`) and **`readiness`** (`buildable` | `blocked` | `unknown`) are the primary signals. `status` is the whole-run verdict; `readiness` answers "does env + structure say it builds?". `ok` (=== zero errors) is kept for back-compat only.
-- **`findings[{scope,code,severity,file,line,message,fixable,fix}]`** are problems we evaluated. Apply each `fix` (or `check --fix`).
-- **`scopes[].notes[{code,reason,requiresBuild?,requiresInput?}]`** are checks we *couldn't* evaluate yet (e.g. types before a build). A note is never a finding and never carries a `fix` — you resolve it by making the missing thing exist (usually a build), not by `--fix`. `summary.notes` counts them.
-
-Loop terminates on `status !== "failed" && summary.fixable === 0` — a `partial` run with nothing left to fix is a **stop** (optionally build, then re-check), not a `--fix` retry. Exit is `1` only when `status` is `"failed"`. For full coverage (types + link-checking) run a build first, then `check` again.
-
-Then walk the categories below for what `check` doesn't cover yet — route-file existence, registry hygiene, the AI surface, post-build search, and Cloudflare config. Emit findings as:
-
-```
-- [error|warn|info] FILE:LINE — what + why + fix.
-```
-
-End with `Summary: N errors, N warnings.`
-
-- **Config** — `astro.config.ts` calls `nimbus(defineNimbusConfig({ ... }))`; `site` is set; `editPattern` (if set) contains `{path}`; `output:` matches the deploy target.
-- **Content** — `content.config.ts` registers `docsCollection()` (and `partialsCollection()` if used); every `.mdx` is inside a registered collection; frontmatter validates.
-- **Sidebar** — every sidebar ref resolves to a content entry; no orphans; no slug collisions.
-- **MDX** — every PascalCase component in `*.mdx` is registered; every `<Render file=...>` resolves; code-fence languages are valid.
-- **Routes** — `llms.txt.ts`, `robots.txt.ts`, `[...slug]/index.md.ts`, `og.png.ts`, `og/[...slug].ts` all exist.
-- **Registry hygiene** — every `src/components/ui/<slug>/` is either MDX-registered or imported in `src/`; transitive deps (`lib/cn.ts`, etc.) exist.
-- **AI surface** — `<AgentDirective />` renders in `BaseLayout.astro`; doc `<head>` has `<link rel="alternate" type="text/markdown" ...>`.
-- **Search** — `data-pagefind-body` is on the docs main wrapper; after `pnpm build`, `dist/pagefind/` exists with ≥1 indexed page.
-- **Cloudflare** (if applicable) — `wrangler.jsonc` has `name`, `compatibility_date`, `assets.directory = "./dist"`, `not_found_handling`.
-
-## Don't
-
-- Hand-add components under `src/components/ui/` that exists in the nimbus-docs registry — use `nimbus-docs add` so deps resolve.
-- Import `.mdx` files directly — use `<Render file="..." />`.
-- Attach remark/rehype plugins via `mdx({ remarkPlugins })` — Sätteri silently drops them. Framework-side transformations run as content passes.
-- Remove `<AgentDirective />` unless asked.
-- Edit `src/components.ts` to bypass registration — if a component is used in `.mdx`, register it.
-
-## Project home
-
-[nimbus-docs.com](https://nimbus-docs.com)
+Upstream project: [nimbus-docs.com](https://nimbus-docs.com).

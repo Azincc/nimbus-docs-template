@@ -1,16 +1,16 @@
 ---
-title: 部署指南
-description: 修改部署配置、连接私有文档仓库、设置自动构建，并更新已部署的模板。
+title: Deployment
+description: Configure a deployed site, connect a private documentation repository, automate builds, and update the template.
 sidebar:
   order: 40
   group:
-    label: 部署指南
+    label: Deployment
     hideIndex: true
 ---
 
-首次部署步骤见[快速入门](./getting-started.md#部署到-cloudflare)。部署后，可以按以下顺序完善站点：
+For your first deployment, see [Getting started](./getting-started.md#deploy-to-cloudflare). After deployment, use these guides to configure and maintain the site:
 
-1. [修改部署配置](./deployment/configuration.md)：设置文档源、站点地址、Logo 和 favicon。
-2. [私有仓库部署](./deployment/private-repository.md)：为私有文档源配置只读访问凭据。
-3. [原文档仓库构建挂钩](./deployment/deploy-hook.md)：让独立文档仓库的推送自动触发站点构建。
-4. [更新模板](./deployment/template-update.md)：通过 GitHub 同步或交给 Agent 更新，保留已有文档、配置和站点地址。
+1. [Build configuration](./deployment/configuration.md): set the documentation source, site URL, logo, and favicon.
+2. [Private repositories](./deployment/private-repository.md): provide read-only credentials for a private documentation source.
+3. [Deploy hooks](./deployment/deploy-hook.md): rebuild the site automatically when you push to a separate documentation repository.
+4. [Updating the template](./deployment/template-update.md): sync through GitHub or ask an agent to update the template while preserving your documents, configuration, and site address.

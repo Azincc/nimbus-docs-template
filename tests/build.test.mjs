@@ -2,14 +2,14 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import test from 'node:test';
+import { test } from 'vitest';
 import { buildEnvironment, digestDirectory, finalizeArtifacts } from '../scripts/artifacts.mjs';
 import { loadSettings } from '../scripts/settings.mjs';
 import { UNKNOWN_ORIGIN } from '../scripts/site-config.mjs';
 
 async function temporaryArtifacts(t) {
   const directory = await mkdtemp(path.join(tmpdir(), 'nimbus-artifact-test-'));
-  t.after(() => rm(directory, { recursive: true, force: true }));
+  t.onTestFinished(() => rm(directory, { recursive: true, force: true }));
   return directory;
 }
 

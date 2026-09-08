@@ -1,4 +1,4 @@
-import test from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -9,7 +9,7 @@ import { readSourceSettings } from '../scripts/source.mjs';
 
 async function brandingFixture(t) {
   const directory = await mkdtemp(path.join(tmpdir(), 'nimbus-branding-test-'));
-  t.after(() => rm(directory, { recursive: true, force: true }));
+  t.onTestFinished(() => rm(directory, { recursive: true, force: true }));
   const root = path.join(directory, 'repo');
   const assetsDir = path.join(directory, 'assets');
   await mkdir(path.join(root, 'docs'), { recursive: true });

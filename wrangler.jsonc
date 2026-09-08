@@ -1,7 +1,10 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "nimbus-template",
-  "compatibility_date": "2026-09-01",
+  "name": "nimbus-docs-template",
+  // Kept in sync with the cloudflare/templates repository linter.
+  "compatibility_date": "2025-10-08",
+  "observability": { "enabled": true },
+  "upload_source_maps": true,
   // Public inputs only. The build reads these defaults; Build variables override them.
   // DOCS_TOKEN belongs exclusively in Settings > Builds > Variables and secrets.
   "vars": {

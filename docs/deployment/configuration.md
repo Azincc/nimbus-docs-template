@@ -1,123 +1,123 @@
 ---
-title: 修改部署配置
-description: 不用编写代码，直接在 Cloudflare 控制台填写文档源、站点地址和图片参数，保存后重新构建。
+title: Build configuration
+description: Set the documentation source, site URL, and branding in the Cloudflare dashboard, then rebuild.
 sidebar:
-  label: 修改部署配置
+  label: Build configuration
   order: 10
 ---
 
-文档仓库、分支、目录、站点地址和图片都可以在 Cloudflare 页面中填写。日常修改这些参数，不需要安装开发工具，也不用编辑代码或 JSON 文件。
+You can set the documentation repository, branch, directory, site URL, and images in the Cloudflare dashboard. Routine changes to these settings do not require development tools or edits to code or JSON files.
 
-基本操作是：**打开构建设置 → 添加或修改变量 → 保存 → 重新构建**。
+The process is: **open build settings → add or edit variables → save → rebuild**.
 
-## 1. 找到构建变量入口
+## 1. Find build variables
 
-1. 登录 Cloudflare，进入 **Workers 和 Pages**。
-2. 点击你部署的 Worker。
-3. 打开 **设置（Settings）**，向下找到 **构建（Builds）**。
-4. 在构建区域找到 **变量和机密（Build variables and secrets）**，点击该区域的 **添加**。
+1. Sign in to Cloudflare and open **Workers & Pages**.
+2. Select your deployed Worker.
+3. Open **Settings** and scroll to **Builds**.
+4. Find **Build variables and secrets** in the build settings and select **Add**.
 
-请使用“构建”下面的变量入口。页面上方的“运行时变量和机密”用于另一种用途；本模板是静态网站，该区域可能提示“不能将变量添加到只有静态资产的 Worker”，不影响下面的构建变量。
+Use the variables section under **Builds**. The runtime **Variables and Secrets** section higher on the page serves a different purpose. Because this template serves static assets, that section may say that variables cannot be added to an assets-only Worker. This does not prevent you from setting build variables.
 
-如果显示“未配置构建变量或密钥”，可以直接点击“添加”。此时网站正在使用模板自带的默认值，不代表部署失败。首次把常用参数添加到这里后，今后就能直接在列表中修改它们。
+If the page says no build variables or secrets are configured, select **Add**. The site is currently using the template defaults; this message does not mean deployment failed. Once you add settings here, you can edit them directly in the list.
 
-## 2. 填写基础参数
+## 2. Set the basic variables
 
-点击“添加”后，会出现 **类型、名称、值** 三个输入项：
+Selecting **Add** opens three fields: **Type**, **Name**, and **Value**.
 
-- **类型**：以下公开参数都选 **变量（Variable）**。
-- **名称**：从下表复制英文名称，大小写保持一致。
-- **值**：填写自己的内容，不加引号。名称和值分开填，不要把 `DOCS_BRANCH=main` 整行填到一个输入框。
+- **Type**: choose **Variable** for the public settings below.
+- **Name**: copy the name from the table exactly, including capitalization.
+- **Value**: enter your value without quotes. Enter the name and value separately; do not put an entire assignment such as `DOCS_BRANCH=main` into one field.
 
-每填完一项，点击“添加”继续填写下一项。建议首次把下面五项都列出来，便于以后集中管理；仍适用的默认值也可以不添加。
+After entering each setting, select **Add** to continue. Adding all five settings the first time makes them easier to manage together, but you can omit any setting whose default already suits your site.
 
-| 想修改什么 | 名称 | 值怎么填 |
+| What to change | Name | Value |
 | --- | --- | --- |
-| 文档放在哪个 GitHub 仓库 | `DOCS_REPO` | 仓库的 HTTPS 地址，例如 `https://github.com/example-user/project-docs.git`；将示例换成自己的仓库 |
-| 使用哪个分支 | `DOCS_BRANCH` | 例如 `main`；填写文档所在的实际分支 |
-| 使用哪个文件夹 | `DOCS_PATH` | 例如 `docs`；文档就在仓库最外层时填一个英文句点 `.` |
-| 站点配置文件在哪里 | `DOCS_CONFIG_PATH` | 仓库中有该文件时填 `docs/site.json`；没有配置文件时保留这一项，把值输入框留空 |
-| 网站的访问地址 | `SITE_URL` | 例如 `https://你的Worker.你的子域.workers.dev`，或已绑定的自定义域名；包含 `https://`，不附带页面路径 |
+| GitHub repository containing your documents | `DOCS_REPO` | The HTTPS clone URL, such as `https://github.com/example-user/project-docs.git`; replace the example with your repository |
+| Source branch | `DOCS_BRANCH` | The branch containing your documents, such as `main` |
+| Documentation directory | `DOCS_PATH` | A path such as `docs`; enter `.` if the documents are at the repository root |
+| Site configuration file | `DOCS_CONFIG_PATH` | `docs/site.json` or the actual path if the file exists; if there is no configuration file, keep this variable and leave its value empty |
+| Public site address | `SITE_URL` | Your actual address, such as `https://your-worker.your-subdomain.workers.dev`, or a custom domain you have already connected; include `https://` and no page path |
 
-这里的 `example-user/project-docs` 是填写格式示例，需要替换成自己的仓库。在 GitHub 打开文档仓库，点击 **Code → HTTPS**，可以复制仓库地址；文件列表上方可以查看分支名。默认文档源为 `https://github.com/Azincc/nimbus-docs-template.git`，复制模板不会自动将它改成你的仓库。
+`example-user/project-docs` illustrates the URL format; replace it with your repository. In GitHub, open the documentation repository and select **Code → HTTPS** to copy its clone URL. The branch selector appears above the file list. The default source is `https://github.com/Azincc/nimbus-docs-template.git`; creating a template copy does not automatically change it to your repository.
 
-文件夹和配置文件路径都从文档仓库的最外层开始填写。例如文档在 `manual` 文件夹，配置文件在 `config/site.json`，就分别填写这两个值。不需要在路径前加仓库地址。
+Directory and configuration paths are relative to the documentation repository root. For example, if documents are in `manual` and the configuration file is in `config/site.json`, enter those two values. Do not prepend the repository URL.
 
-**在 Cloudflare 输入框里，“留空”就是不输入任何字符，不要输入两个引号 `""`。** 新文档仓库没有站点配置文件时，要添加 `DOCS_CONFIG_PATH` 并将值留空；仅省略这一项会继续使用模板默认的 `docs/site.json`。
+**An empty Cloudflare field contains no characters. Do not enter two quotes (`""`).** If your documentation repository has no site configuration file, add `DOCS_CONFIG_PATH` and leave its value empty. Omitting the variable would continue to use the default `docs/site.json` path.
 
-`SITE_URL` 默认是示例站点 `https://nimbus.az1n.com`。部署自己的站点时，将它改为自己的实际访问地址。暂时不确定地址也可以把值留空，网站仍可浏览，但不会生成依赖正式地址的搜索引擎链接和站点地图。填写自定义域名不会自动绑定它，需要先在 Worker 的“域”页面完成域名配置。
+`SITE_URL` defaults to the example site, `https://nimbus.az1n.com`. Change it to your own site's actual address. If you do not know the address yet, you can leave the value empty: the site remains browsable, but it will not generate search-engine links or a sitemap that depend on a public origin. Entering a custom domain does not connect it automatically; configure it in the Worker's domain settings first.
 
-## 3. 按需设置 Logo 和浏览器图标
+## 3. Set the logo and favicon
 
-使用当前模板版本时，可以再添加以下普通变量。它们是可选项，不设置时沿用站点配置中的图片。
+The current template supports these additional variables. Both are optional; when unset, the site uses the images from its site configuration.
 
-| 想修改什么 | 名称 | 值怎么填 |
+| What to change | Name | Value |
 | --- | --- | --- |
-| 网站 Logo | `SITE_LOGO` | 可以直接打开图片的 HTTP(S) 地址，或文档仓库内的图片路径，例如 `docs/assets/logo.svg` |
-| 浏览器标签页的小图标 | `SITE_FAVICON` | 图片的 HTTP(S) 地址，或文档仓库内的图片路径，例如 `docs/assets/favicon.png` |
+| Site logo | `SITE_LOGO` | A direct HTTP(S) image URL, or an image path in the documentation repository, such as `docs/assets/logo.svg` |
+| Browser tab icon | `SITE_FAVICON` | An HTTP(S) image URL, or an image path in the documentation repository, such as `docs/assets/favicon.png` |
 
-填写图片地址时，使用图片本身的地址；GitHub 的文件预览页面地址不是图片地址。图片放在文档仓库时，填写文件路径即可，路径从仓库最外层开始计算。
+Use the address of the image itself. A GitHub file preview page is not an image URL. For an image stored in the documentation repository, enter its path relative to the repository root.
 
-这两项分别生效：修改 Logo 不会同时改变浏览器图标。保留变量并将值留空时，恢复使用站点配置中的对应图片。
+These variables work independently: changing the logo does not change the favicon. Keeping a variable with an empty value restores the corresponding image from the site configuration.
 
-较早创建的部署副本可能尚未支持这两个变量。若修改后重新构建仍无变化，先由模板维护者同步新版构建脚本；只添加变量不会自动升级部署副本。
+Older deployment copies may not support these variables yet. If a rebuild does not apply the change, ask the template maintainer to sync the updated build scripts first. Adding a variable does not upgrade the deployment copy.
 
-## 4. 私有仓库再添加机密
+## 4. Add a secret for a private repository
 
-公开仓库无需添加机密。私有文档仓库需要单独添加：
+Public repositories do not require a secret. For a private documentation repository, add:
 
-| 类型 | 名称 | 值 |
+| Type | Name | Value |
 | --- | --- | --- |
-| **机密（Secret）** | `DOCS_TOKEN` | 仅授权目标仓库、具有 Contents 只读权限的 GitHub Token |
+| **Secret** | `DOCS_TOKEN` | A GitHub token scoped to the target repository with read-only Contents permission |
 
-Token 的创建方法见[私有仓库部署](./private-repository.md)。直接把 Token 填到 Cloudflare 的机密输入框，不要填进仓库地址、普通变量、文档或代码文件。
+See [Private repositories](./private-repository.md) for token creation steps. Paste the token directly into the Cloudflare secret field. Do not put it in the repository URL, a regular variable, documentation, or a code file.
 
-## 5. 保存并重新构建
+## 5. Save and rebuild
 
-1. 检查刚填写的名称和值，点击页面底部的 **保存（Save）**。
-2. 等待保存请求完成。若“未保存的更改”提示仍在，先查看是否有错误提示；没有错误时，刷新设置页，确认刚填写的变量和值仍然存在，即表示保存成功。
-3. 打开 **部署（Deployments）**，进入构建记录，选择 **重试构建（Retry build）**。
-4. 等待构建和部署成功，再打开网站查看结果。
+1. Check the names and values, then select **Save** at the bottom of the page.
+2. Wait for the save request to finish. If an unsaved-changes message remains, check for errors. If there are no errors, refresh the settings page and confirm the variables and values are still present; this confirms they were saved.
+3. Open **Deployments**, open the build record, and select **Retry build**.
+4. Wait for the build and deployment to succeed, then open the site to check the result.
 
-保存变量不会直接改变已经发布的静态页面，需要重新构建。只修改这些参数时，无需重新复制模板、再次点击部署按钮，也不用修改构建命令、部署命令或根目录。
+Saving variables does not change pages that have already been published; a rebuild is required. Changing these settings does not require another template copy, another click on the deployment button, or changes to the build command, deploy command, or root directory.
 
-如果构建失败，查看日志中的错误并修正对应输入，再重试。例如“配置文件不存在”通常是 `DOCS_CONFIG_PATH` 没有指向真实文件；没有该文件时将值留空。
+If the build fails, read the error in the log, correct the relevant input, and retry. For example, a missing configuration file usually means `DOCS_CONFIG_PATH` points to a file that does not exist. Leave its value empty if you have no configuration file.
 
-## 以后如何修改或恢复默认值
+## Change settings or restore defaults later
 
-再次打开 **设置 → 构建 → 变量和机密**，修改列表中对应的值，保存后重新构建即可。
+Return to **Settings → Builds → Build variables and secrets**, edit the relevant value, save, and rebuild.
 
-这里保存的值优先于模板文件中的默认值。即使以后模板更新了某个默认值，你已经保存的构建变量仍然优先，方便用户保持自己的配置。
+Values saved here take precedence over defaults in the template files. Your saved build variables continue to take precedence even if a later template update changes a default.
 
-要恢复模板默认值，删除对应构建变量，保存后重新构建。“删除变量”和“保留变量但将值留空”含义不同：
+To restore a template default, delete the corresponding build variable, save, and rebuild. Deleting a variable and keeping it with an empty value have different effects:
 
-| 操作 | 生效结果 |
+| Action | Result |
 | --- | --- |
-| 删除变量 | 重新读取模板的默认值 |
-| 将 `DOCS_CONFIG_PATH` 的值留空 | 使用通用站点配置，不读取站点 JSON |
-| 将 `SITE_URL` 的值留空 | 不指定正式站点地址 |
-| 将 `SITE_LOGO` 或 `SITE_FAVICON` 的值留空 | 沿用站点配置中的对应图片 |
+| Delete a variable | Read the template default again |
+| Leave `DOCS_CONFIG_PATH` empty | Use the generic site configuration without reading a site JSON file |
+| Leave `SITE_URL` empty | Do not specify a public site origin |
+| Leave `SITE_LOGO` or `SITE_FAVICON` empty | Use the corresponding image from the site configuration |
 
-## 常见问题
+## Troubleshooting
 
-| 遇到的情况 | 处理方法 |
+| Problem | What to check |
 | --- | --- |
-| 找不到添加按钮 | 向下找到“构建”区域中的“变量和机密”，不要停留在页面上方的运行时变量区域 |
-| 保存后还是提示未保存 | 等待保存请求完成并检查错误提示；无错误时刷新页面，核对变量和值是否仍在，提示可能未及时更新 |
-| 仍然显示模板示例文档 | 将 `DOCS_REPO` 改为自己的文档仓库，保存并重新构建 |
-| 找不到站点配置文件 | 有文件时核对路径；没有文件时保留 `DOCS_CONFIG_PATH` 并把值留空 |
-| 私有仓库无法拉取 | 确认 `DOCS_TOKEN` 类型为机密，且 Token 有目标仓库的读取权限 |
-| Logo 或图标没变化 | 检查图片地址、保存状态和构建结果；较早的部署副本还需确认构建脚本支持图片变量 |
-| 文档仓库更新后网站没变化 | 为独立文档源设置[构建挂钩](./deploy-hook.md)，让文档推送自动触发构建 |
+| Cannot find the Add button | Scroll to the variables section under **Builds**, below the runtime variables section |
+| The page still says changes are unsaved | Wait for the save request and check for errors; if there are none, refresh and verify that the values remain, because the message may be stale |
+| The site still shows the template's example documents | Set `DOCS_REPO` to your documentation repository, save, and rebuild |
+| The site configuration file cannot be found | Check the path if the file exists; otherwise, keep `DOCS_CONFIG_PATH` and leave its value empty |
+| A private repository cannot be fetched | Confirm that `DOCS_TOKEN` is a build **Secret** and grants read access to the target repository |
+| The logo or favicon has not changed | Check the image address, saved values, and build result; for older copies, confirm the build scripts support branding variables |
+| Documentation changes do not update the site | Set up a [deploy hook](./deploy-hook.md) for a separate documentation repository so pushes trigger builds |
 
-站点名称、导航、主题和侧栏顺序还有各自的设置方法，见[站点配置](../site-config.md)与[侧栏顺序](../sidebar-order.md)。本文的构建变量只覆盖上面列出的参数，不会把所有站点设置自动变成控制台表单。
+The site name, navigation, theme, and sidebar order have their own settings. See [Site configuration](../site-config.md) and [Sidebar order](../sidebar-order.md). The build variables described here cover only the listed settings; they do not turn every site setting into a dashboard field.
 
-## 供模板维护者参考
+## Notes for template maintainers
 
-公开默认值保存在部署关联的模板仓库根目录 `wrangler.jsonc` 的 `vars` 中。构建脚本优先读取构建环境中的同名变量，没有设置时再读取这些默认值；`DOCS_TOKEN` 只从构建环境读取。
+Public defaults are stored in `vars` in the deployment template repository's root `wrangler.jsonc`. The build scripts first read variables with the same names from the build environment, then fall back to these defaults. `DOCS_TOKEN` is read only from the build environment.
 
-仓库默认值不会自动出现在 Cloudflare 的构建变量列表。为新用户初始化该列表时，在构建设置中添加一次即可；文档源、分支、目录和站点地址填写后，用户的日常调整可以完全在 Cloudflare 完成。
+Repository defaults do not appear automatically in the Cloudflare build variables list. Add them once in build settings if you want to initialize that list for a user. After the source, branch, directory, and site URL have been added, the user can make routine adjustments entirely in Cloudflare.
 
-维护者也可以直接编辑仓库默认值并提交，但已经保存的同名构建变量会优先。此时要构建包含该次修改的新模板提交；重试旧提交不会读取尚未包含的文件改动。
+Maintainers can also edit and commit repository defaults, but saved build variables with the same names take precedence. Build a new template commit containing the changes; retrying an older commit cannot read changes that it does not contain.
 
-官方参考：[Workers Builds 配置](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)。
+Official reference: [Workers Builds configuration](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/).

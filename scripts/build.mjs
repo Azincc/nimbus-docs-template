@@ -11,6 +11,7 @@ import { projectRoot, cleanGenerated, buildEnvironment, digestDirectory, finaliz
 
 process.chdir(projectRoot);
 const dev = process.argv.includes('--dev');
+const astroArgs = process.argv.slice(2).filter(arg => arg !== '--dev' && arg !== '--');
 let checkout;
 let stage;
 
@@ -30,7 +31,7 @@ try {
   const visible = content.pages.filter(page => !page.data.draft);
   if (!visible.length) throw new Error('The source contains no published Markdown documents.');
   if (!content.pages.some(page => page.route === '/')) {
-    const title = '文档';
+    const title = 'Documentation';
     const body = visible.map(page => `- [${page.title.replace(/[\[\]\\]/g, '\\$&')}](${page.route})`).join('\n');
     await writeFile(path.join(stage, 'docs', 'index.md'), `---\n${stringify({ title, sidebar: { order: -1 } })}---\n\n${body}\n`);
     content.pages.unshift({ id: 'index', source: null, route: '/', title, data: { title } });
@@ -53,7 +54,7 @@ try {
   await cleanGenerated(stage); stage = undefined;
   console.log(`[prepare] ${provenance.pages} published pages. ${site.publicSite ? 'SEO origin configured.' : 'SITE_URL is empty: canonical URLs and sitemap are omitted.'}`);
   const exitCode = await new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, ['node_modules/astro/bin/astro.mjs', dev ? 'dev' : 'build'], { stdio: 'inherit', env: buildEnvironment() });
+    const child = spawn(process.execPath, ['node_modules/astro/bin/astro.mjs', dev ? 'dev' : 'build', ...astroArgs], { stdio: 'inherit', env: buildEnvironment() });
     child.once('error', reject);
     child.once('exit', code => resolve(code ?? 1));
   });

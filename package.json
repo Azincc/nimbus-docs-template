@@ -1,6 +1,6 @@
 {
-  "name": "nimbus-template",
-  "version": "0.0.1",
+  "name": "nimbus-docs-template",
+  "description": "Publish Markdown from a GitHub repository as a searchable Nimbus documentation site on Cloudflare Workers.",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,8 +9,10 @@
     "deploy": "node scripts/deploy.mjs",
     "preview": "astro preview",
     "preview:cf": "wrangler dev",
+    "e2e:dev": "wrangler dev",
+    "check": "astro check",
     "typecheck": "astro check",
-    "test": "node --test tests/*.test.mjs",
+    "test": "vitest run",
     "config:probe": "node scripts/config-probe.mjs"
   },
   "dependencies": {
@@ -36,14 +38,24 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.8",
-    "@tailwindcss/vite": "4.1.4",
+    "@tailwindcss/vite": "4.2.4",
     "pagefind": "1.5.2",
-    "tailwindcss": "4.1.4",
-    "typescript": "5.8.3",
-    "wrangler": "4.129.0"
+    "tailwindcss": "4.2.4",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10",
+    "wrangler": "4.127.0"
   },
   "engines": {
     "node": ">=22.12.0"
   },
-  "packageManager": "pnpm@11.19.0"
+  "packageManager": "pnpm@10.2.0",
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "sharp", "workerd"]
+  },
+  "cloudflare": {
+    "label": "Nimbus Docs",
+    "products": ["Workers"],
+    "categories": ["starter"],
+    "docs_url": "https://developers.cloudflare.com/workers/static-assets/"
+  }
 }

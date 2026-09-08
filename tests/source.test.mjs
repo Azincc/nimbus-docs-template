@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import test from 'node:test';
+import { test } from 'vitest';
 import { checkoutSource, readSourceSettings } from '../scripts/source.mjs';
 
 const defaults = {

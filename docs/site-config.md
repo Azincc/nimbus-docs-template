@@ -1,70 +1,74 @@
 ---
-title: 站点配置
-description: 配置 Nimbus 文档站点的名称、导航、主题和品牌资源。
+title: Site configuration
+description: Configure the name, navigation, theme, and branding of a Nimbus documentation site.
 sidebar:
-  label: 站点配置
+  label: Site configuration
   order: 30
 ---
 
-模板在构建时读取文档源仓库中的 JSON 配置，校验后应用到站点。Logo 和 favicon 也可以通过可选构建变量单独设置。模板不加载文档源仓库的 `astro.config.*`，也不执行其中的 JavaScript 或 MDX。
+At build time, the template reads JSON configuration from the document source repository, validates it, and applies it to the site. You can also set the logo and favicon with optional build variables. The template does not load `astro.config.*` or execute JavaScript or MDX from the document source.
 
-## 本站示例
+[中文文档](https://github.com/Azincc/nimbus-docs-template/blob/main/docs-zh-CN/site-config.md)
 
-本仓库将配置保存在 `docs/site.json`，构建变量 `DOCS_CONFIG_PATH` 设为 `docs/site.json`。该路径相对仓库根目录，与 `DOCS_PATH` 分开计算。
+## This example's configuration
+
+This repository stores its configuration in `docs/site.json` and sets `DOCS_CONFIG_PATH` to `docs/site.json`. The path is relative to the repository root and is resolved independently of `DOCS_PATH`.
 
 ```json
 {
   "schemaVersion": 1,
   "title": "Nimbus Docs Template",
-  "description": "使用 GitHub Markdown 构建文档站点；本仓库 docs/ 即为完整示例。",
-  "locale": "zh-CN",
-  "homeLabel": "首页",
+  "description": "Build documentation from GitHub Markdown; this repository's docs/ directory is a complete example.",
+  "locale": "en",
+  "homeLabel": "Home",
   "github": "https://github.com/Azincc/nimbus-docs-template.git",
   "navigation": [
-    { "label": "本站首页", "link": "/" },
-    { "label": "入门", "link": "/getting-started" },
-    { "label": "仓库", "link": "https://github.com/Azincc/nimbus-docs-template.git" }
+    { "label": "Home", "link": "/" },
+    { "label": "Quick start", "link": "/getting-started" },
+    { "label": "GitHub", "link": "https://github.com/Azincc/nimbus-docs-template.git" }
   ],
   "theme": {
     "defaultMode": "system"
   },
   "brand": {
     "logo": "./assets/nimbus-mark.svg",
-    "logoAlt": "Nimbus Docs Template",
+    "logoAlt": "Nimbus",
     "favicon": "./assets/nimbus-mark.svg"
   }
 }
 ```
 
-`schemaVersion` 必须为 `1`，其他字段按需提供。将 `DOCS_CONFIG_PATH` 设为空字符串时使用通用站点配置；保留仓库默认值则读取 `docs/site.json`。未知字段或不合法的值会使构建失败，便于及时发现拼写错误。
+`schemaVersion` must be `1`; other fields are optional. An explicitly empty `DOCS_CONFIG_PATH` uses generic site settings, while the repository default reads `docs/site.json`. Unknown fields and invalid values fail the build so configuration mistakes are visible.
 
-## 配置字段
+## Configuration fields
 
-| 字段 | 格式 | 用途 |
+| Field | Format | Purpose |
 | --- | --- | --- |
-| `schemaVersion` | `1`，必填 | 配置格式版本 |
-| `title` | 字符串 | 站点名称 |
-| `description` | 字符串 | 站点介绍及默认描述 |
-| `locale` | 语言标签，例如 `zh-CN` | 页面语言 |
-| `homeLabel` | 字符串 | 首页在导航中的名称 |
-| `github` | 完整 HTTPS URL 或 `null` | 仓库入口；使用 `null` 关闭 |
-| `navigation` | 包含 `label`、`link` 的对象数组 | 顶部导航 |
-| `theme` | 对象 | 默认外观和强调色 |
-| `brand` | 对象 | Logo、favicon 和默认分享图片 |
+| `schemaVersion` | Required; `1` | Configuration format version |
+| `title` | String | Site name |
+| `description` | String | Site introduction and default description |
+| `locale` | Language tag, such as `en` or `zh-CN` | Page language metadata |
+| `homeLabel` | String | Home-page label in navigation |
+| `github` | Full HTTPS URL or `null` | Repository link; use `null` to hide it |
+| `navigation` | Array of objects with `label` and `link` | Top navigation |
+| `theme` | Object | Default appearance and accent color |
+| `brand` | Object | Logo, favicon, and default social image |
 
-## 导航与侧栏
+`locale` identifies the page language; it does not translate content or UI labels and does not create multilingual routes. English documents live in `docs/`. To publish the separate [Chinese documents](https://github.com/Azincc/nimbus-docs-template/tree/main/docs-zh-CN), set `DOCS_PATH=docs-zh-CN` and `DOCS_CONFIG_PATH=docs-zh-CN/site.json`, then rebuild.
 
-`navigation` 配置顶部入口。内部链接使用已生成的站点路由，例如 `/` 或 `/getting-started`，不填写 `.md` 文件路径；外部链接使用完整 HTTPS URL。内部目标页面必须存在，否则构建会报告错误。
+## Navigation and sidebar
 
-侧栏根据文档自动生成，与顶部导航分别配置。页面标题、描述和顺序在 Markdown frontmatter 中维护，见[编写文档](./writing-docs.md#标题和侧栏)。
+`navigation` configures the top links. Use generated routes such as `/` or `/getting-started` for internal links, rather than `.md` file paths. Use full HTTPS URLs for external links. Internal target pages must exist or the build reports an error.
 
-调整页面和分类的位置，按[配置侧栏顺序](./sidebar-order.md)设置 `sidebar.order`，再重新构建。
+The sidebar is generated from documents and configured separately from top navigation. Maintain page titles, descriptions, and order in Markdown frontmatter. See [Writing documentation](./writing-docs.md#titles-and-sidebar).
 
-## 主题
+To reposition pages and categories, set `sidebar.order` as described in [Sidebar order](./sidebar-order.md), then rebuild.
 
-`theme.defaultMode` 支持 `system`、`light` 和 `dark`。本示例使用 `system`，默认跟随浏览器的外观偏好。
+## Theme
 
-可选的 `theme.accent` 使用六位十六进制颜色，例如：
+`theme.defaultMode` supports `system`, `light`, and `dark`. This example uses `system` to follow the browser's appearance preference by default.
+
+The optional `theme.accent` accepts a six-digit hexadecimal color:
 
 ```json
 {
@@ -75,50 +79,50 @@ sidebar:
 }
 ```
 
-这段字段示例需要合并到完整站点 JSON 中。
+Merge this field example into the complete site JSON.
 
-## 品牌资源
+## Branding
 
-### 通过构建变量设置 Logo 和 favicon
+### Set the logo and favicon with build variables
 
-在 Cloudflare 的 **Worker → Settings → Builds → Build variables and secrets** 中添加普通变量，保存后重新构建：
+In Cloudflare, open **Worker → Settings → Builds → Build variables and secrets**, add ordinary variables, save, and rebuild:
 
-| 构建变量 | 默认值 | 覆盖的 JSON 字段 | 可填写的值 |
+| Build variable | Default | JSON field overridden | Accepted value |
 | --- | --- | --- | --- |
-| `SITE_LOGO` | 空字符串 | `brand.logo` | HTTP(S) 图片 URL，或相对文档源仓库根目录的文件路径 |
-| `SITE_FAVICON` | 空字符串 | `brand.favicon` | HTTP(S) 图片 URL，或相对文档源仓库根目录的文件路径 |
+| `SITE_LOGO` | Empty string | `brand.logo` | HTTP(S) image URL or file path relative to the document repository root |
+| `SITE_FAVICON` | Empty string | `brand.favicon` | HTTP(S) image URL or file path relative to the document repository root |
 
-这两项均可省略。构建时先读取同名环境变量，未提供时读取 `wrangler.jsonc` 的默认值；最终非空值覆盖 JSON 对应品牌字段，最终为空则继承 JSON。设置 Logo 不会改变 favicon，反之亦然。
+Both variables can be omitted. The build reads an environment variable first, falling back to `wrangler.jsonc` if it is absent. A final nonempty value overrides the corresponding JSON branding field; a final empty value inherits JSON. Setting the logo does not change the favicon, and vice versa.
 
-显式空字符串也是有效的构建变量：即使 Wrangler 中配置了非空默认值，也会被这个空值覆盖，最终恢复 JSON 对应设置。删除构建变量则重新读取 Wrangler 默认值，与显式置空不同。
+An explicit empty string is also valid: it overrides even a nonempty Wrangler default and restores the corresponding JSON setting. Deleting a build variable instead restores the Wrangler default, which is different from explicitly clearing it.
 
-例如，两项都填 `docs/assets/nimbus-mark.svg`，就使用 `DOCS_REPO` 仓库根目录下的该文件；也可以填 `https://example.com/brand/logo.svg` 或 `http://example.com/brand/favicon.png` 等图片 URL。变量的本地路径始终以**文档源仓库根目录**为基准，不依赖 `DOCS_PATH` 或 `DOCS_CONFIG_PATH`，没有站点 JSON 时也可以使用。
+For example, set both values to `docs/assets/nimbus-mark.svg` to use that file in `DOCS_REPO`. You can also use image URLs such as `https://example.com/brand/logo.svg` or `http://example.com/brand/favicon.png`. Local variable paths always start at the **document repository root**, independently of `DOCS_PATH` and `DOCS_CONFIG_PATH`, and work even without a site JSON file.
 
-这些是构建变量。普通 **Settings → Variables & Secrets** 中的运行时变量不会自动提供给静态构建，修改后也需要重新构建才会反映在页面上。
+These are build variables. Runtime variables under ordinary **Settings → Variables & Secrets** do not automatically reach static builds. Rebuild after changing variables to update the pages.
 
-### 在 JSON 中维护品牌配置
+### Maintain branding in JSON
 
-| 字段 | 用途 |
+| Field | Purpose |
 | --- | --- |
-| `brand.logo` | 站点品牌标识 |
-| `brand.logoAlt` | Logo 的替代文字 |
-| `brand.favicon` | 浏览器图标 |
-| `brand.socialImage` | 默认分享图片 |
+| `brand.logo` | Site logo |
+| `brand.logoAlt` | Alternative text for the logo |
+| `brand.favicon` | Browser icon |
+| `brand.socialImage` | Default social sharing image |
 
-JSON 中的图片可以使用完整 HTTPS URL，或相对站点 JSON 文件的本地路径。本示例中的 `./assets/nimbus-mark.svg` 以 `docs/site.json` 为基准，指向 `docs/assets/nimbus-mark.svg`，同一图片也用在[首页](./README.md)。这个路径基准与 `SITE_LOGO`、`SITE_FAVICON` 的仓库根目录基准不同。
+Images in JSON can use full HTTPS URLs or local paths relative to the site JSON file. In this example, `./assets/nimbus-mark.svg` is resolved from `docs/site.json` to `docs/assets/nimbus-mark.svg`. The [home page](./README.md) uses the same image. This differs from `SITE_LOGO` and `SITE_FAVICON`, whose paths start at the repository root.
 
-本地资源必须存在，解析后的路径必须处于源仓库内。模板只将被引用的资源复制到公开产物中。Markdown 图片路径则以引用它的 Markdown 文件为基准，见[图片和资源](./writing-docs.md#图片和资源)。
+Local assets must exist and their resolved paths must stay inside the source repository. The template copies only referenced assets into the public output. Markdown images use paths relative to the Markdown file that references them. See [Images and assets](./writing-docs.md#images-and-assets).
 
-## 站点地址
+## Site URL
 
-`SITE_URL` 是可调整的构建变量，不属于站点 JSON，默认值为 `https://nimbus.az1n.com`。未提供同名环境变量时继承仓库默认值，也可以显式设为空字符串；置空后站点仍可在本地或 Cloudflare 提供的地址浏览，但不输出 canonical、依赖绝对站点地址的 SEO 元数据和 sitemap。
+`SITE_URL` is an editable build variable, not a site JSON field. Its default is `https://nimbus.az1n.com`. Omitting the environment variable inherits the repository default; you can also explicitly set an empty string. An empty value keeps the site accessible locally or at its Cloudflare address, but omits canonical URLs, SEO metadata requiring an absolute site origin, and the sitemap.
 
-部署自己的站点或变更域名时，在构建变量中填写包含 `https://` 的实际公开地址并重新构建。填写 `SITE_URL` 不会自动绑定自定义域名，需先在 Cloudflare 完成域名配置。后续调整这个变量无需更改部署阶段确定的构建命令、部署命令或根目录。
+When deploying your own site or changing its domain, enter the actual public URL including `https://` as a build variable and rebuild. `SITE_URL` does not bind a custom domain; configure that domain in Cloudflare first. Changing this variable later does not require changing the build command, deploy command, or root directory selected during setup.
 
-## 更新与凭据
+## Updates and credentials
 
-修改 `docs/site.json` 或品牌资源后，提交并推送到配置的文档源分支，然后重新触发构建。仅修改 Cloudflare 中的 `SITE_LOGO`、`SITE_FAVICON` 时，保存变量后重新构建即可。页脚和 `/_build.json` 记录实际读取的文档提交 SHA；仅改变构建变量时该 SHA 可能保持不变。
+After changing `docs/site.json` or branding assets, commit and push to the configured document source branch, then trigger a build. If you only change `SITE_LOGO` or `SITE_FAVICON` in Cloudflare, save and rebuild. The footer and `/_build.json` record the document commit SHA; it may stay the same when only build variables change.
 
-公开的 [nimbus-docs-template 示例仓库](https://github.com/Azincc/nimbus-docs-template.git) 不需要 Token。私有仓库的 `DOCS_TOKEN` 仅作为 Cloudflare Build Secret 提供给 Git fetch，不能放入站点 JSON、图片 URL 或其他公开字段。
+The public [nimbus-docs-template example repository](https://github.com/Azincc/nimbus-docs-template.git) needs no token. For private repositories, provide `DOCS_TOKEN` only as a Cloudflare Build Secret for Git fetch. Never put it in site JSON, image URLs, or other public fields.
 
-返回[快速入门](./getting-started.md)或[首页](./README.md)。
+Return to [Quick start](./getting-started.md) or [Home](./README.md).

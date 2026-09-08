@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import { test } from "vitest";
 import path from "node:path";
 import os from "node:os";
 import { mkdtemp, mkdir, readFile, rm, writeFile, readdir } from "node:fs/promises";
@@ -8,7 +8,7 @@ import { prepareContent } from "../scripts/content.mjs";
 
 async function fixture(t, files) {
   const temp = await mkdtemp(path.join(os.tmpdir(), "nimbus-content-"));
-  t.after(() => rm(temp, { recursive: true, force: true }));
+  t.onTestFinished(() => rm(temp, { recursive: true, force: true }));
   const options = { root: path.join(temp, "source"), docsPath: "docs", outputDir: path.join(temp, "generated"), assetsDir: path.join(temp, "public", "_source") };
   for (const [filename, content] of Object.entries(files)) {
     const target = path.join(options.root, filename);
