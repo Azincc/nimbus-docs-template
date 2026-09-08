@@ -10,8 +10,8 @@ const defaults = {
   DOCS_BRANCH: 'main',
   DOCS_PATH: 'docs',
   DOCS_CONFIG_PATH: 'docs/site.json',
-  SITE_LOGO: '',
-  SITE_FAVICON: '',
+  SITE_LOGO: 'default',
+  SITE_FAVICON: 'default',
 };
 
 test('build variables override public defaults and the token comes only from the environment', () => {
@@ -19,7 +19,7 @@ test('build variables override public defaults and the token comes only from the
   assert.deepEqual(settings, {
     repo: 'https://github.com/Azincc/nimbus-docs-template.git',
     branch: 'docs/update', docsPath: 'docs', configPath: undefined,
-    siteUrl: 'https://docs.example.com', siteLogo: undefined, siteFavicon: undefined, token: 'test-build-secret',
+    siteUrl: 'https://docs.example.com', siteLogo: 'default', siteFavicon: 'default', token: 'test-build-secret',
   });
   assert.equal(readSourceSettings({}, defaults).token, undefined);
   assert.throws(() => readSourceSettings({}, { ...defaults, DOCS_TOKEN: 'must-not-be-public' }), /Workers Builds secret/);

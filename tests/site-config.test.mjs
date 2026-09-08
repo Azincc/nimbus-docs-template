@@ -15,7 +15,7 @@ async function brandingFixture(t) {
   await mkdir(path.join(root, 'docs'), { recursive: true });
   await writeFile(path.join(root, 'docs', 'README.md'), '# Start\n\nWelcome.');
   const content = await prepareContent({ root, docsPath: 'docs', outputDir: path.join(directory, 'prepared'), assetsDir });
-  const defaults = { DOCS_REPO: 'https://github.com/Azincc/nimbus-docs-template.git', DOCS_CONFIG_PATH: 'docs/site.json' };
+  const defaults = { DOCS_REPO: 'https://github.com/Azincc/nimbus-docs-template.git', DOCS_CONFIG_PATH: 'docs/site.json', SITE_LOGO: 'default', SITE_FAVICON: 'default' };
   return { root, assetsDir, content, defaults };
 }
 
@@ -43,6 +43,8 @@ test('site configuration maps navigation, branding and SEO from a source reposit
     assert.equal(site.nimbus.title, 'My docs');
     assert.equal(site.nimbus.site, settings.siteUrl);
     assert.equal(site.brand.logo, '/_source/brand/logo.svg');
+    assert.equal(site.brand.logoAlt, undefined);
+    assert.equal(site.brand.favicon, '/nimbus-logo.svg');
     assert.equal(site.theme.defaultMode, 'dark');
     config.navigation[0].link = '/deleted';
     await writeFile(path.join(root, 'site.json'), JSON.stringify(config));
@@ -67,18 +69,19 @@ test('build branding overrides missing JSON assets and resolves local overrides 
   assert.equal(await readFile(path.join(assetsDir, 'brand', 'favicon.svg'), 'utf8'), '<svg id="build-favicon"/>');
 });
 
-test('unset or blank build branding inherits assets relative to the site JSON', async (t) => {
+test('default or blank build branding inherits assets relative to the site JSON', async (t) => {
   const { root, assetsDir, content, defaults } = await brandingFixture(t);
   await mkdir(path.join(root, 'docs', 'brand'));
   await writeFile(path.join(root, 'docs', 'brand', 'logo.svg'), '<svg id="json-logo"/>');
   await writeFile(path.join(root, 'docs', 'brand', 'favicon.svg'), '<svg id="json-favicon"/>');
   await writeFile(path.join(root, 'docs', 'site.json'), JSON.stringify({
-    schemaVersion: 1, brand: { logo: './brand/logo.svg', favicon: './brand/favicon.svg' },
+    schemaVersion: 1, brand: { logo: './brand/logo.svg', favicon: './brand/favicon.svg', logoAlt: 'Custom docs' },
   }));
-  for (const env of [{}, { SITE_LOGO: '', SITE_FAVICON: ' \t ' }]) {
+  for (const env of [{}, { SITE_LOGO: 'default', SITE_FAVICON: 'default' }, { SITE_LOGO: '', SITE_FAVICON: ' \t ' }]) {
     const site = await prepareSiteConfig({ root, settings: readSourceSettings(env, defaults), content });
     assert.equal(site.brand.logo, '/_source/docs/brand/logo.svg');
     assert.equal(site.brand.favicon, '/_source/docs/brand/favicon.svg');
+    assert.equal(site.brand.logoAlt, 'Custom docs');
     assert.deepEqual(site.nimbus.head, [{ tag: 'link', attrs: { rel: 'icon', href: '/_source/docs/brand/favicon.svg' } }]);
   }
   assert.equal(await readFile(path.join(assetsDir, 'docs', 'brand', 'logo.svg'), 'utf8'), '<svg id="json-logo"/>');
@@ -97,4 +100,35 @@ test('local build logo and favicon are copied without a site JSON file', async (
   assert.deepEqual(site.nimbus.head, [{ tag: 'link', attrs: { rel: 'icon', href: '/_source/brand/favicon.svg' } }]);
   assert.equal(await readFile(path.join(assetsDir, 'brand', 'logo.svg'), 'utf8'), '<svg id="build-logo"/>');
   assert.equal(await readFile(path.join(assetsDir, 'brand', 'favicon.svg'), 'utf8'), '<svg id="build-favicon"/>');
+});
+
+test('default and blank branding use template assets when the source has no site JSON or images', async (t) => {
+  const { root, content, defaults } = await brandingFixture(t);
+  for (const env of [{}, { SITE_LOGO: 'default', SITE_FAVICON: 'default' }, { SITE_LOGO: '', SITE_FAVICON: ' \t ' }]) {
+    const settings = readSourceSettings({ DOCS_CONFIG_PATH: '', ...env }, defaults);
+    const site = await prepareSiteConfig({ root, settings, content });
+    assert.equal(site.brand.logo, '/nimbus-logo.svg');
+    assert.equal(site.brand.logoAlt, 'Nimbus');
+    assert.equal(site.brand.favicon, '/nimbus-logo.svg');
+    assert.deepEqual(site.nimbus.head, [{ tag: 'link', attrs: { rel: 'icon', href: '/nimbus-logo.svg' } }]);
+  }
+});
+
+test('a single explicit branding override preserves the other template fallback', async (t) => {
+  const { root, assetsDir, content, defaults } = await brandingFixture(t);
+  await mkdir(path.join(root, 'brand'));
+  await writeFile(path.join(root, 'brand', 'favicon.svg'), '<svg id="custom-favicon"/>');
+  const logoSite = await prepareSiteConfig({
+    root, content, settings: readSourceSettings({ DOCS_CONFIG_PATH: '', SITE_LOGO: 'https://cdn.example.com/logo.svg' }, defaults),
+  });
+  assert.equal(logoSite.brand.logo, 'https://cdn.example.com/logo.svg');
+  assert.equal(logoSite.brand.favicon, '/nimbus-logo.svg');
+  const faviconSite = await prepareSiteConfig({
+    root, content, settings: readSourceSettings({ DOCS_CONFIG_PATH: '', SITE_FAVICON: 'brand/favicon.svg' }, defaults),
+  });
+  assert.equal(faviconSite.brand.logo, '/nimbus-logo.svg');
+  assert.equal(faviconSite.brand.logoAlt, 'Nimbus');
+  assert.equal(faviconSite.brand.favicon, '/_source/brand/favicon.svg');
+  assert.deepEqual(faviconSite.nimbus.head, [{ tag: 'link', attrs: { rel: 'icon', href: '/_source/brand/favicon.svg' } }]);
+  assert.equal(await readFile(path.join(assetsDir, 'brand', 'favicon.svg'), 'utf8'), '<svg id="custom-favicon"/>');
 });

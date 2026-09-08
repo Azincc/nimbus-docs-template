@@ -8,7 +8,7 @@ The generated template is pinned to `templates-v0.7.2` and uses
 
 Upstream: <https://github.com/cloudflare/nimbus>
 
-The example site's logo is the unmodified official Nimbus asset from
+The example site's logo and bundled `public/nimbus-logo.svg` default are the unmodified official Nimbus asset from
 <https://nimbus-docs.com/logo.svg>. It identifies the upstream Nimbus project,
 not an original brand owned by this template. The submission icon embeds the
 same asset with transparent padding and uniform scaling for a 16:9 canvas.

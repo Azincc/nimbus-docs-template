@@ -2,6 +2,7 @@ import { readFile, lstat, realpath } from 'node:fs/promises';
 import path from 'node:path';
 
 export const UNKNOWN_ORIGIN = 'https://nimbus.invalid';
+const DEFAULT_BRAND_ASSET = '/nimbus-logo.svg';
 
 function object(value, keys, name) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`${name} must be an object.`);
@@ -63,7 +64,10 @@ export async function prepareSiteConfig({ root, settings, content }) {
     validateSiteConfig(config);
   }
   const brand = { ...config.brand };
-  const overrides = { logo: settings.siteLogo, favicon: settings.siteFavicon };
+  const overrides = Object.fromEntries(
+    Object.entries({ logo: settings.siteLogo, favicon: settings.siteFavicon })
+      .filter(([, value]) => value && value !== 'default'),
+  );
   for (const [key, value] of Object.entries(overrides)) {
     if (value) brand[key] = value;
   }
@@ -77,6 +81,12 @@ export async function prepareSiteConfig({ root, settings, content }) {
       brand[key] = await content.copyAsset(brand[key], overrides[key] ? undefined : settings.configPath);
     }
   }
+  // Bundled defaults belong to the template, independently of the document source.
+  if (!brand.logo) {
+    brand.logo = DEFAULT_BRAND_ASSET;
+    brand.logoAlt ??= 'Nimbus';
+  }
+  brand.favicon ??= DEFAULT_BRAND_ASSET;
   const routes = new Set(content.pages.filter(p => !p.data.draft).map(p => p.route.replace(/\/$/, '') || '/'));
   const navigation = config.navigation ?? [];
   for (const item of navigation) {

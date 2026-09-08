@@ -72,7 +72,7 @@ test('Wrangler public defaults can be overridden by Workers Builds variables and
   assert.deepEqual(await loadSettings({}), {
     repo: 'https://github.com/Azincc/nimbus-docs-template.git', branch: 'main',
     docsPath: 'docs', configPath: 'docs/site.json', siteUrl: 'https://nimbus.az1n.com',
-    siteLogo: undefined, siteFavicon: undefined, token: undefined,
+    siteLogo: 'default', siteFavicon: 'default', token: undefined,
   });
   assert.deepEqual(await loadSettings({
     DOCS_REPO: 'https://github.com/Azincc/nimbus-docs-template.git', DOCS_BRANCH: 'docs/current',

@@ -14,9 +14,9 @@
     "DOCS_PATH": "docs",
     "DOCS_CONFIG_PATH": "docs/site.json",
     "SITE_URL": "https://nimbus.az1n.com",
-    // Empty values inherit brand.logo / brand.favicon from the site JSON.
-    "SITE_LOGO": "",
-    "SITE_FAVICON": ""
+    // "default" uses site JSON branding, falling back to the bundled Nimbus logo.
+    "SITE_LOGO": "default",
+    "SITE_FAVICON": "default"
   },
   "assets": {
     "directory": "./dist",
