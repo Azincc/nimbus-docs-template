@@ -26,7 +26,7 @@ The upstream template is `https://github.com/Azincc/nimbus-docs-template.git`, o
 
 ## 1. Confirm the target repository
 
-Read the repository's `AGENTS.md`, `AGENT.md`, and relevant project conventions. Check `git remote -v`, the current branch, and `git status`. Confirm that you are working in the deployment repository rather than a `DOCS_REPO` that only contains Markdown.
+Read the repository's `AGENT.md` and relevant project conventions. Check `git remote -v`, the current branch, and `git status`. Confirm that you are working in the deployment repository rather than a `DOCS_REPO` that only contains Markdown.
 
 If the user has uncommitted work, use a separate clone or working directory to preserve it. Do not reset, stage, or overwrite unrelated changes.
 

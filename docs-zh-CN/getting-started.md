@@ -36,8 +36,8 @@ sidebar:
 | `DOCS_PATH` | `docs` | 仓库里的文档文件夹；文档在仓库根目录时填 `.` |
 | `DOCS_CONFIG_PATH` | `docs/site.json` | 仓库里的站点配置文件路径；没有此文件时添加变量并将值留空 |
 | `SITE_URL` | `https://nimbus.az1n.com` | 改成自己的完整站点地址，如 `https://你的Worker.你的子域.workers.dev`；暂不确定时添加变量并将值留空 |
-| `SITE_LOGO` | 空 | 可选；填 Logo 的 HTTP(S) 图片地址，或仓库里的图片文件路径 |
-| `SITE_FAVICON` | 空 | 可选；填浏览器标签页图标的 HTTP(S) 图片地址，或仓库里的图片文件路径 |
+| `SITE_LOGO` | `default` | 可选；填 Logo 的 HTTP(S) 图片地址，或仓库里的图片文件路径 |
+| `SITE_FAVICON` | `default` | 可选；填浏览器标签页图标的 HTTP(S) 图片地址，或仓库里的图片文件路径 |
 
 默认的 `docs/` 和 `docs/site.json` 对应英文示例。要部署当前中文文档，在同一构建变量区域同时添加：
 
@@ -52,9 +52,9 @@ sidebar:
 
 `SITE_URL` 用于搜索引擎等页面信息，**不会绑定自定义域名**。留空仍可访问网站，但不会生成依赖正式域名的 canonical 和 sitemap。
 
-`SITE_LOGO` 和 `SITE_FAVICON` 可以不添加。非空值会覆盖站点配置文件中的品牌图片，留空则沿用站点配置。使用仓库图片时，填写 `docs-zh-CN/assets/nimbus-mark.svg` 这样的路径，从文档仓库根目录算起。详见[品牌资源](./site-config.md#品牌资源)。
+`SITE_LOGO` 和 `SITE_FAVICON` 默认填 `default`，沿用站点配置文件中的对应图片；未配置对应图片时使用模板内置的 Nimbus 官方 Logo。填图片 URL 或仓库路径时覆盖站点配置。Cloudflare 不接受空值时，直接填 `default`；空白值仍兼容相同的回退规则。使用仓库图片时，填写 `docs-zh-CN/assets/nimbus-mark.svg` 这样的路径，从文档仓库根目录算起。详见[品牌资源](./site-config.md#品牌资源)。
 
-较早创建的部署副本可能尚不支持这两个图片变量，需要模板维护者先同步新版构建脚本。只添加变量不会自动升级副本。
+旧部署请先[更新模板](./deployment/template-update.md)，同步新版构建脚本和 `public/nimbus-logo.svg`，再将变量设为 `default`。
 
 公开仓库不需要 `DOCS_TOKEN`。如果文档位于私有仓库，在同一个 **构建 → 变量和机密** 区域添加 `DOCS_TOKEN`，类型选择 **Secret**，填入仅授权目标仓库、具有 **Contents: Read-only** 权限的 GitHub Token。Token 仅在 Git 拉取期间使用，不能写入仓库文件或 URL。详见[私有仓库部署](./deployment/private-repository.md)。
 

@@ -49,18 +49,18 @@ Directory and configuration paths are relative to the documentation repository r
 
 ## 3. Set the logo and favicon
 
-The current template supports these additional variables. Both are optional; when unset, the site uses the images from its site configuration.
+Both variables default to `default`: use the corresponding site JSON image, or the built-in official Nimbus logo (`/nimbus-logo.svg`) if that field is absent. Enter `default` when Cloudflare requires a nonempty value.
 
 | What to change | Name | Value |
 | --- | --- | --- |
-| Site logo | `SITE_LOGO` | A direct HTTP(S) image URL, or an image path in the documentation repository, such as `docs/assets/logo.svg` |
-| Browser tab icon | `SITE_FAVICON` | An HTTP(S) image URL, or an image path in the documentation repository, such as `docs/assets/favicon.png` |
+| Site logo | `SITE_LOGO` | `default`, or a direct HTTP(S) image URL, or an image path in the documentation repository, such as `docs/assets/logo.svg` |
+| Browser tab icon | `SITE_FAVICON` | `default`, or an HTTP(S) image URL, or an image path in the documentation repository, such as `docs/assets/favicon.png` |
 
 Use the address of the image itself. A GitHub file preview page is not an image URL. For an image stored in the documentation repository, enter its path relative to the repository root.
 
-These variables work independently: changing the logo does not change the favicon. Keeping a variable with an empty value restores the corresponding image from the site configuration.
+Explicit image URLs and repository paths override JSON. The variables work independently: changing the logo does not change the favicon. Empty or whitespace-only values use the same fallback as `default` for compatibility.
 
-Older deployment copies may not support these variables yet. If a rebuild does not apply the change, ask the template maintainer to sync the updated build scripts first. Adding a variable does not upgrade the deployment copy.
+Before using `default` in an older deployment, update its build scripts and `public/nimbus-logo.svg`. Changing build variables alone does not update the template.
 
 ## 4. Add a secret for a private repository
 
@@ -89,14 +89,14 @@ Return to **Settings → Builds → Build variables and secrets**, edit the rele
 
 Values saved here take precedence over defaults in the template files. Your saved build variables continue to take precedence even if a later template update changes a default.
 
-To restore a template default, delete the corresponding build variable, save, and rebuild. Deleting a variable and keeping it with an empty value have different effects:
+To restore a template default, delete the corresponding build variable, save, and rebuild. You can also choose the behavior below:
 
 | Action | Result |
 | --- | --- |
 | Delete a variable | Read the template default again |
 | Leave `DOCS_CONFIG_PATH` empty | Use the generic site configuration without reading a site JSON file |
 | Leave `SITE_URL` empty | Do not specify a public site origin |
-| Leave `SITE_LOGO` or `SITE_FAVICON` empty | Use the corresponding image from the site configuration |
+| Set `SITE_LOGO` or `SITE_FAVICON` to `default` (or empty) | Use the corresponding site JSON image, then the built-in Nimbus logo if absent |
 
 ## Troubleshooting
 
@@ -107,7 +107,7 @@ To restore a template default, delete the corresponding build variable, save, an
 | The site still shows the template's example documents | Set `DOCS_REPO` to your documentation repository, save, and rebuild |
 | The site configuration file cannot be found | Check the path if the file exists; otherwise, keep `DOCS_CONFIG_PATH` and leave its value empty |
 | A private repository cannot be fetched | Confirm that `DOCS_TOKEN` is a build **Secret** and grants read access to the target repository |
-| The logo or favicon has not changed | Check the image address, saved values, and build result; for older copies, confirm the build scripts support branding variables |
+| The logo or favicon has not changed | Check the image address, saved values, and build result; for older copies, update the build scripts and `public/nimbus-logo.svg` before using `default` |
 | Documentation changes do not update the site | Set up a [deploy hook](./deploy-hook.md) for a separate documentation repository so pushes trigger builds |
 
 The site name, navigation, theme, and sidebar order have their own settings. See [Site configuration](../site-config.md) and [Sidebar order](../sidebar-order.md). The build variables described here cover only the listed settings; they do not turn every site setting into a dashboard field.

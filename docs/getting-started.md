@@ -38,16 +38,16 @@ Enter **names and values in their separate fields, without quotes**. For example
 | `DOCS_PATH` | `docs` | The document directory; use `.` if documents are at the repository root |
 | `DOCS_CONFIG_PATH` | `docs/site.json` | The site configuration path; add this variable with an empty value if there is no configuration file |
 | `SITE_URL` | `https://nimbus.az1n.com` | Your complete public URL, such as `https://your-worker.your-subdomain.workers.dev`; add an empty value until known |
-| `SITE_LOGO` | Empty | Optional HTTP(S) logo image URL or image path in the repository |
-| `SITE_FAVICON` | Empty | Optional HTTP(S) favicon image URL or image path in the repository |
+| `SITE_LOGO` | `default` | Optional HTTP(S) logo image URL or image path in the repository |
+| `SITE_FAVICON` | `default` | Optional HTTP(S) favicon image URL or image path in the repository |
 
-To set an empty value, clear the value field; **do not enter two quotation marks `""`**. Omitting a variable inherits its default. Adding the variable with an empty value overrides that default.
+Omitting a variable inherits its default. To clear `SITE_URL` or `DOCS_CONFIG_PATH`, leave the value field empty; **do not enter two quotation marks `""`**.
 
 `SITE_URL` controls search-engine metadata and **does not bind a custom domain**. The site remains accessible when it is empty, but origin-dependent canonical URLs and the sitemap are omitted.
 
-`SITE_LOGO` and `SITE_FAVICON` can be omitted. Nonempty values override the branding in the site configuration; empty values inherit it. Repository image paths start at the document repository root, for example `docs/assets/nimbus-mark.svg`. See [Branding](./site-config.md#branding).
+`SITE_LOGO` and `SITE_FAVICON` default to `default`: use the corresponding site JSON image, or the built-in official Nimbus logo (`/nimbus-logo.svg`) if that field is absent. Enter `default` when Cloudflare requires a nonempty value. Empty values behave the same way for compatibility. An explicit HTTP(S) image URL or repository path overrides JSON; paths start at the document repository root, for example `docs/assets/nimbus-mark.svg`. See [Branding](./site-config.md#branding).
 
-Older deployment copies may not support these image variables yet. Update their template build scripts first; adding variables alone does not upgrade a copy.
+Before using `default` in an older deployment, update its build scripts and `public/nimbus-logo.svg`. Changing build variables alone does not update the template.
 
 Public repositories do not need `DOCS_TOKEN`. For a private document repository, add `DOCS_TOKEN` in the same **Builds → Variables and secrets** section and select **Secret**. Use a GitHub token restricted to the source repository with **Contents: Read-only** permission. The token is used only for Git fetch and must not be written into repository files or URLs. See [Private repositories](./deployment/private-repository.md).
 

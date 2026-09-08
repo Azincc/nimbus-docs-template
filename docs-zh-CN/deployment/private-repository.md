@@ -68,13 +68,13 @@ Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于�
 | `DOCS_PATH` | Variable | 相对私有仓库根目录的文档目录；上述结构为 `docs`，也是默认值 |
 | `DOCS_CONFIG_PATH` | Variable | 有配置文件时填 `docs/site.json` 或实际路径；没有 JSON 文件时显式置空 |
 | `SITE_URL` | Variable | 默认 `https://nimbus.az1n.com`；可覆盖为自己站点包含 `https://` 的实际地址，也可显式置空 |
-| `SITE_LOGO` | Variable，可选 | Logo 的 HTTP(S) 图片 URL 或相对私有文档源仓库根目录的路径，例如 `docs/assets/nimbus-mark.svg`；默认空 |
-| `SITE_FAVICON` | Variable，可选 | favicon 的 HTTP(S) 图片 URL 或相对私有文档源仓库根目录的路径，例如 `docs/assets/nimbus-mark.svg`；默认空 |
+| `SITE_LOGO` | Variable，可选 | Logo 的 HTTP(S) 图片 URL 或相对私有文档源仓库根目录的路径，例如 `docs/assets/nimbus-mark.svg`；默认 `default` |
+| `SITE_FAVICON` | Variable，可选 | favicon 的 HTTP(S) 图片 URL 或相对私有文档源仓库根目录的路径，例如 `docs/assets/nimbus-mark.svg`；默认 `default` |
 | `DOCS_TOKEN` | Secret | 上一步生成且已获得所需组织批准的只读 GitHub Token |
 
 未设置同名构建变量时，模板会读取 `wrangler.jsonc` 中的公开默认值。仍适用的默认值无需重复填写，但 `DOCS_REPO` 必须改为你的私有仓库地址，否则仍会读取公开示例。
 
-`SITE_LOGO` 和 `SITE_FAVICON` 的最终值非空时，分别覆盖 JSON 的 `brand.logo` 和 `brand.favicon`；最终值为空时，沿用 JSON 中的设置。
+`SITE_LOGO` 和 `SITE_FAVICON` 填图片 URL 或仓库路径时，分别覆盖 JSON 的 `brand.logo` 和 `brand.favicon`。默认值 `default` 或空白值沿用 JSON，未配置对应字段时使用模板内置的 Nimbus 官方 Logo。Cloudflare 不接受空值时，直接填 `default`。
 
 这两个变量的路径都相对于 `DOCS_REPO` 仓库根目录，与站点 JSON 是否存在、存放在哪里无关。JSON 内的本地资源路径仍相对于 JSON 文件。构建可以用同一个只读 Token 读取仓库图片，无需额外添加图片凭据。
 

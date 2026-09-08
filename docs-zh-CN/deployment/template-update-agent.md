@@ -26,7 +26,7 @@ searchable: false
 
 ## 1. 确认目标仓库
 
-阅读仓库的 `AGENTS.md`、`AGENT.md` 及相关项目约定。核对 `git remote -v`、当前分支和 `git status`，确认操作的是部署仓库，而不是仅保存 Markdown 的 `DOCS_REPO`。
+阅读仓库的 `AGENT.md` 及相关项目约定。核对 `git remote -v`、当前分支和 `git status`，确认操作的是部署仓库，而不是仅保存 Markdown 的 `DOCS_REPO`。
 
 用户有未提交工作时，在独立克隆或工作目录中处理更新，保留原有工作。不重置、暂存或覆盖无关修改。
 

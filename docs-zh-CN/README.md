@@ -29,8 +29,8 @@
 | `DOCS_PATH` | `docs` |
 | `DOCS_CONFIG_PATH` | `docs/site.json` |
 | `SITE_URL` | `https://nimbus.az1n.com` |
-| `SITE_LOGO` | 空字符串，继承站点 JSON 的 `brand.logo` |
-| `SITE_FAVICON` | 空字符串，继承站点 JSON 的 `brand.favicon` |
+| `SITE_LOGO` | `default`，沿用站点 JSON 的 `brand.logo` |
+| `SITE_FAVICON` | `default`，沿用站点 JSON 的 `brand.favicon` |
 
 默认配置读取英文 `docs/`，无需逐项填写这些变量。要发布这份完整中文示例，保留默认文档仓库和分支，只修改以下两个构建变量：
 
@@ -43,9 +43,9 @@
 
 Logo 和 favicon 可以通过可选的构建变量设置。变量值接受 HTTP(S) 图片 URL，也接受相对文档源仓库根目录的路径，例如 `docs-zh-CN/assets/nimbus-mark.svg`。这类路径不受站点 JSON 位置影响；写在 JSON 中的资源路径仍相对 JSON 文件。
 
-构建时先读取同名环境变量，未设置时使用 `wrangler.jsonc` 默认值。最终值非空就覆盖对应的 JSON 品牌字段，为空则沿用 JSON。要修改这些变量，请打开 Cloudflare **Settings → Builds → Build variables and secrets**，添加普通变量后重新构建。运行时变量不会自动进入静态构建。详见[品牌资源](./site-config.md#品牌资源)。
+构建时先读取同名环境变量，未设置时使用 `wrangler.jsonc` 默认值。填图片 URL 或仓库路径时覆盖对应 JSON 品牌字段；默认的 `default` 或空白值沿用 JSON，未配置对应字段时使用模板内置的 Nimbus 官方 Logo。Cloudflare 不接受空值时，直接填 `default`。要修改这些变量，请打开 Cloudflare **Settings → Builds → Build variables and secrets**，添加普通变量后重新构建。运行时变量不会自动进入静态构建。详见[品牌资源](./site-config.md#品牌资源)。
 
-较早创建的模板副本可能还不支持这两个图片变量。请先由模板维护者同步新版构建脚本，只添加变量不会自动升级副本。
+旧部署请先[更新模板](./deployment/template-update.md)，同步新版构建脚本和 `public/nimbus-logo.svg`，再将变量设为 `default`。
 
 ## 内容版本
 

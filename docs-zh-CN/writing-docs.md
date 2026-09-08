@@ -108,7 +108,7 @@ sidebar:
 
 品牌 Logo 和 favicon 也可以通过普通构建变量 `SITE_LOGO`、`SITE_FAVICON` 设置，两项均可省略。变量接受 HTTP(S) 图片 URL，也接受相对 `DOCS_REPO` 文档源仓库根目录的路径，例如 `docs-zh-CN/assets/nimbus-mark.svg`。本地路径不依赖站点 JSON 的位置；JSON 中的 `brand.logo`、`brand.favicon` 本地路径仍以 JSON 文件为基准。
 
-构建变量的最终值非空时，覆盖对应 JSON 字段；最终为空时，继承 JSON。变量在 Cloudflare Builds 区域保存后，需要重新构建才会生效。具体见[品牌资源](./site-config.md#品牌资源)。
+图片 URL 或仓库路径会覆盖对应 JSON 字段。默认值 `default` 或空白值沿用 JSON，未配置对应字段时使用模板内置的 Nimbus 官方 Logo。Cloudflare 不接受空值时，直接填 `default`。变量在 Cloudflare Builds 区域保存后，需要重新构建才会生效。具体见[品牌资源](./site-config.md#品牌资源)。
 
 ## 发布更新
 

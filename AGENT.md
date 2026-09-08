@@ -1,6 +1,6 @@
 # Maintaining this Nimbus template
 
-This project wraps the Nimbus Astro starter with a GitHub Markdown source pipeline. Follow `AGENTS.md` for project rules. Keep verification focused on the changed behavior and core build flow.
+This project wraps the Nimbus Astro starter with a GitHub Markdown source pipeline. Keep verification focused on the changed behavior and core build flow.
 
 ## Content and generated files
 
@@ -12,6 +12,7 @@ This project wraps the Nimbus Astro starter with a GitHub Markdown source pipeli
 - `.cache/`, `.generated/`, `.astro/`, `.nimbus/`, `public/_source/`, `public/_build.json`, and `dist/` are disposable build outputs.
 - Builds fetch the remote source. Local edits to either document set become part of a normal build only after they reach the configured source branch.
 - Do not modify the fetched source repository. Write conversions only to temporary or generated directories.
+- `SITE_LOGO` and `SITE_FAVICON` default to `default`: use the corresponding site JSON image, then fall back to `public/nimbus-logo.svg`. Keep this bundled official Nimbus asset available when the source repository has no branding.
 - `DOCS_TOKEN` is a build secret used only for Git fetch. Never persist it in configuration, logs, URLs, or static output.
 
 Source documents use ordinary `.md`, optionally with frontmatter. The pipeline does not execute MDX or JavaScript from the document source. Use the document root's `README.md` or `index.md` for the home page; do not include both. If neither exists, the build generates an index.

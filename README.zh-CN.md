@@ -33,12 +33,14 @@
 | `DOCS_PATH` | `docs` | 相对文档源仓库根目录的文档路径 |
 | `DOCS_CONFIG_PATH` | `docs/site.json` | 站点配置文件路径；没有此文件时添加变量并将值留空 |
 | `SITE_URL` | `https://nimbus.az1n.com` | 自己的完整站点地址；暂不确定时添加变量并将值留空 |
-| `SITE_LOGO` | 空 | Logo 的 HTTP(S) 图片地址或相对文档源仓库根目录的路径 |
-| `SITE_FAVICON` | 空 | favicon 的 HTTP(S) 图片地址或相对文档源仓库根目录的路径 |
+| `SITE_LOGO` | `default` | Logo 的 HTTP(S) 图片地址或相对文档源仓库根目录的路径 |
+| `SITE_FAVICON` | `default` | favicon 的 HTTP(S) 图片地址或相对文档源仓库根目录的路径 |
 
 需要留空时，添加变量并清空值输入框，不要输入 `""`。如果没有添加变量，仍会使用模板默认值。请在 **构建** 设置中填写变量，普通 **Settings → Variables & Secrets** 中的运行时变量不会自动提供给构建。
 
-`SITE_URL` 用于 SEO，设置它不会绑定域名。留空时网站仍可访问，但不生成依赖正式域名的 canonical 和 sitemap。`SITE_LOGO`、`SITE_FAVICON` 非空时覆盖 JSON 配置，留空则沿用 JSON。
+`SITE_URL` 用于 SEO，设置它不会绑定域名。留空时网站仍可访问，但不生成依赖正式域名的 canonical 和 sitemap。`SITE_LOGO`、`SITE_FAVICON` 默认填 `default`，沿用 JSON 中的对应图片；未配置对应图片时使用模板内置的 Nimbus 官方 Logo。填图片 URL 或仓库路径时覆盖 JSON。Cloudflare 不接受空值时，直接填 `default`；空白值仍兼容相同的回退规则。
+
+旧部署请先[更新模板](docs-zh-CN/deployment/template-update.md)，同步新版构建脚本和 `public/nimbus-logo.svg`，再将变量设为 `default`。
 
 ### 选择中文示例
 

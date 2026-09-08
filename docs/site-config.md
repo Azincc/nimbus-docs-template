@@ -89,12 +89,14 @@ In Cloudflare, open **Worker → Settings → Builds → Build variables and sec
 
 | Build variable | Default | JSON field overridden | Accepted value |
 | --- | --- | --- | --- |
-| `SITE_LOGO` | Empty string | `brand.logo` | HTTP(S) image URL or file path relative to the document repository root |
-| `SITE_FAVICON` | Empty string | `brand.favicon` | HTTP(S) image URL or file path relative to the document repository root |
+| `SITE_LOGO` | `default` | `brand.logo` | `default`, an HTTP(S) image URL, or a file path relative to the document repository root |
+| `SITE_FAVICON` | `default` | `brand.favicon` | `default`, an HTTP(S) image URL, or a file path relative to the document repository root |
 
-Both variables can be omitted. The build reads an environment variable first, falling back to `wrangler.jsonc` if it is absent. A final nonempty value overrides the corresponding JSON branding field; a final empty value inherits JSON. Setting the logo does not change the favicon, and vice versa.
+Both variables default to `default`. The build reads an environment variable first, falling back to `wrangler.jsonc` if it is absent. The value `default` uses the corresponding `brand.logo` or `brand.favicon` from site JSON; if that field is absent, it uses the built-in official Nimbus logo at `/nimbus-logo.svg`. An explicit HTTP(S) image URL or repository path overrides JSON. The two variables work independently.
 
-An explicit empty string is also valid: it overrides even a nonempty Wrangler default and restores the corresponding JSON setting. Deleting a build variable instead restores the Wrangler default, which is different from explicitly clearing it.
+Enter `default` when Cloudflare requires a nonempty field. Empty or whitespace-only values use the same JSON-to-built-in fallback for compatibility, even if Wrangler has a custom image default. Deleting the build variable instead restores the Wrangler default.
+
+Before using `default` in an older deployment, update its build scripts and `public/nimbus-logo.svg`. Changing build variables alone does not update the template.
 
 For example, set both values to `docs/assets/nimbus-mark.svg` to use that file in `DOCS_REPO`. You can also use image URLs such as `https://example.com/brand/logo.svg` or `http://example.com/brand/favicon.png`. Local variable paths always start at the **document repository root**, independently of `DOCS_PATH` and `DOCS_CONFIG_PATH`, and work even without a site JSON file.
 

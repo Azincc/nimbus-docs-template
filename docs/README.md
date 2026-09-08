@@ -31,14 +31,14 @@ This home page has no frontmatter. The template extracts its page title from the
 | `DOCS_PATH` | `docs` |
 | `DOCS_CONFIG_PATH` | `docs/site.json` |
 | `SITE_URL` | `https://nimbus.az1n.com` |
-| `SITE_LOGO` | Empty string; inherits `brand.logo` from the site JSON |
-| `SITE_FAVICON` | Empty string; inherits `brand.favicon` from the site JSON |
+| `SITE_LOGO` | `default`; site JSON image, then built-in Nimbus logo |
+| `SITE_FAVICON` | `default`; site JSON image, then built-in Nimbus logo |
 
 These are template defaults, so you only need to add build variables for values you want to override. You can explicitly clear `SITE_URL`; when deploying your own site, set it to your public URL. Setting this variable does not bind a domain.
 
-The optional `SITE_LOGO` and `SITE_FAVICON` variables accept HTTP(S) image URLs or paths relative to the document repository root, such as `docs/assets/nimbus-mark.svg`. Build environment variables take precedence over defaults in `wrangler.jsonc`. A final nonempty value overrides the corresponding JSON branding field; a final empty value inherits JSON. Variable paths do not depend on the site JSON location, while paths in JSON remain relative to that file. Set ordinary variables under Cloudflare **Settings → Builds → Build variables and secrets**, then rebuild. Runtime variables do not automatically reach static builds. See [Branding](./site-config.md#branding).
+The optional `SITE_LOGO` and `SITE_FAVICON` variables accept HTTP(S) image URLs or paths relative to the document repository root, such as `docs/assets/nimbus-mark.svg`. Build environment variables take precedence over defaults in `wrangler.jsonc`. The value `default` uses the corresponding JSON branding field, or the built-in official Nimbus logo (`/nimbus-logo.svg`) if that field is absent. Use `default` when Cloudflare requires a nonempty value. Empty values follow the same fallback; explicit image URLs and repository paths override JSON. Variable paths do not depend on the site JSON location, while paths in JSON remain relative to that file. Set ordinary variables under Cloudflare **Settings → Builds → Build variables and secrets**, then rebuild. Runtime variables do not automatically reach static builds. See [Branding](./site-config.md#branding).
 
-Older deployment copies may not support these two image variables yet. Update their template build scripts first; adding a variable does not upgrade a copy automatically.
+Before using `default` in an older deployment, update its build scripts and `public/nimbus-logo.svg`. Changing build variables alone does not update the template.
 
 ## Document language
 

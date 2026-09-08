@@ -66,13 +66,13 @@ Open the Worker's **Settings → Builds → Build variables and secrets**. Use o
 | `DOCS_PATH` | Variable | The documentation directory relative to the private repository root; the structure above uses the default, `docs` |
 | `DOCS_CONFIG_PATH` | Variable | `docs/site.json` or the actual configuration path; explicitly leave it empty if there is no JSON file |
 | `SITE_URL` | Variable | Defaults to `https://nimbus.az1n.com`; override it with your actual site address including `https://`, or explicitly leave it empty |
-| `SITE_LOGO` | Variable, optional | An HTTP(S) image URL or a path relative to the private source repository root, such as `docs/assets/nimbus-mark.svg`; empty by default |
-| `SITE_FAVICON` | Variable, optional | An HTTP(S) image URL or a path relative to the private source repository root, such as `docs/assets/nimbus-mark.svg`; empty by default |
+| `SITE_LOGO` | Variable, optional | An HTTP(S) image URL or a path relative to the private source repository root, such as `docs/assets/nimbus-mark.svg`; defaults to `default` |
+| `SITE_FAVICON` | Variable, optional | An HTTP(S) image URL or a path relative to the private source repository root, such as `docs/assets/nimbus-mark.svg`; defaults to `default` |
 | `DOCS_TOKEN` | Secret | The read-only GitHub token created above, with any required organization approval completed |
 
 If a build variable is not provided, the template reads the public default from `wrangler.jsonc`; you do not need to repeat defaults that still apply. You must override `DOCS_REPO` with your private repository URL, or the build will continue to read the public example.
 
-Nonempty `SITE_LOGO` and `SITE_FAVICON` values override JSON `brand.logo` and `brand.favicon`, respectively. Empty values inherit the JSON settings. Variable paths are relative to the `DOCS_REPO` repository root, regardless of whether the site JSON exists or where it is stored. Existing local asset paths inside the JSON remain relative to that JSON file. The same read-only token lets the build read repository images; no separate image credential is needed.
+`SITE_LOGO` and `SITE_FAVICON` default to `default`, which inherits JSON `brand.logo` and `brand.favicon`, respectively, or uses the built-in official Nimbus logo (`/nimbus-logo.svg`) if the corresponding field is absent. Enter `default` when Cloudflare requires a nonempty value. Empty values have the same behavior; explicit HTTP(S) image URLs and repository paths override JSON. Variable paths are relative to the `DOCS_REPO` repository root, regardless of whether the site JSON exists or where it is stored. Existing local asset paths inside the JSON remain relative to that JSON file. The same read-only token lets the build read repository images; no separate image credential is needed.
 
 `SITE_URL` does not connect a domain automatically. Complete the domain configuration before using your public address. Leaving the value empty keeps the site browsable but omits canonical links, SEO output, and sitemaps that depend on the public site origin.
 

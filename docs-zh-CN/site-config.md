@@ -87,12 +87,14 @@ sidebar:
 
 | 构建变量 | 默认值 | 覆盖的 JSON 字段 | 可填写的值 |
 | --- | --- | --- | --- |
-| `SITE_LOGO` | 空字符串 | `brand.logo` | HTTP(S) 图片 URL，或相对文档源仓库根目录的文件路径 |
-| `SITE_FAVICON` | 空字符串 | `brand.favicon` | HTTP(S) 图片 URL，或相对文档源仓库根目录的文件路径 |
+| `SITE_LOGO` | `default` | `brand.logo` | `default`、HTTP(S) 图片 URL，或相对文档源仓库根目录的文件路径 |
+| `SITE_FAVICON` | `default` | `brand.favicon` | `default`、HTTP(S) 图片 URL，或相对文档源仓库根目录的文件路径 |
 
-这两项均可省略。构建时优先读取同名环境变量，未提供时才读取 `wrangler.jsonc` 的默认值。最终值非空时，覆盖 JSON 对应的品牌字段；最终为空时，继承 JSON。Logo 和 favicon 分别设置，互不影响。
+构建时优先读取同名环境变量，未提供时读取 `wrangler.jsonc` 的默认值 `default`。填图片 URL 或仓库路径时，覆盖 JSON 中的对应字段；填 `default` 或空白值时，先沿用 JSON 的 `brand.logo` 或 `brand.favicon`，未使用站点 JSON 或未配置对应字段时，使用模板内置的 Nimbus 官方 Logo `/nimbus-logo.svg`。Logo 和 favicon 分别设置，互不影响。
 
-将构建变量显式设为空字符串，即可覆盖 Wrangler 中的非空默认值，恢复 JSON 中的对应设置。删除构建变量后则会重新读取 Wrangler 默认值，与显式置空不同。
+需要恢复上述回退规则时，将变量改为 `default` 即可，Cloudflare 要求填写非空值时也使用这个值。空白值仍兼容相同的规则；删除变量则重新读取 Wrangler 默认值。
+
+旧部署请先[更新模板](./deployment/template-update.md)，同步新版构建脚本和 `public/nimbus-logo.svg`，再将变量设为 `default`。
 
 例如，两项都填 `docs-zh-CN/assets/nimbus-mark.svg`，就会使用 `DOCS_REPO` 仓库根目录下的该文件。也可以填 `https://example.com/brand/logo.svg` 或 `http://example.com/brand/favicon.png` 等图片 URL。
 

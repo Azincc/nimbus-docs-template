@@ -42,12 +42,16 @@ All variables are optional. Unset values use the defaults below. Enter names and
 | `DOCS_PATH` | `docs` | Document directory, relative to the source repository root |
 | `DOCS_CONFIG_PATH` | `docs/site.json` | Site configuration path; set an empty value if there is no configuration file |
 | `SITE_URL` | `https://nimbus.az1n.com` | Your public site URL; set an empty value until known |
-| `SITE_LOGO` | Empty | HTTP(S) image URL or path relative to the source repository root |
-| `SITE_FAVICON` | Empty | HTTP(S) image URL or path relative to the source repository root |
+| `SITE_LOGO` | `default` | HTTP(S) image URL or path relative to the source repository root |
+| `SITE_FAVICON` | `default` | HTTP(S) image URL or path relative to the source repository root |
 
-An empty value overrides a default; omitting a variable inherits it. To clear a value, leave the field blank instead of entering `""`. Use **Builds** variables: runtime **Variables & Secrets** are not automatically available during static builds.
+Omitting a variable inherits its default. For `SITE_URL` and `DOCS_CONFIG_PATH`, clear the field to override the default with an empty value; do not enter `""`. Use **Builds** variables: runtime **Variables & Secrets** are not automatically available during static builds.
 
-`SITE_URL` controls SEO metadata, not domain binding. An empty value disables origin-dependent canonical URLs and the sitemap. Empty branding variables inherit the logo and favicon from the site configuration.
+`SITE_URL` controls SEO metadata, not domain binding. An empty value disables origin-dependent canonical URLs and the sitemap.
+
+`SITE_LOGO` and `SITE_FAVICON` use `default` to inherit the corresponding site JSON image, falling back to the built-in official Nimbus logo (`/nimbus-logo.svg`) if that field is absent. Enter `default` when Cloudflare requires a nonempty value. Empty values behave the same way; an explicit image URL or repository path overrides JSON.
+
+Before using `default` in an older deployment, [update the template](docs/deployment/template-update.md), including its build scripts and `public/nimbus-logo.svg`.
 
 For a **private source repository**, add `DOCS_TOKEN` in the same **Builds → Variables and secrets** section, with type **Secret**. Use a GitHub token restricted to the source repository with **Contents: Read-only** permission. The token is used only for Git fetch; never put it in a repository file, URL, or ordinary variable. **The resulting website is public even when its source repository is private.** See the [private repository guide](docs/deployment/private-repository.md).
 

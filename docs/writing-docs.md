@@ -110,7 +110,7 @@ Image paths are relative to the Markdown file that references them. This example
 
 The template copies referenced local assets and rewrites their URLs. Images can live in other ordinary directories in the source repository, but paths cannot escape the repository. Hidden files, hidden directories, and symbolic links are not published.
 
-You can also set the logo and favicon through the optional ordinary build variables `SITE_LOGO` and `SITE_FAVICON`. They accept HTTP(S) image URLs or paths relative to the `DOCS_REPO` repository root, such as `docs/assets/nimbus-mark.svg`, regardless of the site JSON location. Local `brand.logo` and `brand.favicon` paths in JSON remain relative to the JSON file. A final nonempty build variable overrides the corresponding JSON field; an empty value inherits JSON. Save the variables in Cloudflare Builds and rebuild to apply them. See [Branding](./site-config.md#branding).
+You can also set the logo and favicon through the optional ordinary build variables `SITE_LOGO` and `SITE_FAVICON`. They accept HTTP(S) image URLs or paths relative to the `DOCS_REPO` repository root, such as `docs/assets/nimbus-mark.svg`, regardless of the site JSON location. Local `brand.logo` and `brand.favicon` paths in JSON remain relative to the JSON file. The default value `default` inherits the corresponding JSON field, falling back to the built-in official Nimbus logo (`/nimbus-logo.svg`) if that field is absent. Use `default` when Cloudflare requires a nonempty value; empty values behave the same way. Explicit image URLs and repository paths override JSON. Save the variables in Cloudflare Builds and rebuild to apply them. See [Branding](./site-config.md#branding).
 
 ## Publish updates
 
