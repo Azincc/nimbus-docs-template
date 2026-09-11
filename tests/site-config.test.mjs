@@ -27,6 +27,52 @@ test('site JSON validates its defined format instead of accepting arbitrary Nimb
   assert.equal(validateSiteConfig({ schemaVersion: 1, title: 'Docs', theme: { defaultMode: 'dark' } }).title, 'Docs');
 });
 
+test('a source without site JSON builds with generic settings using only the first-deploy inputs', async (t) => {
+  const { root, content, defaults } = await brandingFixture(t);
+  const inputs = { DOCS_REPO: defaults.DOCS_REPO, DOCS_BRANCH: 'main', DOCS_PATH: 'docs' };
+  const site = await prepareSiteConfig({ root, settings: readSourceSettings(inputs), content });
+  assert.equal(site.nimbus.title, 'nimbus-docs-template Docs');
+  assert.equal(site.publicSite, null);
+  assert.equal(site.brand.logo, '/nimbus-logo.svg');
+  assert.equal(site.brand.favicon, '/nimbus-logo.svg');
+  // Explicitly requesting even the conventional path still requires that file.
+  await assert.rejects(prepareSiteConfig({
+    root, settings: readSourceSettings({ ...inputs, DOCS_CONFIG_PATH: 'docs/site.json' }), content,
+  }), /DOCS_CONFIG_PATH.*does not exist/);
+});
+
+test('automatic site JSON preserves local branding and explicit overrides or disabling', async (t) => {
+  const { root, content, defaults } = await brandingFixture(t);
+  await mkdir(path.join(root, 'docs-zh-CN'));
+  await writeFile(path.join(root, 'docs-zh-CN', 'logo.svg'), '<svg id="automatic-logo"/>');
+  await writeFile(path.join(root, 'docs-zh-CN', 'site.json'), JSON.stringify({
+    schemaVersion: 1, title: '中文文档', locale: 'zh-CN', brand: { logo: './logo.svg' },
+  }));
+  const inputs = { DOCS_REPO: defaults.DOCS_REPO, DOCS_PATH: 'docs-zh-CN' };
+  const automatic = await prepareSiteConfig({ root, settings: readSourceSettings(inputs), content });
+  assert.equal(automatic.nimbus.title, '中文文档');
+  assert.equal(automatic.nimbus.locale, 'zh-CN');
+  assert.equal(automatic.brand.logo, '/_source/docs-zh-CN/logo.svg');
+  const overridden = await prepareSiteConfig({ root, settings: readSourceSettings({
+    ...inputs, SITE_LOGO: 'https://cdn.example.com/logo.svg', SITE_URL: 'https://docs.example.com',
+  }), content });
+  assert.equal(overridden.brand.logo, 'https://cdn.example.com/logo.svg');
+  assert.equal(overridden.publicSite, 'https://docs.example.com');
+  const disabled = await prepareSiteConfig({ root, settings: readSourceSettings({ ...inputs, DOCS_CONFIG_PATH: '' }), content });
+  assert.equal(disabled.nimbus.title, 'nimbus-docs-template Docs');
+  assert.equal(disabled.brand.logo, '/nimbus-logo.svg');
+});
+
+test('automatic site configuration only tolerates missing files, not invalid JSON or schema', async (t) => {
+  const { root, content, defaults } = await brandingFixture(t);
+  const settings = readSourceSettings({ DOCS_REPO: defaults.DOCS_REPO });
+  const file = path.join(root, 'docs', 'site.json');
+  await writeFile(file, '{');
+  await assert.rejects(prepareSiteConfig({ root, settings, content }), /valid JSON/);
+  await writeFile(file, JSON.stringify({ schemaVersion: 2 }));
+  await assert.rejects(prepareSiteConfig({ root, settings, content }), /schemaVersion/);
+});
+
 test('site configuration maps navigation, branding and SEO from a source repository', async () => {
   const directory = await mkdtemp(path.join(tmpdir(), 'nimbus-site-test-'));
   try {

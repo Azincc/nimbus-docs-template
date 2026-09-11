@@ -8,6 +8,7 @@
   "navigation": [
     { "label": "本站首页", "link": "/" },
     { "label": "入门", "link": "/getting-started" },
+    { "label": "English", "link": "https://nimbus.az1n.com/" },
     { "label": "仓库", "link": "https://github.com/Azincc/nimbus-docs-template.git" }
   ],
   "theme": {

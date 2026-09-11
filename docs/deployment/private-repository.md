@@ -22,7 +22,7 @@ Confirm these build settings during deployment, and keep them unchanged when con
 | Deploy command | `pnpm run deploy` |
 | Root directory | Repository root |
 
-If the creation flow has no **Build variables and secrets** section, create the Worker using the default public example first, then add the private source variables and secret below. If you already entered a private repository and the first fetch failed, add the missing configuration after the Worker is created and retry.
+The initial template form has three source fields: `DOCS_REPO`, `DOCS_BRANCH`, and `DOCS_PATH`. Keep their prefilled public example values for this first deployment, then add the private source variables and secret below. If you already entered a private repository and the first fetch failed, add the missing configuration after the Worker is created and retry.
 
 The Cloudflare GitHub App authorization connects and builds the template repository. It does not provide private repository credentials to the documentation fetch script. That script uses a GitHub Personal Access Token (PAT), supplied through `DOCS_TOKEN`, to perform Git fetch.
 
@@ -38,7 +38,7 @@ To customize the site name, navigation, or branding, add `docs/site.json`. The s
 }
 ```
 
-Add other fields as needed; see [Site configuration](../site-config.md). If this file does not exist, explicitly leave `DOCS_CONFIG_PATH` empty in the next steps. Omitting the variable inherits the template's default `docs/site.json` path.
+Add other fields as needed; see [Site configuration](../site-config.md). The template automatically reads `site.json` in `DOCS_PATH`. If the file does not exist, it uses generic site settings; no `DOCS_CONFIG_PATH` variable or empty value is needed.
 
 Note the private repository's HTTPS clone URL, documentation branch, and paths to the documentation directory and configuration file relative to the repository root. Copy the URL from **Code → HTTPS** in the repository, without adding a token.
 
@@ -57,24 +57,26 @@ Save the token in the Cloudflare build secret in the next step. Do not put it in
 
 ## 4. Configure build variables and the secret
 
-Open the Worker's **Settings → Builds → Build variables and secrets**. Use ordinary variables for source and site settings, and select **Secret** for `DOCS_TOKEN`. The logo and favicon are optional.
+Open the Worker's **Settings → Builds → Build variables and secrets**. Use ordinary variables for source and site settings, and select **Secret** for `DOCS_TOKEN`. The four optional site variables are absent from the initial deployment form; add them here only when needed.
 
 | Name | Type | Value |
 | --- | --- | --- |
 | `DOCS_REPO` | Variable | The target private GitHub repository's HTTPS clone URL, without a username, password, or token |
 | `DOCS_BRANCH` | Variable | The branch containing private documents; omit it to inherit `main` if appropriate |
 | `DOCS_PATH` | Variable | The documentation directory relative to the private repository root; the structure above uses the default, `docs` |
-| `DOCS_CONFIG_PATH` | Variable | `docs/site.json` or the actual configuration path; explicitly leave it empty if there is no JSON file |
-| `SITE_URL` | Variable | Defaults to `https://nimbus.az1n.com`; override it with your actual site address including `https://`, or explicitly leave it empty |
-| `SITE_LOGO` | Variable, optional | An HTTP(S) image URL or a path relative to the private source repository root, such as `docs/assets/nimbus-mark.svg`; defaults to `default` |
-| `SITE_FAVICON` | Variable, optional | An HTTP(S) image URL or a path relative to the private source repository root, such as `docs/assets/nimbus-mark.svg`; defaults to `default` |
+| `DOCS_CONFIG_PATH` | Variable, optional | Add only when the configuration file is elsewhere in the source repository; otherwise `DOCS_PATH/site.json` is read if present |
+| `SITE_URL` | Variable, optional | Your actual site address including `https://`, once known; unset by default |
+| `SITE_LOGO` | Variable, optional | An HTTP(S) image URL or a path relative to the private source repository root, such as `docs/assets/nimbus-mark.svg`; otherwise use JSON branding or the built-in Nimbus logo |
+| `SITE_FAVICON` | Variable, optional | An HTTP(S) image URL or a path relative to the private source repository root, such as `docs/assets/nimbus-mark.svg`; otherwise use JSON branding or the built-in Nimbus logo |
 | `DOCS_TOKEN` | Secret | The read-only GitHub token created above, with any required organization approval completed |
 
-If a build variable is not provided, the template reads the public default from `wrangler.jsonc`; you do not need to repeat defaults that still apply. You must override `DOCS_REPO` with your private repository URL, or the build will continue to read the public example.
+Source variables use the public defaults in `wrangler.jsonc` unless overridden; you do not need to repeat defaults that still apply. You must override `DOCS_REPO` with your private repository URL, or the build will continue to read the public example. Optional site variables use the automatic behavior described above.
 
-`SITE_LOGO` and `SITE_FAVICON` default to `default`, which inherits JSON `brand.logo` and `brand.favicon`, respectively, or uses the built-in official Nimbus logo (`/nimbus-logo.svg`) if the corresponding field is absent. Enter `default` when Cloudflare requires a nonempty value. Empty values have the same behavior; explicit HTTP(S) image URLs and repository paths override JSON. Variable paths are relative to the `DOCS_REPO` repository root, regardless of whether the site JSON exists or where it is stored. Existing local asset paths inside the JSON remain relative to that JSON file. The same read-only token lets the build read repository images; no separate image credential is needed.
+An explicitly configured `DOCS_CONFIG_PATH` must point to an existing, valid JSON file. For an older deployment, [update the template](./template-update.md) first, then delete an old `DOCS_CONFIG_PATH` to enable automatic discovery. Existing optional build variables continue to override the new defaults until removed.
 
-`SITE_URL` does not connect a domain automatically. Complete the domain configuration before using your public address. Leaving the value empty keeps the site browsable but omits canonical links, SEO output, and sitemaps that depend on the public site origin.
+Unset `SITE_LOGO` and `SITE_FAVICON` inherit JSON `brand.logo` and `brand.favicon`, respectively, or use the built-in official Nimbus logo (`/nimbus-logo.svg`) if the corresponding field is absent. Existing `default` and empty values have the same behavior; explicit HTTP(S) image URLs and repository paths override JSON. Variable paths are relative to the `DOCS_REPO` repository root, regardless of whether the site JSON exists or where it is stored. Existing local asset paths inside the JSON remain relative to that JSON file. The same read-only token lets the build read repository images; no separate image credential is needed.
+
+`SITE_URL` does not connect a domain automatically. Complete any custom domain configuration before using that address. Without this variable, the site remains browsable but omits canonical links, SEO output, and sitemaps that depend on the public site origin.
 
 **Build variables and secrets** are provided to the build process. Worker runtime variables and secrets under **Settings → Variables & Secrets** are not automatically available to static builds. Setting `DOCS_TOKEN` only in the runtime section does not authenticate documentation fetches. Logo and favicon build variables also require a rebuild after saving.
 
@@ -123,7 +125,7 @@ When changing private repositories, also update `DOCS_REPO` and ensure that the 
 | Problem | What to check |
 | --- | --- |
 | Fetching the private repository fails with a not-found or permission error | Verify the HTTPS URL, branch, and `DOCS_TOKEN` build secret on this Worker; confirm the token has not expired, selects the repository, grants read-only Contents access, and has organization approval |
-| A `DOCS_CONFIG_PATH` or JSON error appears | Paths are relative to the private repository root; explicitly leave the value empty if no configuration exists, or check JSON syntax and `schemaVersion: 1` if it does |
+| A `DOCS_CONFIG_PATH` or JSON error appears | Correct an explicitly configured path or delete the variable to use automatic discovery; if a file exists, check JSON syntax and `schemaVersion: 1` |
 | A page or image is missing during the build | Confirm the file is committed to `DOCS_BRANCH`, and check `DOCS_PATH`, capitalization, and relative links; see [Writing documents](../writing-docs.md) |
 | Changing variables or the secret did not update the site | Save and trigger a new build; check its documentation SHA rather than only an older deployment |
 | A GitHub push did not start a build | Check the latest webhook delivery, Deploy Hook URL, and selected template branch; confirm the document change was pushed to the source branch the build reads |

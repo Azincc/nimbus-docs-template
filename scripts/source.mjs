@@ -78,12 +78,17 @@ export function readSourceSettings(env = process.env, defaults = {}) {
   if (Object.hasOwn(defaults, 'DOCS_TOKEN') || Object.hasOwn(defaults, 'token')) {
     throw new Error('Do not put DOCS_TOKEN in the public defaults in wrangler.jsonc.vars. Configure it as a Workers Builds secret.');
   }
-  const configPath = setting(env, defaults, 'DOCS_CONFIG_PATH');
+  const docsPath = repositoryPath(setting(env, defaults, 'DOCS_PATH', 'docs') || 'docs', 'DOCS_PATH');
+  // Only an inferred path is optional. Explicit paths must exist; an explicit
+  // empty string continues to disable JSON configuration for existing sites.
+  const configPathOptional = (env.DOCS_CONFIG_PATH ?? defaults.DOCS_CONFIG_PATH) == null;
+  const configPath = setting(env, defaults, 'DOCS_CONFIG_PATH', path.posix.join(docsPath, 'site.json'));
   return {
     repo: repositoryUrl(setting(env, defaults, 'DOCS_REPO')),
     branch: branchName(setting(env, defaults, 'DOCS_BRANCH', 'main') || 'main'),
-    docsPath: repositoryPath(setting(env, defaults, 'DOCS_PATH', 'docs') || 'docs', 'DOCS_PATH'),
+    docsPath,
     configPath: configPath ? repositoryPath(configPath, 'DOCS_CONFIG_PATH') : undefined,
+    configPathOptional,
     siteUrl: publicSiteUrl(setting(env, defaults, 'SITE_URL')),
     siteLogo: publicBrandAsset(setting(env, defaults, 'SITE_LOGO'), 'SITE_LOGO'),
     siteFavicon: publicBrandAsset(setting(env, defaults, 'SITE_FAVICON'), 'SITE_FAVICON'),

@@ -47,22 +47,31 @@ export function validateSiteConfig(config) {
   return config;
 }
 
-export async function prepareSiteConfig({ root, settings, content }) {
-  let config = { schemaVersion: 1 };
-  if (settings.configPath) {
-    const target = path.resolve(root, settings.configPath);
-    const relative = path.relative(root, target);
-    if (relative.startsWith('..') || path.isAbsolute(relative)) throw new Error('DOCS_CONFIG_PATH escapes the source repository.');
-    let current = root;
-    for (const part of relative.split(path.sep)) {
-      current = path.join(current, part);
-      if ((await lstat(current)).isSymbolicLink()) throw new Error('DOCS_CONFIG_PATH cannot pass through a symlink.');
+async function loadSiteConfig(root, settings) {
+  if (!settings.configPath) return { schemaVersion: 1 };
+  const target = path.resolve(root, settings.configPath);
+  const relative = path.relative(root, target);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) throw new Error('DOCS_CONFIG_PATH escapes the source repository.');
+  let current = root;
+  for (const part of relative.split(path.sep)) {
+    current = path.join(current, part);
+    let stat;
+    try { stat = await lstat(current); } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+      if (settings.configPathOptional) return { schemaVersion: 1 };
+      throw new Error('DOCS_CONFIG_PATH points to a file that does not exist. Correct the path or remove this variable to use automatic configuration.');
     }
-    const resolvedRelative = path.relative(await realpath(root), await realpath(target));
-    if (resolvedRelative.startsWith('..') || path.isAbsolute(resolvedRelative)) throw new Error('DOCS_CONFIG_PATH escapes the source repository.');
-    try { config = JSON.parse(await readFile(target, 'utf8')); } catch { throw new Error('DOCS_CONFIG_PATH must point to a valid JSON file.'); }
-    validateSiteConfig(config);
+    if (stat.isSymbolicLink()) throw new Error('DOCS_CONFIG_PATH cannot pass through a symlink.');
   }
+  const resolvedRelative = path.relative(await realpath(root), await realpath(target));
+  if (resolvedRelative.startsWith('..') || path.isAbsolute(resolvedRelative)) throw new Error('DOCS_CONFIG_PATH escapes the source repository.');
+  let config;
+  try { config = JSON.parse(await readFile(target, 'utf8')); } catch { throw new Error('DOCS_CONFIG_PATH must point to a valid JSON file.'); }
+  return validateSiteConfig(config);
+}
+
+export async function prepareSiteConfig({ root, settings, content }) {
+  const config = await loadSiteConfig(root, settings);
   const brand = { ...config.brand };
   const overrides = Object.fromEntries(
     Object.entries({ logo: settings.siteLogo, favicon: settings.siteFavicon })

@@ -10,6 +10,8 @@ You can set the documentation repository, branch, directory, site URL, and image
 
 The process is: **open build settings → add or edit variables → save → rebuild**.
 
+For a new deployment, the template's Cloudflare form shows only `DOCS_REPO`, `DOCS_BRANCH`, and `DOCS_PATH`, with prefilled example values. The four optional settings below are absent from that form. You can deploy without a site JSON file, public site URL, or custom images, then add settings here when needed.
+
 ## 1. Find build variables
 
 1. Sign in to Cloudflare and open **Workers & Pages**.
@@ -29,38 +31,43 @@ Selecting **Add** opens three fields: **Type**, **Name**, and **Value**.
 - **Name**: copy the name from the table exactly, including capitalization.
 - **Value**: enter your value without quotes. Enter the name and value separately; do not put an entire assignment such as `DOCS_BRANCH=main` into one field.
 
-After entering each setting, select **Add** to continue. Adding all five settings the first time makes them easier to manage together, but you can omit any setting whose default already suits your site.
+After entering each setting, select **Add** to continue. Add only the source values you want to change; defaults remain in effect for values you have not overridden.
 
 | What to change | Name | Value |
 | --- | --- | --- |
 | GitHub repository containing your documents | `DOCS_REPO` | The HTTPS clone URL, such as `https://github.com/example-user/project-docs.git`; replace the example with your repository |
 | Source branch | `DOCS_BRANCH` | The branch containing your documents, such as `main` |
 | Documentation directory | `DOCS_PATH` | A path such as `docs`; enter `.` if the documents are at the repository root |
-| Site configuration file | `DOCS_CONFIG_PATH` | `docs/site.json` or the actual path if the file exists; if there is no configuration file, keep this variable and leave its value empty |
-| Public site address | `SITE_URL` | Your actual address, such as `https://your-worker.your-subdomain.workers.dev`, or a custom domain you have already connected; include `https://` and no page path |
 
 `example-user/project-docs` illustrates the URL format; replace it with your repository. In GitHub, open the documentation repository and select **Code → HTTPS** to copy its clone URL. The branch selector appears above the file list. The default source is `https://github.com/Azincc/nimbus-docs-template.git`; creating a template copy does not automatically change it to your repository.
 
-Directory and configuration paths are relative to the documentation repository root. For example, if documents are in `manual` and the configuration file is in `config/site.json`, enter those two values. Do not prepend the repository URL.
+The document directory is relative to the documentation repository root. Do not prepend the repository URL. With `DOCS_PATH=manual`, the template automatically reads `manual/site.json` if it exists; otherwise it uses generic site settings. You do not need to add an empty variable when there is no JSON file.
 
-**An empty Cloudflare field contains no characters. Do not enter two quotes (`""`).** If your documentation repository has no site configuration file, add `DOCS_CONFIG_PATH` and leave its value empty. Omitting the variable would continue to use the default `docs/site.json` path.
+To publish this repository's Chinese example, set `DOCS_PATH=docs-zh-CN`; the template automatically reads `docs-zh-CN/site.json`. Delete or update any existing explicit `DOCS_CONFIG_PATH` first, then rebuild.
 
-`SITE_URL` defaults to the example site, `https://nimbus.az1n.com`. Change it to your own site's actual address. If you do not know the address yet, you can leave the value empty: the site remains browsable, but it will not generate search-engine links or a sitemap that depend on a public origin. Entering a custom domain does not connect it automatically; configure it in the Worker's domain settings first.
-
-## 3. Set the logo and favicon
-
-Both variables default to `default`: use the corresponding site JSON image, or the built-in official Nimbus logo (`/nimbus-logo.svg`) if that field is absent. Enter `default` when Cloudflare requires a nonempty value.
+Add these optional settings only when needed:
 
 | What to change | Name | Value |
 | --- | --- | --- |
-| Site logo | `SITE_LOGO` | `default`, or a direct HTTP(S) image URL, or an image path in the documentation repository, such as `docs/assets/logo.svg` |
-| Browser tab icon | `SITE_FAVICON` | `default`, or an HTTP(S) image URL, or an image path in the documentation repository, such as `docs/assets/favicon.png` |
+| A configuration file outside the document directory | `DOCS_CONFIG_PATH` | Its actual path relative to the source repository root, such as `config/site.json`; an explicitly selected file must exist and contain valid JSON |
+| Public site address | `SITE_URL` | Your actual address, such as `https://your-worker.your-subdomain.workers.dev`, or a custom domain you have already connected; include `https://` and no page path |
+
+`SITE_URL` is unset by default. Until you know the address, do not add it: the website remains browsable, but omits origin-dependent canonical URLs, SEO metadata, and the sitemap. Once the address is known, add it and rebuild. Entering a custom domain does not connect it automatically; configure it in the Worker's domain settings first.
+
+## 3. Set the logo and favicon
+
+Both variables are optional and unset by default: the build uses the corresponding site JSON image, or the built-in official Nimbus logo (`/nimbus-logo.svg`) if that field is absent. Add them only to customize images.
+
+| What to change | Name | Value |
+| --- | --- | --- |
+| Site logo | `SITE_LOGO` | A direct HTTP(S) image URL, or an image path in the documentation repository, such as `docs/assets/logo.svg` |
+| Browser tab icon | `SITE_FAVICON` | An HTTP(S) image URL, or an image path in the documentation repository, such as `docs/assets/favicon.png` |
 
 Use the address of the image itself. A GitHub file preview page is not an image URL. For an image stored in the documentation repository, enter its path relative to the repository root.
 
-Explicit image URLs and repository paths override JSON. The variables work independently: changing the logo does not change the favicon. Empty or whitespace-only values use the same fallback as `default` for compatibility.
+Explicit image URLs and repository paths override JSON. The variables work independently: changing the logo does not change the favicon. Delete a variable to restore the fallback. Existing `default`, empty, and whitespace-only values retain the same fallback for compatibility.
 
-Before using `default` in an older deployment, update its build scripts and `public/nimbus-logo.svg`. Changing build variables alone does not update the template.
+For an older deployment, [update the template](./template-update.md) to get these defaults. Changing build variables alone does not update the template.
 
 ## 4. Add a secret for a private repository
 
@@ -81,22 +88,24 @@ See [Private repositories](./private-repository.md) for token creation steps. Pa
 
 Saving variables does not change pages that have already been published; a rebuild is required. Changing these settings does not require another template copy, another click on the deployment button, or changes to the build command, deploy command, or root directory.
 
-If the build fails, read the error in the log, correct the relevant input, and retry. For example, a missing configuration file usually means `DOCS_CONFIG_PATH` points to a file that does not exist. Leave its value empty if you have no configuration file.
+If the build fails, read the error in the log, correct the relevant input, and retry. A missing explicitly selected configuration file means `DOCS_CONFIG_PATH` points to a file that does not exist. Correct that path, or delete the variable to restore automatic discovery. Invalid JSON still needs to be fixed, even in an automatically discovered file.
 
 ## Change settings or restore defaults later
 
 Return to **Settings → Builds → Build variables and secrets**, edit the relevant value, save, and rebuild.
 
-Values saved here take precedence over defaults in the template files. Your saved build variables continue to take precedence even if a later template update changes a default.
+Values saved here take precedence over defaults in the template files. Your saved build variables continue to take precedence even if a later template update changes a default. After updating an older template, delete an old `DOCS_CONFIG_PATH` to let it follow `DOCS_PATH` automatically. Remove other optional values, such as the old example `SITE_URL`, if you want their new unset behavior.
 
 To restore a template default, delete the corresponding build variable, save, and rebuild. You can also choose the behavior below:
 
 | Action | Result |
 | --- | --- |
-| Delete a variable | Read the template default again |
-| Leave `DOCS_CONFIG_PATH` empty | Use the generic site configuration without reading a site JSON file |
-| Leave `SITE_URL` empty | Do not specify a public site origin |
-| Set `SITE_LOGO` or `SITE_FAVICON` to `default` (or empty) | Use the corresponding site JSON image, then the built-in Nimbus logo if absent |
+| Delete `DOCS_CONFIG_PATH` | Automatically read `DOCS_PATH/site.json` if present; otherwise use generic site settings |
+| Delete `SITE_URL` | Do not specify a public site origin |
+| Delete `SITE_LOGO` or `SITE_FAVICON` | Use the corresponding site JSON image, then the built-in Nimbus logo if absent |
+| Delete a document-source variable | Read that source value's template default again |
+
+For compatibility, an explicitly empty `DOCS_CONFIG_PATH` still disables JSON, an empty `SITE_URL` still leaves the public origin unspecified, and `default` or empty image values still inherit JSON or the built-in image. You do not need to create empty fields in Cloudflare to use the new defaults. If your template copy retains custom optional defaults in `wrangler.jsonc`, deleting a build variable restores those values instead.
 
 ## Troubleshooting
 
@@ -105,18 +114,18 @@ To restore a template default, delete the corresponding build variable, save, an
 | Cannot find the Add button | Scroll to the variables section under **Builds**, below the runtime variables section |
 | The page still says changes are unsaved | Wait for the save request and check for errors; if there are none, refresh and verify that the values remain, because the message may be stale |
 | The site still shows the template's example documents | Set `DOCS_REPO` to your documentation repository, save, and rebuild |
-| The site configuration file cannot be found | Check the path if the file exists; otherwise, keep `DOCS_CONFIG_PATH` and leave its value empty |
+| The site configuration file cannot be found | Correct the explicit path, or delete `DOCS_CONFIG_PATH` to restore automatic discovery; if JSON exists but is invalid, fix its contents |
 | A private repository cannot be fetched | Confirm that `DOCS_TOKEN` is a build **Secret** and grants read access to the target repository |
-| The logo or favicon has not changed | Check the image address, saved values, and build result; for older copies, update the build scripts and `public/nimbus-logo.svg` before using `default` |
+| The logo or favicon has not changed | Check the image address, saved values, and build result; update older template copies to get the current fallback behavior |
 | Documentation changes do not update the site | Set up a [deploy hook](./deploy-hook.md) for a separate documentation repository so pushes trigger builds |
 
 The site name, navigation, theme, and sidebar order have their own settings. See [Site configuration](../site-config.md) and [Sidebar order](../sidebar-order.md). The build variables described here cover only the listed settings; they do not turn every site setting into a dashboard field.
 
 ## Notes for template maintainers
 
-Public defaults are stored in `vars` in the deployment template repository's root `wrangler.jsonc`. The build scripts first read variables with the same names from the build environment, then fall back to these defaults. `DOCS_TOKEN` is read only from the build environment.
+Keep only the three public document-source defaults in `vars` in the template repository's root `wrangler.jsonc`. Cloudflare uses these declarations to create the initial deployment fields. Optional settings are handled by build-script defaults; declaring them in `vars` again would reintroduce fields in the initial form. Build environment variables take precedence, and `DOCS_TOKEN` is read only from the build environment.
 
-Repository defaults do not appear automatically in the Cloudflare build variables list. Add them once in build settings if you want to initialize that list for a user. After the source, branch, directory, and site URL have been added, the user can make routine adjustments entirely in Cloudflare.
+The initial deployment form and the deployed Worker's build variables list are separate. If the latter is empty, users can add only the settings they want to change; an empty list does not mean template defaults are missing. Optional configuration needs no placeholder entries.
 
 Maintainers can also edit and commit repository defaults, but saved build variables with the same names take precedence. Build a new template commit containing the changes; retrying an older commit cannot read changes that it does not contain.
 

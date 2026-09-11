@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { test } from 'vitest';
 import { buildEnvironment, digestDirectory, finalizeArtifacts } from '../scripts/artifacts.mjs';
-import { loadSettings } from '../scripts/settings.mjs';
+import { loadPublicDefaults, loadSettings } from '../scripts/settings.mjs';
 import { UNKNOWN_ORIGIN } from '../scripts/site-config.mjs';
 
 async function temporaryArtifacts(t) {
@@ -69,10 +69,11 @@ test('artifact digests detect edits, path changes, and deleted files', async (t)
 });
 
 test('Wrangler public defaults can be overridden by Workers Builds variables and its build secret', async () => {
+  assert.deepEqual(Object.keys(await loadPublicDefaults()).sort(), ['DOCS_BRANCH', 'DOCS_PATH', 'DOCS_REPO']);
   assert.deepEqual(await loadSettings({}), {
     repo: 'https://github.com/Azincc/nimbus-docs-template.git', branch: 'main',
-    docsPath: 'docs', configPath: 'docs/site.json', siteUrl: 'https://nimbus.az1n.com',
-    siteLogo: 'default', siteFavicon: 'default', token: undefined,
+    docsPath: 'docs', configPath: 'docs/site.json', configPathOptional: true, siteUrl: undefined,
+    siteLogo: undefined, siteFavicon: undefined, token: undefined,
   });
   assert.deepEqual(await loadSettings({
     DOCS_REPO: 'https://github.com/Azincc/nimbus-docs-template.git', DOCS_BRANCH: 'docs/current',
@@ -81,7 +82,7 @@ test('Wrangler public defaults can be overridden by Workers Builds variables and
     DOCS_TOKEN: 'private-repository-build-secret',
   }), {
     repo: 'https://github.com/Azincc/nimbus-docs-template.git', branch: 'docs/current',
-    docsPath: 'knowledge', configPath: 'website.json', siteUrl: 'https://docs.example.com',
+    docsPath: 'knowledge', configPath: 'website.json', configPathOptional: false, siteUrl: 'https://docs.example.com',
     siteLogo: 'https://cdn.example.com/logo.svg', siteFavicon: 'brand/favicon.svg',
     token: 'private-repository-build-secret',
   });

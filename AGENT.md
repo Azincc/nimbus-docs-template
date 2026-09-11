@@ -12,7 +12,10 @@ This project wraps the Nimbus Astro starter with a GitHub Markdown source pipeli
 - `.cache/`, `.generated/`, `.astro/`, `.nimbus/`, `public/_source/`, `public/_build.json`, and `dist/` are disposable build outputs.
 - Builds fetch the remote source. Local edits to either document set become part of a normal build only after they reach the configured source branch.
 - Do not modify the fetched source repository. Write conversions only to temporary or generated directories.
-- `SITE_LOGO` and `SITE_FAVICON` default to `default`: use the corresponding site JSON image, then fall back to `public/nimbus-logo.svg`. Keep this bundled official Nimbus asset available when the source repository has no branding.
+- Keep only `DOCS_REPO`, `DOCS_BRANCH`, and `DOCS_PATH` in `wrangler.jsonc` `vars`, so optional settings are absent from the initial Cloudflare deployment form. Optional values can still be supplied through build variables.
+- Unset `DOCS_CONFIG_PATH` automatically discovers `site.json` in `DOCS_PATH`; a missing automatic file uses generic settings. Explicit paths must exist and contain valid JSON; explicit empty values retain the behavior of disabling JSON. Existing build variables override defaults and must be removed to enable automatic discovery.
+- `SITE_URL` is unset by default. Omit origin-dependent canonical URLs, SEO output, and the sitemap until a real site origin is provided.
+- Unset `SITE_LOGO` and `SITE_FAVICON` use the corresponding site JSON image, then fall back to `public/nimbus-logo.svg`; `default` and empty values retain this behavior. Keep this bundled official Nimbus asset available when the source repository has no branding.
 - `DOCS_TOKEN` is a build secret used only for Git fetch. Never persist it in configuration, logs, URLs, or static output.
 
 Source documents use ordinary `.md`, optionally with frontmatter. The pipeline does not execute MDX or JavaScript from the document source. Use the document root's `README.md` or `index.md` for the home page; do not include both. If neither exists, the build generates an index.

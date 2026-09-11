@@ -27,25 +27,18 @@
 | `DOCS_REPO` | `https://github.com/Azincc/nimbus-docs-template.git` |
 | `DOCS_BRANCH` | `main` |
 | `DOCS_PATH` | `docs` |
-| `DOCS_CONFIG_PATH` | `docs/site.json` |
-| `SITE_URL` | `https://nimbus.az1n.com` |
-| `SITE_LOGO` | `default`，沿用站点 JSON 的 `brand.logo` |
-| `SITE_FAVICON` | `default`，沿用站点 JSON 的 `brand.favicon` |
 
-默认配置读取英文 `docs/`，无需逐项填写这些变量。要发布这份完整中文示例，保留默认文档仓库和分支，只修改以下两个构建变量：
+首次 Cloudflare 部署表单只显示以上三项，保留预填值即可体验英文示例。模板会自动读取所选 `DOCS_PATH` 中的 `site.json`；没有文件时使用通用配置，无需添加空变量。
 
-| 构建变量 | 中文示例值 |
-| --- | --- |
-| `DOCS_PATH` | `docs-zh-CN` |
-| `DOCS_CONFIG_PATH` | `docs-zh-CN/site.json` |
+要发布这份完整中文示例，保留默认文档仓库和分支，只将 `DOCS_PATH` 改为 `docs-zh-CN`。模板会自动读取 `docs-zh-CN/site.json`。如果旧部署已有显式 `DOCS_CONFIG_PATH`，请删除它或改为 `docs-zh-CN/site.json`，保存后重新构建。
 
-保存并重新构建后，站点会显示中文文档。部署自己的站点时，将 `SITE_URL` 改为实际公开地址，也可以显式留空。设置这个变量不会自动绑定域名。
+其他可选变量不会出现在首次部署表单。配置文件放在其他位置时，再添加 `DOCS_CONFIG_PATH`；确定实际公开地址后，再添加 `SITE_URL`。未设置 `SITE_URL` 时网站仍可访问，只省略依赖正式地址的 canonical、SEO 信息和 sitemap。设置它不会自动绑定域名。
 
 Logo 和 favicon 可以通过可选的构建变量设置。变量值接受 HTTP(S) 图片 URL，也接受相对文档源仓库根目录的路径，例如 `docs-zh-CN/assets/nimbus-mark.svg`。这类路径不受站点 JSON 位置影响；写在 JSON 中的资源路径仍相对 JSON 文件。
 
-构建时先读取同名环境变量，未设置时使用 `wrangler.jsonc` 默认值。填图片 URL 或仓库路径时覆盖对应 JSON 品牌字段；默认的 `default` 或空白值沿用 JSON，未配置对应字段时使用模板内置的 Nimbus 官方 Logo。Cloudflare 不接受空值时，直接填 `default`。要修改这些变量，请打开 Cloudflare **Settings → Builds → Build variables and secrets**，添加普通变量后重新构建。运行时变量不会自动进入静态构建。详见[品牌资源](./site-config.md#品牌资源)。
+图片变量未设置时沿用 JSON，未配置对应字段时使用模板内置的 Nimbus 官方 Logo。原有 `default` 和空白值继续兼容相同规则；图片 URL 或仓库路径会覆盖对应 JSON 品牌字段。要修改这些变量，请打开 Cloudflare **Settings → Builds → Build variables and secrets**，添加普通变量后重新构建。运行时变量不会自动进入静态构建。详见[品牌资源](./site-config.md#品牌资源)。
 
-旧部署请先[更新模板](./deployment/template-update.md)，同步新版构建脚本和 `public/nimbus-logo.svg`，再将变量设为 `default`。
+旧部署需先[更新模板](./deployment/template-update.md)才能获得新的默认行为。已保存的构建变量仍会优先生效；需要恢复新默认行为时，删除对应旧变量。
 
 ## 内容版本
 

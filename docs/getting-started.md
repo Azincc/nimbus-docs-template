@@ -17,37 +17,39 @@ Deploy and change settings in the Cloudflare dashboard without installing develo
 <!-- deploy-button:end -->
 
 1. Click **Deploy to Cloudflare** above. Follow the prompts to authorize GitHub and create your template repository and Worker.
-2. Use `pnpm run build` as the build command and `pnpm run deploy` as the deploy command. Set the root directory to the repository root.
-3. Open the Worker's **Settings → Builds → Variables and secrets**, click **Add**, and enter the variables you want to change using the next section.
-4. Save, then select **Retry build** in the build history. After it succeeds, open the `workers.dev` address provided by Cloudflare.
+2. Confirm the build command is `pnpm run build`, the deploy command is `pnpm run deploy`, and the root directory is the repository root. Keep the three prefilled source values for the example, or enter your public repository, branch, and document directory.
+3. Start the deployment. After it succeeds, open the `workers.dev` address provided by Cloudflare.
 
-To change the document source, site URL, logo, or favicon later, edit the same variables, save, and rebuild.
+To change the document source, site URL, logo, or favicon later, open the Worker's **Settings → Builds → Variables and secrets**, add or edit the relevant variables, save, and select **Retry build** in the build history.
 
 The first deployment may show the example documents. A message saying no build variables or secrets are configured means you have not added them in the dashboard; the template still uses its defaults. Copying the template does not automatically change the document source to your repository.
 
 ## Build variables
 
-All seven values below can be ordinary variables in **Builds → Variables and secrets**. Add only the values you want to change; omitted variables inherit the template defaults.
+The initial Cloudflare deployment form shows only `DOCS_REPO`, `DOCS_BRANCH`, and `DOCS_PATH`. All three displayed fields need values. Keep the prefilled values for the example, or change them to your own document source.
 
-Enter **names and values in their separate fields, without quotes**. For example, enter `DOCS_BRANCH` as the name and `main` as the value.
-
-| Variable | Default | What to enter |
+| Initial field | Prefilled value | What to enter |
 | --- | --- | --- |
 | `DOCS_REPO` | `https://github.com/Azincc/nimbus-docs-template.git` | Your document repository's HTTPS URL, such as `https://github.com/your-user/your-docs.git` |
 | `DOCS_BRANCH` | `main` | The branch containing the documents |
 | `DOCS_PATH` | `docs` | The document directory; use `.` if documents are at the repository root |
-| `DOCS_CONFIG_PATH` | `docs/site.json` | The site configuration path; add this variable with an empty value if there is no configuration file |
-| `SITE_URL` | `https://nimbus.az1n.com` | Your complete public URL, such as `https://your-worker.your-subdomain.workers.dev`; add an empty value until known |
-| `SITE_LOGO` | `default` | Optional HTTP(S) logo image URL or image path in the repository |
-| `SITE_FAVICON` | `default` | Optional HTTP(S) favicon image URL or image path in the repository |
 
-Omitting a variable inherits its default. To clear `SITE_URL` or `DOCS_CONFIG_PATH`, leave the value field empty; **do not enter two quotation marks `""`**.
+The following optional variables are absent from the initial form. Add them later in **Settings → Builds → Variables and secrets** only when you need an override. Enter **names and values in their separate fields, without quotes**.
 
-`SITE_URL` controls search-engine metadata and **does not bind a custom domain**. The site remains accessible when it is empty, but origin-dependent canonical URLs and the sitemap are omitted.
+| Optional variable | Behavior when not set | What to enter when needed |
+| --- | --- | --- |
+| `DOCS_CONFIG_PATH` | Automatically read `site.json` in `DOCS_PATH`; use generic settings if no file exists | A different configuration path relative to the source repository root |
+| `SITE_URL` | No public origin is specified | Your complete site URL, such as `https://your-worker.your-subdomain.workers.dev` |
+| `SITE_LOGO` | Use the JSON logo or the built-in Nimbus logo | An HTTP(S) image URL or repository image path |
+| `SITE_FAVICON` | Use the JSON favicon or the built-in Nimbus logo | An HTTP(S) image URL or repository image path |
 
-`SITE_LOGO` and `SITE_FAVICON` default to `default`: use the corresponding site JSON image, or the built-in official Nimbus logo (`/nimbus-logo.svg`) if that field is absent. Enter `default` when Cloudflare requires a nonempty value. Empty values behave the same way for compatibility. An explicit HTTP(S) image URL or repository path overrides JSON; paths start at the document repository root, for example `docs/assets/nimbus-mark.svg`. See [Branding](./site-config.md#branding).
+A source repository without `site.json` can deploy as it is; no empty variable is needed. If you explicitly set `DOCS_CONFIG_PATH`, the file must exist and contain valid JSON.
 
-Before using `default` in an older deployment, update its build scripts and `public/nimbus-logo.svg`. Changing build variables alone does not update the template.
+`SITE_URL` controls search-engine metadata and **does not bind a custom domain**. Until you set it, the site remains accessible but omits origin-dependent canonical URLs, SEO metadata, and the sitemap. Add it after confirming your public address, then rebuild.
+
+Unset branding uses the corresponding site JSON image, or the built-in official Nimbus logo (`/nimbus-logo.svg`). Existing `default` and empty values keep this behavior. An explicit HTTP(S) image URL or repository path overrides JSON; paths start at the document repository root, for example `docs/assets/nimbus-mark.svg`. See [Branding](./site-config.md#branding).
+
+For an older deployment, [update the template](./deployment/template-update.md) first. Existing explicit build variables still take precedence. Delete an old `DOCS_CONFIG_PATH` to enable automatic discovery, and delete other optional overrides you no longer need.
 
 Public repositories do not need `DOCS_TOKEN`. For a private document repository, add `DOCS_TOKEN` in the same **Builds → Variables and secrets** section and select **Secret**. Use a GitHub token restricted to the source repository with **Contents: Read-only** permission. The token is used only for Git fetch and must not be written into repository files or URLs. See [Private repositories](./deployment/private-repository.md).
 
@@ -55,7 +57,7 @@ Make sure these are **build** variables. Ordinary runtime variables are not auto
 
 When documents and template code share the connected build repository and branch, pushing documents triggers a build. For a separate document repository, connect automatic updates with a [Deploy hook](./deployment/deploy-hook.md).
 
-The default source is the English `docs/` directory. To publish the [Chinese documentation](https://github.com/Azincc/nimbus-docs-template/tree/main/docs-zh-CN) instead, set `DOCS_PATH` to `docs-zh-CN` and `DOCS_CONFIG_PATH` to `docs-zh-CN/site.json`, then rebuild. This selects the published document language at build time.
+The default source is the English `docs/` directory. To publish the [Chinese documentation](https://github.com/Azincc/nimbus-docs-template/tree/main/docs-zh-CN) instead, set `DOCS_PATH` to `docs-zh-CN`, then rebuild. The template automatically reads `docs-zh-CN/site.json`; delete or update any existing explicit `DOCS_CONFIG_PATH` first. This selects the published document language at build time.
 
 ## Local development
 

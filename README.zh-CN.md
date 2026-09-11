@@ -16,40 +16,41 @@
 ## 快速部署
 
 1. 点击 **Deploy to Cloudflare**，授权 GitHub，创建自己的模板仓库和 Worker。
-2. 确认构建命令为 `pnpm run build`、部署命令为 `pnpm run deploy`，根目录为模板目录。
-3. 打开 Worker 的 **设置（Settings）→ 构建（Builds）→ 变量和机密（Variables and secrets）**，按下表添加需要修改的变量。
-4. 保存后，在构建记录中选择 **重试构建（Retry build）**。成功后，通过 Cloudflare 提供的 `workers.dev` 地址访问站点。
+2. 确认构建命令为 `pnpm run build`、部署命令为 `pnpm run deploy`，根目录为模板目录。三个文档源字段保留示例预填值，或填写自己的公开仓库、分支和文档目录。
+3. 开始部署。成功后，通过 Cloudflare 提供的 `workers.dev` 地址访问站点。
 
-首次部署会发布本仓库的英文示例文档。要发布自己的文档，请填写 `DOCS_REPO`；复制模板不会自动修改这个值。构建变量可以随时修改，保存后重新构建即可生效。
+部署后需要修改配置时，打开 Worker 的 **设置（Settings）→ 构建（Builds）→ 变量和机密（Variables and secrets）**，添加或修改对应变量，保存后在构建记录中选择 **重试构建（Retry build）**。
+
+保留预填的文档源参数时，会发布本仓库的英文示例文档。要发布自己的文档，请填写 `DOCS_REPO`；复制模板不会自动修改这个值。构建变量可以随时修改，保存后重新构建即可生效。
 
 ## 构建变量
 
-只需添加要修改的变量，其余使用下表中的默认值。**名称和值分开填写，值不加引号**。
+首次 Cloudflare 部署表单只显示以下三个文档源字段。每项都需要有值；体验示例时直接保留预填内容，发布自己的文档时改成实际仓库、分支和目录。
 
-| 变量 | 默认值 | 用途 |
+| 变量 | 预填值 | 用途 |
 | --- | --- | --- |
 | `DOCS_REPO` | `https://github.com/Azincc/nimbus-docs-template.git` | 文档源仓库的 GitHub HTTPS 地址 |
 | `DOCS_BRANCH` | `main` | 文档分支 |
-| `DOCS_PATH` | `docs` | 相对文档源仓库根目录的文档路径 |
-| `DOCS_CONFIG_PATH` | `docs/site.json` | 站点配置文件路径；没有此文件时添加变量并将值留空 |
-| `SITE_URL` | `https://nimbus.az1n.com` | 自己的完整站点地址；暂不确定时添加变量并将值留空 |
-| `SITE_LOGO` | `default` | Logo 的 HTTP(S) 图片地址或相对文档源仓库根目录的路径 |
-| `SITE_FAVICON` | `default` | favicon 的 HTTP(S) 图片地址或相对文档源仓库根目录的路径 |
+| `DOCS_PATH` | `docs` | 相对文档源仓库根目录的文档路径；文档在根目录时填 `.` |
 
-需要留空时，添加变量并清空值输入框，不要输入 `""`。如果没有添加变量，仍会使用模板默认值。请在 **构建** 设置中填写变量，普通 **Settings → Variables & Secrets** 中的运行时变量不会自动提供给构建。
+以下可选项不会出现在首次部署表单，也不需要填写。部署后有需要时，再到 **设置 → 构建 → 变量和机密** 添加。**名称和值分开填写，值不加引号**。
 
-`SITE_URL` 用于 SEO，设置它不会绑定域名。留空时网站仍可访问，但不生成依赖正式域名的 canonical 和 sitemap。`SITE_LOGO`、`SITE_FAVICON` 默认填 `default`，沿用 JSON 中的对应图片；未配置对应图片时使用模板内置的 Nimbus 官方 Logo。填图片 URL 或仓库路径时覆盖 JSON。Cloudflare 不接受空值时，直接填 `default`；空白值仍兼容相同的回退规则。
+| 可选变量 | 不设置时的行为 | 何时添加 |
+| --- | --- | --- |
+| `DOCS_CONFIG_PATH` | 自动读取 `DOCS_PATH` 目录中的 `site.json`；没有文件时使用通用站点配置 | 配置文件放在文档源仓库的其他位置 |
+| `SITE_URL` | 不指定正式站点地址 | 已确定实际访问地址，需要完整 SEO 信息和站点地图 |
+| `SITE_LOGO` | 沿用 JSON 的 Logo；没有时使用内置 Nimbus Logo | 用 HTTP(S) 图片地址或相对文档源仓库根目录的路径覆盖 |
+| `SITE_FAVICON` | 沿用 JSON 的 favicon；没有时使用内置 Nimbus Logo | 用 HTTP(S) 图片地址或相对文档源仓库根目录的路径覆盖 |
 
-旧部署请先[更新模板](docs-zh-CN/deployment/template-update.md)，同步新版构建脚本和 `public/nimbus-logo.svg`，再将变量设为 `default`。
+没有 `site.json` 也能部署，无需新建配置文件或添加空变量。手动指定 `DOCS_CONFIG_PATH` 后，该文件必须存在且 JSON 有效。`SITE_URL` 不会绑定域名；未设置时网站仍可访问，只省略依赖正式地址的 canonical、SEO 信息和 sitemap。图片变量原有的 `default` 和空白值继续兼容上述回退规则。
+
+请在 **构建** 设置中填写变量，普通 **Settings → Variables & Secrets** 中的运行时变量不会自动提供给构建。保存后重新构建生效。
+
+旧部署需先[更新模板](docs-zh-CN/deployment/template-update.md)。已保存的构建变量会继续覆盖新默认行为：删除旧的 `DOCS_CONFIG_PATH` 才能让配置路径自动跟随 `DOCS_PATH`；其他不再需要覆盖的可选变量也可删除。
 
 ### 选择中文示例
 
-默认 `DOCS_REPO` 的 `docs/` 提供英文文档。要发布中文示例，在 **构建 → 变量和机密** 中同时设置：
-
-| 变量 | 中文示例值 |
-| --- | --- |
-| `DOCS_PATH` | `docs-zh-CN` |
-| `DOCS_CONFIG_PATH` | `docs-zh-CN/site.json` |
+默认 `DOCS_REPO` 的 `docs/` 提供英文文档。要发布中文示例，只需将 `DOCS_PATH` 改为 `docs-zh-CN`，模板会自动读取 `docs-zh-CN/site.json`。如果旧部署中已有显式 `DOCS_CONFIG_PATH`，请删除这一变量，或将它改成 `docs-zh-CN/site.json`。
 
 文档仓库和 `main` 分支保持默认，保存后重新构建即可。路径从 `DOCS_REPO` 的根目录算起；使用自己的文档源时，填写实际目录。切换文档语言不会改变模板代码的来源。
 

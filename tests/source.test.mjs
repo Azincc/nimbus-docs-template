@@ -18,11 +18,28 @@ test('build variables override public defaults and the token comes only from the
   const settings = readSourceSettings({ DOCS_BRANCH: 'docs/update', DOCS_CONFIG_PATH: '', SITE_URL: 'https://docs.example.com/', DOCS_TOKEN: 'test-build-secret' }, defaults);
   assert.deepEqual(settings, {
     repo: 'https://github.com/Azincc/nimbus-docs-template.git',
-    branch: 'docs/update', docsPath: 'docs', configPath: undefined,
+    branch: 'docs/update', docsPath: 'docs', configPath: undefined, configPathOptional: false,
     siteUrl: 'https://docs.example.com', siteLogo: 'default', siteFavicon: 'default', token: 'test-build-secret',
   });
   assert.equal(readSourceSettings({}, defaults).token, undefined);
   assert.throws(() => readSourceSettings({}, { ...defaults, DOCS_TOKEN: 'must-not-be-public' }), /Workers Builds secret/);
+});
+
+test('automatic site configuration follows the document directory unless a path is explicitly configured', () => {
+  const sourceDefaults = { DOCS_REPO: defaults.DOCS_REPO };
+  for (const [docsPath, configPath] of [['docs', 'docs/site.json'], ['docs-zh-CN', 'docs-zh-CN/site.json'], ['.', 'site.json']]) {
+    const settings = readSourceSettings({ DOCS_PATH: docsPath }, sourceDefaults);
+    assert.equal(settings.configPath, configPath);
+    assert.equal(settings.configPathOptional, true);
+    assert.equal(settings.siteUrl, undefined);
+    assert.equal(settings.siteLogo, undefined);
+    assert.equal(settings.siteFavicon, undefined);
+  }
+  const existing = readSourceSettings({ DOCS_PATH: 'knowledge' }, defaults);
+  assert.equal(existing.configPath, 'docs/site.json');
+  assert.equal(existing.configPathOptional, false);
+  const explicit = readSourceSettings({ DOCS_CONFIG_PATH: 'docs/site.json' }, sourceDefaults);
+  assert.equal(explicit.configPathOptional, false);
 });
 
 test('branding build variables override public defaults and blank values defer to site JSON', () => {

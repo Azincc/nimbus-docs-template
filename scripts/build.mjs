@@ -52,7 +52,7 @@ try {
   await writeFile('public/_build.json', JSON.stringify(provenance, null, 2));
   await checkout.cleanup(); checkout = undefined;
   await cleanGenerated(stage); stage = undefined;
-  console.log(`[prepare] ${provenance.pages} published pages. ${site.publicSite ? 'SEO origin configured.' : 'SITE_URL is empty: canonical URLs and sitemap are omitted.'}`);
+  console.log(`[prepare] ${provenance.pages} published pages. ${site.publicSite ? 'SEO origin configured.' : 'SITE_URL is not configured: canonical URLs and sitemap are omitted.'}`);
   const exitCode = await new Promise((resolve, reject) => {
     const child = spawn(process.execPath, ['node_modules/astro/bin/astro.mjs', dev ? 'dev' : 'build', ...astroArgs], { stdio: 'inherit', env: buildEnvironment() });
     child.once('error', reject);

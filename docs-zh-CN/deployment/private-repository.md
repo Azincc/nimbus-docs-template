@@ -22,13 +22,13 @@ sidebar:
 | Deploy command | `pnpm run deploy` |
 | Root directory | 仓库根目录 |
 
-如果创建界面没有 **Build variables and secrets** 入口，可以先用默认的公开示例创建 Worker，再按下文补充私有文档源变量和 Secret。已经填写私有仓库但首次拉取失败时，也可以在 Worker 创建后补齐配置并重试。
+首次模板表单只有 `DOCS_REPO`、`DOCS_BRANCH`、`DOCS_PATH` 三个文档源字段。这一步先保留预填的公开示例值创建 Worker，再按下文补充私有文档源变量和 Secret。已经填写私有仓库但首次拉取失败时，也可以在 Worker 创建后补齐配置并重试。
 
 Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于文档拉取脚本所需的私有仓库凭据。文档拉取脚本通过 `DOCS_TOKEN` 使用 GitHub Personal Access Token（PAT）执行 Git fetch。
 
 ## 2. 准备私有仓库中的文档
 
-下文以私有仓库中的 `docs/` 目录为例，目录名不限制文档语言。如果将本模板的中文示例按原目录复制到私有仓库，使用的目录就是 `docs-zh-CN/`，构建变量 `DOCS_PATH`、`DOCS_CONFIG_PATH` 应分别设为 `docs-zh-CN`、`docs-zh-CN/site.json`。
+下文以私有仓库中的 `docs/` 目录为例，目录名不限制文档语言。如果将本模板的中文示例按原目录复制到私有仓库，将 `DOCS_PATH` 设为 `docs-zh-CN`，模板就会自动读取 `docs-zh-CN/site.json`。旧部署若已有显式 `DOCS_CONFIG_PATH`，需删除它或改成对应路径。
 
 在目标私有仓库的文档分支中创建 `docs/README.md`，写好标题和正文后提交。这个文件会成为站点首页。添加更多页面和图片的方法见[编写文档](../writing-docs.md)。
 
@@ -40,7 +40,7 @@ Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于�
 }
 ```
 
-其他字段按需添加，详见[站点配置](../site-config.md)。没有配置文件时，稍后需将 `DOCS_CONFIG_PATH` 显式设为空字符串。省略这个变量会继承模板默认的 `docs/site.json` 路径。
+其他字段按需添加，详见[站点配置](../site-config.md)。模板自动读取 `DOCS_PATH` 目录中的 `site.json`；没有文件时使用通用站点配置，无需添加 `DOCS_CONFIG_PATH` 或填写空值。
 
 从私有仓库的 **Code → HTTPS** 复制 HTTPS 克隆地址，地址中不要添加 Token。同时记下文档所在分支，以及文档目录、配置文件相对于仓库根目录的路径。
 
@@ -59,26 +59,28 @@ Cloudflare GitHub App 的授权用于连接和构建模板仓库，不等同于�
 
 ## 4. 配置构建变量和 Secret
 
-打开目标 Worker 的 **Settings → Builds → Build variables and secrets**，按下表配置。文档源与站点参数使用普通变量，其中 Logo 和 favicon 可选；`DOCS_TOKEN` 单独选择 **Secret** 类型。
+打开目标 Worker 的 **Settings → Builds → Build variables and secrets**，按下表配置。文档源与站点参数使用普通变量；`DOCS_TOKEN` 单独选择 **Secret** 类型。四个可选站点变量不会出现在首次部署表单，有需要时再在这里添加。
 
 | 名称 | 类型 | 填写内容 |
 | --- | --- | --- |
 | `DOCS_REPO` | Variable | 目标私有 GitHub 仓库的 HTTPS 克隆地址，不含用户名、密码或 Token |
 | `DOCS_BRANCH` | Variable | 私有文档所在分支；若使用 `main`，可继承默认值 `main` |
 | `DOCS_PATH` | Variable | 相对私有仓库根目录的文档目录；上述结构为 `docs`，也是默认值 |
-| `DOCS_CONFIG_PATH` | Variable | 有配置文件时填 `docs/site.json` 或实际路径；没有 JSON 文件时显式置空 |
-| `SITE_URL` | Variable | 默认 `https://nimbus.az1n.com`；可覆盖为自己站点包含 `https://` 的实际地址，也可显式置空 |
-| `SITE_LOGO` | Variable，可选 | Logo 的 HTTP(S) 图片 URL 或相对私有文档源仓库根目录的路径，例如 `docs/assets/nimbus-mark.svg`；默认 `default` |
-| `SITE_FAVICON` | Variable，可选 | favicon 的 HTTP(S) 图片 URL 或相对私有文档源仓库根目录的路径，例如 `docs/assets/nimbus-mark.svg`；默认 `default` |
+| `DOCS_CONFIG_PATH` | Variable，可选 | 配置文件位于仓库其他位置时才添加；未设置时自动读取 `DOCS_PATH/site.json`，没有文件也可部署 |
+| `SITE_URL` | Variable，可选 | 确定站点地址后，填包含 `https://` 的实际地址；默认未设置 |
+| `SITE_LOGO` | Variable，可选 | Logo 的 HTTP(S) 图片 URL 或相对私有文档源仓库根目录的路径，例如 `docs/assets/nimbus-mark.svg`；未设置时沿用 JSON 图片或内置 Nimbus Logo |
+| `SITE_FAVICON` | Variable，可选 | favicon 的 HTTP(S) 图片 URL 或相对私有文档源仓库根目录的路径，例如 `docs/assets/nimbus-mark.svg`；未设置时沿用 JSON 图片或内置 Nimbus Logo |
 | `DOCS_TOKEN` | Secret | 上一步生成且已获得所需组织批准的只读 GitHub Token |
 
-未设置同名构建变量时，模板会读取 `wrangler.jsonc` 中的公开默认值。仍适用的默认值无需重复填写，但 `DOCS_REPO` 必须改为你的私有仓库地址，否则仍会读取公开示例。
+文档源变量未覆盖时，模板会读取 `wrangler.jsonc` 中的公开默认值；仍适用的默认值无需重复填写。但 `DOCS_REPO` 必须改为你的私有仓库地址，否则仍会读取公开示例。可选站点变量不设置时按上表自动处理。
 
-`SITE_LOGO` 和 `SITE_FAVICON` 填图片 URL 或仓库路径时，分别覆盖 JSON 的 `brand.logo` 和 `brand.favicon`。默认值 `default` 或空白值沿用 JSON，未配置对应字段时使用模板内置的 Nimbus 官方 Logo。Cloudflare 不接受空值时，直接填 `default`。
+手动指定 `DOCS_CONFIG_PATH` 后，该文件必须存在且 JSON 有效。旧部署需先[更新模板](./template-update.md)，再删除旧的 `DOCS_CONFIG_PATH`，才能启用自动查找。其他已保存的可选构建变量也会继续覆盖新默认行为，直到删除它们。
+
+`SITE_LOGO` 和 `SITE_FAVICON` 填图片 URL 或仓库路径时，分别覆盖 JSON 的 `brand.logo` 和 `brand.favicon`。不设置时沿用 JSON，未配置对应字段时使用模板内置的 Nimbus 官方 Logo。原有 `default` 或空白值继续兼容相同规则。
 
 这两个变量的路径都相对于 `DOCS_REPO` 仓库根目录，与站点 JSON 是否存在、存放在哪里无关。JSON 内的本地资源路径仍相对于 JSON 文件。构建可以用同一个只读 Token 读取仓库图片，无需额外添加图片凭据。
 
-`SITE_URL` 不会自动绑定域名，使用自己的正式地址前需先完成域名配置。暂时留空也能浏览站点，但不会生成依赖正式站点地址的 canonical、SEO 输出和 sitemap。
+`SITE_URL` 不会自动绑定域名，使用自定义域名前需先完成域名配置。未设置这个变量时仍能浏览站点，只省略依赖正式站点地址的 canonical、SEO 输出和 sitemap。
 
 这里的 **Build variables and secrets** 供构建进程使用。普通 **Settings → Variables & Secrets** 设置的是 Worker 运行时变量和 Secret，不会自动传给静态构建。因此，只在运行时区域填写 `DOCS_TOKEN`，文档拉取仍无法获得认证。Logo 和 favicon 的普通构建变量也需要保存后重新构建才会生效。
 
@@ -127,7 +129,7 @@ Token 到期、被撤销或需要轮换时，按第 3 步创建新的只读 Toke
 | 现象 | 检查与处理 |
 | --- | --- |
 | 私有仓库拉取失败、提示找不到仓库或无权限 | 核对 HTTPS 仓库地址、分支是否存在，以及 `DOCS_TOKEN` 是否位于当前 Worker 的构建 Secret；确认 Token 未过期、选中了目标仓库、具备 Contents 只读权限且组织已批准 |
-| 报告 `DOCS_CONFIG_PATH` 或 JSON 错误 | 路径以私有仓库根目录为基准；没有配置文件时显式置空，有文件时检查 JSON 格式和 `schemaVersion: 1` |
+| 报告 `DOCS_CONFIG_PATH` 或 JSON 错误 | 修正手动指定的路径，或删除这个变量以启用自动查找；文件存在时检查 JSON 格式和 `schemaVersion: 1` |
 | 页面或图片在构建时提示不存在 | 确认文件已提交到 `DOCS_BRANCH`，检查 `DOCS_PATH`、大小写和相对链接，参见[编写文档](../writing-docs.md) |
 | 修改了变量或 Secret，站点没有更新 | 保存后重新触发构建；检查新构建的文档 SHA，不仅查看旧的部署结果 |
 | GitHub push 后没有新构建 | 检查 Webhook 最近一次投递、Deploy Hook URL 和关联模板分支；确认修改已推送到构建读取的文档分支 |

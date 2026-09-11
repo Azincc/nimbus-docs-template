@@ -29,20 +29,18 @@ This home page has no frontmatter. The template extracts its page title from the
 | `DOCS_REPO` | `https://github.com/Azincc/nimbus-docs-template.git` |
 | `DOCS_BRANCH` | `main` |
 | `DOCS_PATH` | `docs` |
-| `DOCS_CONFIG_PATH` | `docs/site.json` |
-| `SITE_URL` | `https://nimbus.az1n.com` |
-| `SITE_LOGO` | `default`; site JSON image, then built-in Nimbus logo |
-| `SITE_FAVICON` | `default`; site JSON image, then built-in Nimbus logo |
 
-These are template defaults, so you only need to add build variables for values you want to override. You can explicitly clear `SITE_URL`; when deploying your own site, set it to your public URL. Setting this variable does not bind a domain.
+These are the only three fields in the initial Cloudflare deployment form. Keep the prefilled values for this example, or enter your own source. The template automatically reads `site.json` in the selected `DOCS_PATH`; if the file does not exist, it uses generic site settings. No empty variable is needed.
 
-The optional `SITE_LOGO` and `SITE_FAVICON` variables accept HTTP(S) image URLs or paths relative to the document repository root, such as `docs/assets/nimbus-mark.svg`. Build environment variables take precedence over defaults in `wrangler.jsonc`. The value `default` uses the corresponding JSON branding field, or the built-in official Nimbus logo (`/nimbus-logo.svg`) if that field is absent. Use `default` when Cloudflare requires a nonempty value. Empty values follow the same fallback; explicit image URLs and repository paths override JSON. Variable paths do not depend on the site JSON location, while paths in JSON remain relative to that file. Set ordinary variables under Cloudflare **Settings → Builds → Build variables and secrets**, then rebuild. Runtime variables do not automatically reach static builds. See [Branding](./site-config.md#branding).
+Optional settings do not appear in the initial form. Add `DOCS_CONFIG_PATH` later only if the JSON is stored elsewhere. Add `SITE_URL` after confirming your public address; it does not bind a domain. Without `SITE_URL`, the website remains accessible but omits origin-dependent canonical URLs, SEO metadata, and the sitemap.
 
-Before using `default` in an older deployment, update its build scripts and `public/nimbus-logo.svg`. Changing build variables alone does not update the template.
+The optional `SITE_LOGO` and `SITE_FAVICON` variables accept HTTP(S) image URLs or paths relative to the document repository root, such as `docs/assets/nimbus-mark.svg`. When unset, they use the corresponding JSON branding field, or the built-in official Nimbus logo (`/nimbus-logo.svg`) if that field is absent. Existing `default` and empty values follow the same fallback; explicit image URLs and repository paths override JSON. Variable paths do not depend on the site JSON location, while paths in JSON remain relative to that file. Add ordinary variables under Cloudflare **Settings → Builds → Build variables and secrets**, then rebuild. Runtime variables do not automatically reach static builds. See [Branding](./site-config.md#branding).
+
+Older deployments must [update the template](./deployment/template-update.md) to get these defaults. Saved build variables still override them; delete old optional values when you want the new default behavior.
 
 ## Document language
 
-English documentation is published from `docs/` by default. The complete Chinese documentation is kept separately in [`docs-zh-CN/`](https://github.com/Azincc/nimbus-docs-template/tree/main/docs-zh-CN). To publish it instead, set `DOCS_PATH=docs-zh-CN` and `DOCS_CONFIG_PATH=docs-zh-CN/site.json`, then rebuild. These are separate document sources selected at build time; the template does not add a runtime language switcher.
+English documentation is published from `docs/` by default. The complete Chinese documentation is kept separately in [`docs-zh-CN/`](https://github.com/Azincc/nimbus-docs-template/tree/main/docs-zh-CN). To publish it instead, set `DOCS_PATH=docs-zh-CN`, then rebuild; `docs-zh-CN/site.json` is discovered automatically. Delete or update any existing explicit `DOCS_CONFIG_PATH` first. These are separate document sources selected at build time; the template does not add a runtime language switcher.
 
 ## Content version
 

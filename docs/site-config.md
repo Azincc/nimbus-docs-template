@@ -12,7 +12,9 @@ At build time, the template reads JSON configuration from the document source re
 
 ## This example's configuration
 
-This repository stores its configuration in `docs/site.json` and sets `DOCS_CONFIG_PATH` to `docs/site.json`. The path is relative to the repository root and is resolved independently of `DOCS_PATH`.
+This repository stores its configuration in `docs/site.json`. When `DOCS_CONFIG_PATH` is unset, the template automatically looks for `site.json` inside `DOCS_PATH`; with the default `DOCS_PATH=docs`, it reads this file. If no file exists, it uses generic site settings. The initial deployment form does not ask for `DOCS_CONFIG_PATH`.
+
+For a configuration file stored elsewhere, add `DOCS_CONFIG_PATH` as a build variable after deployment. Explicit paths are relative to the source repository root, independently of `DOCS_PATH`, and must point to an existing file.
 
 ```json
 {
@@ -25,6 +27,7 @@ This repository stores its configuration in `docs/site.json` and sets `DOCS_CONF
   "navigation": [
     { "label": "Home", "link": "/" },
     { "label": "Quick start", "link": "/getting-started" },
+    { "label": "中文", "link": "https://nimbus-zh-cn.az1n.com/" },
     { "label": "GitHub", "link": "https://github.com/Azincc/nimbus-docs-template.git" }
   ],
   "theme": {
@@ -38,7 +41,7 @@ This repository stores its configuration in `docs/site.json` and sets `DOCS_CONF
 }
 ```
 
-`schemaVersion` must be `1`; other fields are optional. An explicitly empty `DOCS_CONFIG_PATH` uses generic site settings, while the repository default reads `docs/site.json`. Unknown fields and invalid values fail the build so configuration mistakes are visible.
+`schemaVersion` must be `1`; other fields are optional. Unknown fields, invalid JSON, and invalid values fail the build, including in an automatically discovered file. An explicitly empty `DOCS_CONFIG_PATH` still disables JSON for compatibility, but a repository without `site.json` needs no variable or empty value.
 
 ## Configuration fields
 
@@ -54,7 +57,7 @@ This repository stores its configuration in `docs/site.json` and sets `DOCS_CONF
 | `theme` | Object | Default appearance and accent color |
 | `brand` | Object | Logo, favicon, and default social image |
 
-`locale` identifies the page language; it does not translate content or UI labels and does not create multilingual routes. English documents live in `docs/`. To publish the separate [Chinese documents](https://github.com/Azincc/nimbus-docs-template/tree/main/docs-zh-CN), set `DOCS_PATH=docs-zh-CN` and `DOCS_CONFIG_PATH=docs-zh-CN/site.json`, then rebuild.
+`locale` identifies the page language; it does not translate content or UI labels and does not create multilingual routes. English documents live in `docs/`. To publish the separate [Chinese documents](https://github.com/Azincc/nimbus-docs-template/tree/main/docs-zh-CN), set `DOCS_PATH=docs-zh-CN`, then rebuild. The configuration follows automatically. If an older deployment explicitly sets `DOCS_CONFIG_PATH`, delete it or update it to `docs-zh-CN/site.json` first.
 
 ## Navigation and sidebar
 
@@ -85,18 +88,18 @@ Merge this field example into the complete site JSON.
 
 ### Set the logo and favicon with build variables
 
-In Cloudflare, open **Worker → Settings → Builds → Build variables and secrets**, add ordinary variables, save, and rebuild:
+These optional variables do not appear in the initial deployment form. To customize branding later, open **Worker → Settings → Builds → Build variables and secrets**, add ordinary variables, save, and rebuild:
 
-| Build variable | Default | JSON field overridden | Accepted value |
+| Build variable | When unset | JSON field overridden | Accepted value |
 | --- | --- | --- | --- |
-| `SITE_LOGO` | `default` | `brand.logo` | `default`, an HTTP(S) image URL, or a file path relative to the document repository root |
-| `SITE_FAVICON` | `default` | `brand.favicon` | `default`, an HTTP(S) image URL, or a file path relative to the document repository root |
+| `SITE_LOGO` | JSON logo, then built-in Nimbus logo | `brand.logo` | An HTTP(S) image URL or a file path relative to the document repository root |
+| `SITE_FAVICON` | JSON favicon, then built-in Nimbus logo | `brand.favicon` | An HTTP(S) image URL or a file path relative to the document repository root |
 
-Both variables default to `default`. The build reads an environment variable first, falling back to `wrangler.jsonc` if it is absent. The value `default` uses the corresponding `brand.logo` or `brand.favicon` from site JSON; if that field is absent, it uses the built-in official Nimbus logo at `/nimbus-logo.svg`. An explicit HTTP(S) image URL or repository path overrides JSON. The two variables work independently.
+Both variables are unset by default. They use the corresponding `brand.logo` or `brand.favicon` from site JSON; if that field is absent, they use the built-in official Nimbus logo at `/nimbus-logo.svg`. An explicit HTTP(S) image URL or repository path overrides JSON. The two variables work independently.
 
-Enter `default` when Cloudflare requires a nonempty field. Empty or whitespace-only values use the same JSON-to-built-in fallback for compatibility, even if Wrangler has a custom image default. Deleting the build variable instead restores the Wrangler default.
+To restore this fallback, delete the corresponding build variable. Existing `default`, empty, and whitespace-only values keep the same behavior for compatibility, even if Wrangler has a custom image default. Deleting a build variable restores a custom Wrangler default if one remains in an older or customized copy.
 
-Before using `default` in an older deployment, update its build scripts and `public/nimbus-logo.svg`. Changing build variables alone does not update the template.
+For an older deployment, [update the template](./deployment/template-update.md) to get these defaults. Saved build variables continue to override them; delete old optional values to use the new automatic behavior.
 
 For example, set both values to `docs/assets/nimbus-mark.svg` to use that file in `DOCS_REPO`. You can also use image URLs such as `https://example.com/brand/logo.svg` or `http://example.com/brand/favicon.png`. Local variable paths always start at the **document repository root**, independently of `DOCS_PATH` and `DOCS_CONFIG_PATH`, and work even without a site JSON file.
 
@@ -117,7 +120,7 @@ Local assets must exist and their resolved paths must stay inside the source rep
 
 ## Site URL
 
-`SITE_URL` is an editable build variable, not a site JSON field. Its default is `https://nimbus.az1n.com`. Omitting the environment variable inherits the repository default; you can also explicitly set an empty string. An empty value keeps the site accessible locally or at its Cloudflare address, but omits canonical URLs, SEO metadata requiring an absolute site origin, and the sitemap.
+`SITE_URL` is an optional build variable, not a site JSON field, and is unset by default. It does not appear in the initial deployment form. Without it, the site remains accessible locally or at its Cloudflare address, but omits canonical URLs, SEO metadata requiring an absolute site origin, and the sitemap. Existing explicit empty values retain this behavior.
 
 When deploying your own site or changing its domain, enter the actual public URL including `https://` as a build variable and rebuild. `SITE_URL` does not bind a custom domain; configure that domain in Cloudflare first. Changing this variable later does not require changing the build command, deploy command, or root directory selected during setup.
 
