@@ -18,9 +18,17 @@ Deploy and change settings in the Cloudflare dashboard without installing develo
 2. Confirm the build command is `pnpm run build`, the deploy command is `pnpm run deploy`, and the root directory is the repository root. Keep the three prefilled source values for the example, or enter your public repository, branch, and document directory.
 3. Start the deployment. After it succeeds, open the `workers.dev` address provided by Cloudflare.
 
+![Cloudflare initial deployment form with DOCS_REPO, DOCS_BRANCH, and DOCS_PATH fields](./assets/cloudflare-initial-deploy.png)
+
+Keep the prefilled values to deploy the public example, or enter your own document source. The screenshot uses the Chinese dashboard; variable names are the same in every language.
+
 To change the document source, site URL, logo, or favicon later, open the Worker's **Settings → Builds → Variables and secrets**, add or edit the relevant variables, save, and select **Retry build** in the build history.
 
 The first deployment may show the example documents. A message saying no build variables or secrets are configured means you have not added them in the dashboard; the template still uses its defaults. Copying the template does not automatically change the document source to your repository.
+
+![Cloudflare Settings showing the build variables list and the Add button](./assets/cloudflare-build-variables.png)
+
+This screenshot shows an existing site's configuration; the list is not generated automatically. Click **Add** for a missing variable, or edit an existing value. Add only the variables you want to change; you do not need to copy every row or set the optional `DOCS_CONFIG_PATH` and `SITE_URL` values shown here.
 
 ## Build variables
 

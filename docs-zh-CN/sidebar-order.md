@@ -6,9 +6,9 @@ sidebar:
   order: 25
 ---
 
-左侧菜单按 Markdown 文件开头的 `sidebar.order` 排序，数字越小越靠前。排序只比较同一层级的项目，因此分类的位置和分类内页面的位置需要分别设置。
+左侧菜单按 Markdown 文件开头的 `sidebar.order` 排序，数字越小越靠前。只有同一层级的项目会互相比较，分类的位置和分类内页面的顺序需要分别设置。
 
-在 `DOCS_REPO` 指定的文档源仓库中修改这些文件。本示例的文档目录为 `docs-zh-CN/`，`src/content/docs/` 是生成目录，不在其中维护排序。
+请在 `DOCS_REPO` 指定的文档源仓库中修改文件。本示例的文档目录是 `docs-zh-CN/`。`src/content/docs/` 是生成目录，不要在其中修改排序。
 
 ## 设置页面顺序
 
@@ -59,11 +59,11 @@ sidebar:
 ---
 ```
 
-`sidebar.order: 40` 决定整个分类的位置，`sidebar.group.label` 设置分类名称。设置 `hideIndex: true` 后，侧栏会保留分类的子页面列表，但不显示入口页面的概览链接。入口页面仍可通过链接访问。
+`sidebar.order: 40` 决定整个分类的位置，`sidebar.group.label` 设置分类名称。设置 `hideIndex: true` 后，侧栏会保留分类的子页面列表，隐藏入口页面的概览链接。入口页面仍可通过链接访问。
 
 `order` 写在 `sidebar` 下，与 `group` 同级，不写成 `sidebar.group.order`。入口文件中还可以写分类介绍及子页面链接，参考现有的 [部署指南](./deployment.md)。
 
-当前模板不能直接使用目录内的 `README.md` 或 `index.md` 配置分类。要控制整个分类的位置，应使用 `deployment.md`。如果已有 `deployment/README.md` 或 `deployment/index.md`，先把概览内容迁移到 `deployment.md` 并更新引用，避免两个文件占用同一个 `/deployment` 路由。
+当前模板不能直接使用目录内的 `README.md` 或 `index.md` 配置分类。要调整整个分类的位置，应使用 `deployment.md`。如果已有 `deployment/README.md` 或 `deployment/index.md`，先把概览内容移到 `deployment.md`，再更新引用，避免两个文件占用同一个 `/deployment` 路由。
 
 ## 设置分类内部的顺序
 
@@ -107,14 +107,16 @@ sidebar:
 - 分类未显式设置顺序时，取子项中最小的 `order`；子项也都未设置时，该分类排在已设置顺序的同级项目之后。
 - 同级项目的 `order` 相同时，按侧栏显示名称排序。需要固定先后关系时，使用不同的数字。
 
-给分类入口显式设置 `order`，可以避免新增或调整子页面时影响整个分类的位置。
+在分类入口文件中设置 `order` 后，新增或调整子页面就不会改变整个分类的位置。
 
 ## 让修改生效
 
 保存文档后，提交并推送到 `DOCS_REPO` 的 `DOCS_BRANCH` 分支，再触发站点构建。构建与部署成功后刷新页面，查看侧栏顺序。
 
-文档与模板使用同一仓库、同一构建分支且已启用自动构建时，推送会触发更新。独立文档源可通过[构建挂钩](./deployment/deploy-hook.md)自动触发；本地的 `pnpm dev` 和 `pnpm build` 也会读取远程文档，需要先推送修改。
+如果文档与模板使用同一仓库、同一构建分支，并且已启用自动构建，推送就会触发更新。独立文档源可通过[构建挂钩](./deployment/deploy-hook.md)自动触发构建。
 
-如果顺序没有变化，检查是否改在实际使用的文档源中、是否已推送到对应分支，以及新构建是否成功。若只有分类内顺序发生变化，再检查修改的是子页面还是同级的分类入口文件。
+本地的 `pnpm dev` 和 `pnpm build` 也会读取远程文档，因此运行前需要先推送修改。
+
+如果顺序没有变化，先确认修改的是站点实际使用的文档源，再检查是否已推送到对应分支、新构建是否成功。若只有分类内的顺序变化了，检查修改的是子页面还是与目录同级的分类入口文件。
 
 顶部导航由站点 JSON 的 `navigation` 数组顺序控制，与 `sidebar.order` 分开，详见[站点配置](./site-config.md#导航与侧栏)。

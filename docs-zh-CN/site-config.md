@@ -10,9 +10,11 @@ sidebar:
 
 ## 本站示例
 
-本中文示例的配置保存在文档源仓库的 `docs-zh-CN/site.json`。使用中文示例时，只需将 `DOCS_PATH` 设为 `docs-zh-CN`；未设置 `DOCS_CONFIG_PATH` 时，模板自动寻找该目录中的 `site.json`，没有文件则使用通用站点配置。首次部署表单无需填写配置文件路径。
+本中文示例的配置保存在文档源仓库的 `docs-zh-CN/site.json`。使用中文示例时，只需将 `DOCS_PATH` 设为 `docs-zh-CN`。
 
-配置文件放在其他位置时，部署后再添加构建变量 `DOCS_CONFIG_PATH`，填相对文档源仓库根目录的路径。显式路径不依赖 `DOCS_PATH`，对应文件必须存在。若旧部署已经设置了这个变量，切换中文时需删除它，或将它改为 `docs-zh-CN/site.json`。
+未设置 `DOCS_CONFIG_PATH` 时，模板会自动查找该目录中的 `site.json`，没有文件则使用通用站点配置。首次部署表单无需填写配置文件路径。
+
+如果配置文件放在其他位置，部署后添加构建变量 `DOCS_CONFIG_PATH`，填入相对文档源仓库根目录的路径。手动指定的路径不依赖 `DOCS_PATH`，对应文件必须存在。若旧部署已经设置了这个变量，切换中文时需删除它，或将它改为 `docs-zh-CN/site.json`。
 
 ```json
 {
@@ -39,9 +41,9 @@ sidebar:
 }
 ```
 
-`schemaVersion` 必须为 `1`，其他字段按需提供。显式空白的 `DOCS_CONFIG_PATH` 继续兼容禁用 JSON 的行为，但文档源没有 `site.json` 时，无需添加变量或填写空值。
+`schemaVersion` 必须为 `1`，其他字段按需填写。将 `DOCS_CONFIG_PATH` 显式设为空白仍可禁用 JSON 配置。文档源没有 `site.json` 时，无需添加变量或填写空值。
 
-未知字段、无效 JSON 或不合法的值会导致构建失败，自动发现的配置文件也遵循此规则，便于及时发现拼写错误。
+配置中有未知字段、JSON 语法错误或无效值时，构建会失败。自动找到的配置文件也会接受同样的校验，便于及时发现拼写错误。
 
 ## 配置字段
 
@@ -93,17 +95,21 @@ sidebar:
 | `SITE_LOGO` | 沿用 JSON Logo，没有时使用内置 Nimbus Logo | `brand.logo` | HTTP(S) 图片 URL，或相对文档源仓库根目录的文件路径 |
 | `SITE_FAVICON` | 沿用 JSON favicon，没有时使用内置 Nimbus Logo | `brand.favicon` | HTTP(S) 图片 URL，或相对文档源仓库根目录的文件路径 |
 
-这两个变量默认未设置，先沿用 JSON 的 `brand.logo` 或 `brand.favicon`，未使用站点 JSON 或未配置对应字段时，使用模板内置的 Nimbus 官方 Logo `/nimbus-logo.svg`。填图片 URL 或仓库路径时，覆盖 JSON 中的对应字段。Logo 和 favicon 分别设置，互不影响。
+这两个变量默认未设置，站点会沿用 JSON 的 `brand.logo` 或 `brand.favicon`。如果未使用站点 JSON，或 JSON 中没有对应字段，就使用模板内置的 Nimbus 官方 Logo `/nimbus-logo.svg`。
 
-需要恢复上述回退规则时，删除对应构建变量即可。原有 `default` 和空白值继续兼容相同规则，即使 Wrangler 中有自定义图片默认值也会沿用 JSON 或内置图片。旧版或自定义副本仍保留 Wrangler 图片默认值时，删除构建变量会恢复该默认值。
+填写图片 URL 或仓库路径会覆盖 JSON 中的对应字段。Logo 和 favicon 分别设置，互不影响。
 
-旧部署需先[更新模板](./deployment/template-update.md)才能获得新默认行为。已保存的构建变量仍然优先；要使用新的自动行为，请删除对应旧变量。
+要恢复上述规则，删除对应构建变量即可。原有的 `default` 和空白值仍按这一规则处理：即使 Wrangler 中有自定义图片默认值，也会沿用 JSON 或内置图片。
+
+如果旧版模板或自定义副本仍保留 Wrangler 图片默认值，删除构建变量后会恢复该默认值。
+
+旧部署需先[更新模板](./deployment/template-update.md)，才能使用新的默认规则。已保存的构建变量仍然优先；如果希望模板自动选择配置，请删除对应旧变量。
 
 例如，两项都填 `docs-zh-CN/assets/nimbus-mark.svg`，就会使用 `DOCS_REPO` 仓库根目录下的该文件。也可以填 `https://example.com/brand/logo.svg` 或 `http://example.com/brand/favicon.png` 等图片 URL。
 
 变量中的本地路径始终以**文档源仓库根目录**为基准，不依赖 `DOCS_PATH` 或 `DOCS_CONFIG_PATH`，没有站点 JSON 时也可以使用。
 
-以上设置需要使用构建变量。普通 **Settings → Variables & Secrets** 中的运行时变量不会自动提供给静态构建。修改构建变量后，需要重新构建，页面才会更新。
+以上设置需要使用构建变量。普通 **Settings → Variables & Secrets** 中的运行时变量不会自动提供给静态构建。保存构建变量后，重新构建才会更新页面。
 
 ### 在 JSON 中维护品牌配置
 
@@ -114,7 +120,7 @@ sidebar:
 | `brand.favicon` | 浏览器图标 |
 | `brand.socialImage` | 默认分享图片 |
 
-JSON 中的图片可以使用完整 HTTPS URL，也可以使用相对站点 JSON 文件的本地路径。本示例中的 `./assets/nimbus-mark.svg` 相对 `docs-zh-CN/site.json`，指向 `docs-zh-CN/assets/nimbus-mark.svg`，与[首页](./README.md)使用的是同一张图片。
+JSON 中的图片可以使用完整 HTTPS URL，也可以使用相对站点 JSON 文件的本地路径。本示例中的 `./assets/nimbus-mark.svg` 以 `docs-zh-CN/site.json` 为基准，指向 `docs-zh-CN/assets/nimbus-mark.svg`，与[首页](./README.md)使用的是同一张图片。
 
 这里以 JSON 文件为基准，`SITE_LOGO`、`SITE_FAVICON` 则以仓库根目录为基准。
 
@@ -124,9 +130,11 @@ JSON 中的图片可以使用完整 HTTPS URL，也可以使用相对站点 JSON
 
 `SITE_URL` 是可选构建变量，不属于站点 JSON，默认未设置，不出现在首次部署表单中。
 
-未设置时，仍可通过本地地址或 Cloudflare 提供的地址浏览站点，但构建不输出 canonical、依赖绝对站点地址的 SEO 元数据和 sitemap。原有显式空值继续保持这一行为。
+未设置时，仍可通过本地地址或 Cloudflare 提供的地址浏览站点。构建不会输出 canonical、依赖绝对站点地址的 SEO 元数据和 sitemap。原有的显式空值也保持这一行为。
 
-部署自己的站点或变更域名时，在构建变量中填写包含 `https://` 的实际公开地址，然后重新构建。填写 `SITE_URL` 不会自动绑定自定义域名，需先在 Cloudflare 完成域名配置。后续调整这个变量时，无需更改部署阶段确定的构建命令、部署命令或根目录。
+部署自己的站点或变更域名时，在构建变量中填写包含 `https://` 的实际公开地址，然后重新构建。填写 `SITE_URL` 不会自动绑定自定义域名，需先在 Cloudflare 完成域名配置。
+
+以后修改这个变量时，无需更改部署时确定的构建命令、部署命令或根目录。
 
 ## 更新与凭据
 
