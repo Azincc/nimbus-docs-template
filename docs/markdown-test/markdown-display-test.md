@@ -8,8 +8,6 @@ sidebar:
 
 This page is a browsable Markdown style sample. Use it to inspect headings, text, lists, tables, code, and images. 🔎
 
-[中文文档](https://github.com/Azincc/nimbus-docs-template/blob/main/docs-zh-CN/markdown测试/markdown显示测试.md)
-
 ## Heading levels
 
 The page title above is already an H1, so the body starts with H2 headings.

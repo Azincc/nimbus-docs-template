@@ -95,5 +95,3 @@ When the documentation repository no longer needs to trigger builds, disable or 
 
 - [Cloudflare Workers Builds Deploy Hooks](https://developers.cloudflare.com/workers/ci-cd/builds/deploy-hooks/)
 - [Creating GitHub webhooks](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks)
-
-Return to [Getting started](../getting-started.md) or the [home page](../README.md).

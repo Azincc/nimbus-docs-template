@@ -134,5 +134,3 @@ When changing private repositories, also update `DOCS_REPO` and ensure that the 
 
 - [Cloudflare Workers Builds configuration](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)
 - [Managing GitHub personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
-
-Return to [Getting started](../getting-started.md) or the [home page](../README.md).

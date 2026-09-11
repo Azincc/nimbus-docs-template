@@ -8,8 +8,6 @@ sidebar:
 
 Maintain `.md` files in the document source repository's `docs/` directory. The template discovers pages automatically, leaves the originals unchanged, and writes build content only to temporary and generated directories.
 
-[中文文档](https://github.com/Azincc/nimbus-docs-template/blob/main/docs-zh-CN/writing-docs.md)
-
 ## Organize pages
 
 This example has the following structure:
@@ -119,5 +117,3 @@ Commit and push document changes, then trigger a site build. The build regenerat
 A separate document source can use a [Deploy hook](./deployment/deploy-hook.md) to rebuild automatically after a push.
 
 The current document input handles `.md` files and ignores `.mdx`. It does not execute JavaScript or MDX components from the document source. To change template code, edit the template project itself and consult the [repository maintenance instructions](https://github.com/Azincc/nimbus-docs-template/blob/main/AGENT.md).
-
-Continue to [Site configuration](./site-config.md), or [return home](./README.md).

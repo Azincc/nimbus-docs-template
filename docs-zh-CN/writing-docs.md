@@ -117,5 +117,3 @@ sidebar:
 独立文档源可以通过[构建挂钩](./deployment/deploy-hook.md)在 push 后自动重建，省去每次手动触发的步骤。
 
 当前文档输入仅处理 `.md`，忽略 `.mdx`；文档源不执行 JavaScript 或 MDX 组件。需要调整模板代码时，直接修改模板项目，并参考[仓库维护说明](https://github.com/Azincc/nimbus-docs-template/blob/main/AGENT.md)。
-
-继续阅读[站点配置](./site-config.md)，或[返回首页](./README.md)。

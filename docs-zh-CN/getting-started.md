@@ -88,5 +88,3 @@ pnpm preview:cf
 确认构建产物后，可以运行 `pnpm run deploy` 发布到 Cloudflare，发布需要 Cloudflare 部署授权。部署命令只接受成功构建且未被修改的产物。修改站点后，要先重新执行 `pnpm build`。
 
 开发模板时，使用 `pnpm test` 运行核心测试，构建后使用 `pnpm check` 检查 Astro 与 TypeScript（`pnpm typecheck` 为同义命令）。`pnpm e2e:dev --port 8787` 用于启动已构建产物，供浏览器测试访问。
-
-继续阅读[编写文档](./writing-docs.md)，或[返回首页](./README.md)。

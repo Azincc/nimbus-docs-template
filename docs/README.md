@@ -4,8 +4,6 @@
 
 Publish Markdown from a GitHub repository as a documentation site with navigation, search, and theme switching. This site's content comes from the `docs/` directory in [nimbus-docs-template](https://github.com/Azincc/nimbus-docs-template.git) itself, providing a working example of the template.
 
-[中文文档](https://github.com/Azincc/nimbus-docs-template/tree/main/docs-zh-CN)
-
 ## Start here
 
 - [Quick start](./getting-started.md): deploy on Cloudflare and configure build variables.

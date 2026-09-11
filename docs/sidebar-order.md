@@ -10,8 +10,6 @@ The left sidebar uses `sidebar.order` in each Markdown file's frontmatter. Small
 
 Edit these files in the document source selected by `DOCS_REPO`. This example uses `docs/`; `src/content/docs/` is generated, so do not maintain ordering there.
 
-[中文文档](https://github.com/Azincc/nimbus-docs-template/blob/main/docs-zh-CN/sidebar-order.md)
-
 ## Order pages
 
 Add or edit frontmatter between the opening pair of `---` lines. For example, [Writing documentation](./writing-docs.md) uses:

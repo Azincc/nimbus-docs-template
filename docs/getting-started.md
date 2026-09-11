@@ -8,8 +8,6 @@ sidebar:
 
 Deploy and change settings in the Cloudflare dashboard without installing development tools or editing code. By default, the template reads `docs/` on the `main` branch of the [example repository](https://github.com/Azincc/nimbus-docs-template.git). You can switch to your own document repository after deployment.
 
-[中文文档](https://github.com/Azincc/nimbus-docs-template/blob/main/docs-zh-CN/getting-started.md)
-
 ## Deploy to Cloudflare
 
 <!-- deploy-button:start -->
@@ -90,5 +88,3 @@ Open [Writing documentation](./writing-docs.md) and [Site configuration](./site-
 After reviewing the output, run `pnpm run deploy` to publish it to Cloudflare. This requires Cloudflare deployment authorization. The deploy command accepts only successfully built, unchanged artifacts; run `pnpm build` again after changing the site.
 
 For template development, run core tests with `pnpm test` and check Astro and TypeScript after building with `pnpm check` (`pnpm typecheck` is an alias). Use `pnpm e2e:dev --port 8787` to serve completed build artifacts for browser tests.
-
-Continue to [Writing documentation](./writing-docs.md), or [return home](./README.md).

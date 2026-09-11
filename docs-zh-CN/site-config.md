@@ -135,5 +135,3 @@ JSON 中的图片可以使用完整 HTTPS URL，也可以使用相对站点 JSON
 页脚和 `/_build.json` 记录实际读取的文档提交 SHA。仅改变构建变量时，该 SHA 可能保持不变。
 
 公开的 [nimbus-docs-template 示例仓库](https://github.com/Azincc/nimbus-docs-template.git) 不需要 Token。私有仓库的 `DOCS_TOKEN` 仅作为 Cloudflare Build Secret 提供给 Git fetch，不能放入站点 JSON、图片 URL 或其他公开字段。
-
-返回[快速入门](./getting-started.md)或[首页](./README.md)。

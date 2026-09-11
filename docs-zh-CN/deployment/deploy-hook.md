@@ -97,5 +97,3 @@ GitHub 仓库级 `push` Webhook 也可能接收其他分支的推送，或仅修
 
 - [Cloudflare Workers Builds Deploy Hooks](https://developers.cloudflare.com/workers/ci-cd/builds/deploy-hooks/)
 - [GitHub 创建 Webhook](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks)
-
-返回[快速入门](../getting-started.md)或[首页](../README.md)。

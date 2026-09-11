@@ -8,8 +8,6 @@ sidebar:
 
 At build time, the template reads JSON configuration from the document source repository, validates it, and applies it to the site. You can also set the logo and favicon with optional build variables. The template does not load `astro.config.*` or execute JavaScript or MDX from the document source.
 
-[中文文档](https://github.com/Azincc/nimbus-docs-template/blob/main/docs-zh-CN/site-config.md)
-
 ## This example's configuration
 
 This repository stores its configuration in `docs/site.json`. When `DOCS_CONFIG_PATH` is unset, the template automatically looks for `site.json` inside `DOCS_PATH`; with the default `DOCS_PATH=docs`, it reads this file. If no file exists, it uses generic site settings. The initial deployment form does not ask for `DOCS_CONFIG_PATH`.
@@ -129,5 +127,3 @@ When deploying your own site or changing its domain, enter the actual public URL
 After changing `docs/site.json` or branding assets, commit and push to the configured document source branch, then trigger a build. If you only change `SITE_LOGO` or `SITE_FAVICON` in Cloudflare, save and rebuild. The footer and `/_build.json` record the document commit SHA; it may stay the same when only build variables change.
 
 The public [nimbus-docs-template example repository](https://github.com/Azincc/nimbus-docs-template.git) needs no token. For private repositories, provide `DOCS_TOKEN` only as a Cloudflare Build Secret for Git fetch. Never put it in site JSON, image URLs, or other public fields.
-
-Return to [Quick start](./getting-started.md) or [Home](./README.md).

@@ -138,5 +138,3 @@ Token 到期、被撤销或需要轮换时，按第 3 步创建新的只读 Toke
 
 - [Cloudflare Workers Builds 配置](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)
 - [GitHub Personal Access Token 管理说明](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
-
-返回[快速入门](../getting-started.md)或[首页](../README.md)。
